@@ -939,9 +939,14 @@ h2 {
 
 .team-copy h2 {
   margin: 30px 0 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f7f9 42%, #8f949e 100%);
+  background-clip: text;
+  color: transparent;
   font-size: 94px;
   line-height: 0.98;
   letter-spacing: -0.065em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .team-handles {
@@ -1113,33 +1118,36 @@ h2 {
   display: grid;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  border: 1px solid rgba(191, 210, 240, 0.34);
+  overflow: visible;
+  border: 0;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 31% 24%, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.09) 12%, transparent 27%),
-    radial-gradient(circle at 68% 76%, rgba(40, 95, 176, 0.18), transparent 42%),
-    linear-gradient(145deg, rgba(55, 66, 86, 0.82), rgba(8, 12, 20, 0.94) 62%, rgba(2, 4, 8, 0.98));
-  box-shadow:
-    inset 10px 10px 22px rgba(255, 255, 255, 0.08),
-    inset -14px -18px 28px rgba(0, 0, 0, 0.62),
-    0 10px 28px rgba(0, 0, 0, 0.58),
-    0 0 18px rgba(67, 121, 207, 0.08);
+  background: transparent;
   font-family: "JetBrains Mono", monospace;
   font-size: 14px;
   letter-spacing: -0.05em;
   transform: rotate(6deg) scale(var(--planet-highlight-scale));
-  transition: border-color 480ms ease, background 480ms ease, box-shadow 480ms ease, color 480ms ease, transform 480ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: color 480ms ease, transform 480ms cubic-bezier(0.22, 0.61, 0.36, 1);
   place-items: center;
 }
 
-.team-planet-surface::after {
+.orb-skin {
   position: absolute;
-  inset: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  content: "";
+  top: 50%;
+  left: 50%;
+  width: 238%;
+  max-width: none;
+  height: auto;
   pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: filter 520ms ease, opacity 520ms ease;
+}
+
+.planet-initials {
+  position: relative;
+  z-index: 2;
+  color: rgba(222, 232, 248, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
+  transition: color 480ms ease, text-shadow 480ms ease;
 }
 
 .team-planet::after {
@@ -1167,17 +1175,16 @@ h2 {
 }
 
 .team-planet.is-active .team-planet-surface {
-  border-color: rgba(170, 220, 255, 0.95);
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.98), rgba(201, 234, 255, 0.36) 11%, transparent 28%),
-    radial-gradient(circle at 65% 72%, rgba(0, 64, 255, 0.72), transparent 48%),
-    linear-gradient(145deg, #21a5ff, #0753db 56%, #001846);
-  box-shadow:
-    inset 11px 12px 22px rgba(255, 255, 255, 0.28),
-    inset -16px -18px 30px rgba(0, 12, 60, 0.58),
-    0 0 16px rgba(95, 195, 255, 0.96),
-    0 0 48px rgba(0, 112, 255, 0.72),
-    0 0 92px rgba(0, 82, 255, 0.33);
+  filter: drop-shadow(0 0 15px rgba(76, 177, 255, 0.62)) drop-shadow(0 0 38px rgba(0, 91, 255, 0.32));
+}
+
+.team-planet.is-active .orb-skin {
+  filter: brightness(1.22) saturate(1.42) contrast(1.06);
+}
+
+.team-planet.is-active .planet-initials {
+  color: white;
+  text-shadow: 0 0 12px rgba(91, 184, 255, 0.9), 0 2px 8px rgba(0, 0, 0, 0.95);
 }
 
 .team-planet.is-active::after {
@@ -1190,37 +1197,33 @@ h2 {
   top: 50%;
   left: 54%;
   z-index: 9;
-  display: flex;
+  display: grid;
   width: 276px;
   height: 276px;
-  overflow: hidden;
-  border: 1px solid rgba(192, 214, 247, 0.42);
+  overflow: visible;
+  border: 0;
   border-radius: 50%;
+  background: transparent;
+  filter: drop-shadow(0 26px 52px rgba(0, 0, 0, 0.72)) drop-shadow(0 0 38px rgba(39, 111, 224, 0.25));
+  transform: translate(-50%, -50%);
+  place-items: center;
+}
+
+.solar-core-content {
+  position: absolute;
+  z-index: 2;
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background:
-    radial-gradient(circle at 31% 22%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.16) 12%, transparent 29%),
-    radial-gradient(circle at 70% 73%, rgba(20, 78, 179, 0.34), transparent 45%),
-    linear-gradient(145deg, rgba(76, 88, 111, 0.92), rgba(12, 18, 31, 0.97) 57%, #03050a);
-  box-shadow:
-    inset 20px 22px 40px rgba(255, 255, 255, 0.13),
-    inset -34px -38px 56px rgba(0, 0, 0, 0.72),
-    0 24px 70px rgba(0, 0, 0, 0.62),
-    0 0 32px rgba(64, 135, 246, 0.32),
-    0 0 100px rgba(25, 92, 209, 0.19);
-  transform: translate(-50%, -50%);
 }
 
-.solar-core::after {
-  position: absolute;
-  inset: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  content: "";
+.solar-core .orb-skin {
+  width: 238%;
+  filter: brightness(1.04) saturate(1.08);
 }
 
-.solar-core img {
+.solar-core .solar-core-mark {
   width: 52px;
   margin-bottom: 15px;
   filter: drop-shadow(0 0 16px rgba(119, 182, 255, 0.34));
@@ -1235,37 +1238,33 @@ h2 {
 .space-body {
   position: absolute;
   z-index: -1;
-  border: 1px solid rgba(214, 226, 247, 0.18);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 34% 28%, rgba(255, 227, 214, 0.74), rgba(145, 170, 211, 0.16) 13%, transparent 28%),
-    radial-gradient(circle at 68% 70%, rgba(24, 72, 156, 0.28), transparent 48%),
-    linear-gradient(145deg, #31394a, #090d16 62%, #010205);
-  box-shadow: inset -38px -45px 70px rgba(0, 0, 0, 0.82), 0 0 52px rgba(77, 119, 194, 0.16);
-  filter: blur(0.2px);
+  max-width: none;
+  height: auto;
+  pointer-events: none;
 }
 
 .space-body-top {
-  top: -210px;
-  right: -94px;
-  width: 360px;
-  height: 360px;
+  top: -455px;
+  right: -490px;
+  width: 1180px;
+  opacity: 0.78;
+  filter: blur(8px);
 }
 
 .space-body-bottom {
-  bottom: -330px;
-  left: -320px;
-  width: 610px;
-  height: 610px;
+  bottom: -1050px;
+  left: -1900px;
+  width: 2300px;
+  opacity: 0.8;
+  filter: blur(12px);
 }
 
 .space-body-far {
-  right: 160px;
-  bottom: -138px;
-  width: 118px;
-  height: 118px;
-  opacity: 0.42;
-  filter: blur(4px);
+  right: 310px;
+  bottom: -140px;
+  width: 420px;
+  opacity: 0.34;
+  filter: blur(17px);
 }
 
 /* Comparison and cycle */
