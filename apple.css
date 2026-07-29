@@ -579,6 +579,31 @@ kbd {
   transform: translate(-50%, -50%);
 }
 
+/* Та же сфера, что несёт солнечную систему на слайде команды, — на фоне
+   первого слайда. У orb-skin.png середина прозрачная, поэтому на чёрном
+   она читается как планета со светящимся лимбом и не мешает заголовку:
+   ободок проходит снаружи строк заголовка.
+   Диаметр 838px и центр y=466 — минимальная окружность, вмещающая весь
+   текст с полем, при условии что низ (y=885) не задевает венки номинаций
+   (начинаются с y=920). */
+.hero-orb {
+  position: absolute;
+  top: 466px;
+  left: 50%;
+  z-index: 0;
+  width: 838px;
+  height: 838px;
+  opacity: 0.72;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: hero-orb-drift 19s ease-in-out infinite;
+}
+
+@keyframes hero-orb-drift {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, calc(-50% - 14px)) scale(1.018); }
+}
+
 /* Номинации: лавровые венки в стиле кинопостеров.
    Одна ветвь описана как <symbol> в index.html, правая — та же ветвь по scaleX(-1). */
 .awards {
@@ -679,6 +704,19 @@ h2 {
   line-height: 1.45;
 }
 
+/* Первый слайд: блок поднят на 78px, а мера подзаголовка сужена до 660px,
+   чтобы весь текст уместился внутрь сферы. При 920px первая строка выходила
+   на 743px и вылезала за ободок; при 660px строки 623 и 567px, и вся
+   раскладка вписывается в окружность d=838 с запасом от 38px.
+   Подъём нужен потому, что слайд стал нижне-тяжёлым из-за венков. */
+.hero {
+  top: calc(50% - 78px);
+}
+
+.hero .subhead {
+  max-width: 660px;
+}
+
 /* Market */
 
 .stat-keynote {
@@ -748,11 +786,26 @@ h2 {
   display: block;
 }
 
-/* Без will-change: transform — иначе Chrome растрирует слой на стартовом
-   масштабе и к концу полёта поверхность планеты становится мыльной. */
+/* Отдельная текстура, а не orb-skin.png: тот — светящийся ободок с полностью
+   прозрачной серединой. На мелких планетах слайда команды это незаметно (фон
+   чёрный и просвечивает как тело шара), но в переходе сквозь него был виден
+   шов между слайдами — слева тёмный слайд 7, справа светлый слайд 8, и сфера
+   выглядела разрезанной надвое. orb-transition.png залит полностью. */
+/* Сфера подключена <img>-ом, а не background-ом. Фоновая картинка не
+   запрашивается, пока элемент display: none, — загрузка начиналась только
+   в момент старта перехода, и первую половину пролёта сфера была пустой,
+   пока файл докачивался. Изображение в разметке грузится вместе со страницей. */
 .planet-wipe-body {
   position: absolute;
+  border-radius: 50%;
+  box-shadow: 0 0 110px rgba(56, 120, 205, 0.26);
   backface-visibility: hidden;
+}
+
+.planet-wipe-orb {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .market-counter {
@@ -1585,39 +1638,6 @@ h2 {
   opacity: 1;
 }
 
-.model-loading {
-  position: absolute;
-  inset: 18% 8%;
-  display: grid;
-  gap: 16px;
-  align-content: center;
-  justify-items: center;
-  border: 0;
-  color: #5f6168;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: opacity 260ms ease;
-}
-
-.model-loading i {
-  width: 42px;
-  height: 42px;
-  border: 1px solid #34363c;
-  border-top-color: var(--blue);
-  border-radius: 50%;
-  animation: model-loading-spin 1s linear infinite;
-}
-
-.macbook-3d-slot.is-ready .model-loading {
-  opacity: 0;
-}
-
-@keyframes model-loading-spin {
-  to { transform: rotate(360deg); }
-}
-
 .model-credit {
   position: absolute;
   right: 130px;
@@ -2095,15 +2115,41 @@ h2 {
 }
 
 .roadmap-list span {
+  position: relative;
   padding: 35px 22px;
   color: #aaa;
   font-family: "JetBrains Mono", monospace;
   font-size: 13px;
   text-align: center;
+  transition: color 420ms ease, background-color 420ms ease;
 }
 
 .roadmap-list span + span {
   border-left: 1px solid #353535;
+}
+
+/* Маршруты подсвечиваются по очереди. Полоса лежит поверх нижней границы
+   списка (bottom: -1px) и растёт от центра, поэтому переход между соседними
+   ячейками читается как перемещение акцента, а не как две вспышки. */
+.roadmap-list span::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--blue);
+  transform: scaleX(0);
+  transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.roadmap-list span.is-active {
+  color: white;
+  background-color: rgba(41, 151, 255, 0.07);
+}
+
+.roadmap-list span.is-active::after {
+  transform: scaleX(1);
 }
 
 /* Pricing */

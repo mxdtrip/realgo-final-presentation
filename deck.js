@@ -16,6 +16,9 @@
   const marketCounterMain = document.getElementById("marketCounterMain");
   const marketCounterDecimal = document.getElementById("marketCounterDecimal");
   const marketCounterPercent = document.getElementById("marketCounterPercent");
+  const roadmapList = document.querySelector(".roadmap-list");
+  const roadmapItems = roadmapList ? Array.from(roadmapList.children) : [];
+  const roadmapSlide = roadmapList?.closest(".slide") || null;
   const teamSlide = document.querySelector(".slide-team");
   const teamHandles = Array.from(document.querySelectorAll("[data-team-index]"));
   const teamOrbits = Array.from(document.querySelectorAll(".team-orbit"));
@@ -144,6 +147,10 @@
   let activeTeamMember = 0;
   let teamRotationTimer = null;
   let teamSwitchTimer = null;
+  let activeRoadmapItem = 0;
+  let roadmapTimer = null;
+  let roadmapStartTimer = null;
+  const ROADMAP_STEP = 2200;
   let teamOrbitFrame = null;
   let teamOrbitElapsed = 0;
   let teamOrbitStartedAt = 0;
@@ -300,6 +307,49 @@
     window.clearInterval(teamRotationTimer);
     window.clearTimeout(teamSwitchTimer);
     memberRole.classList.remove("is-running", "is-switching");
+  }
+
+  function highlightRoadmapItem(index) {
+    const total = roadmapItems.length;
+    activeRoadmapItem = ((index % total) + total) % total;
+    roadmapItems.forEach((item, itemIndex) => {
+      item.classList.toggle("is-active", itemIndex === activeRoadmapItem);
+    });
+  }
+
+  function stopRoadmapCycle() {
+    window.clearInterval(roadmapTimer);
+    window.clearTimeout(roadmapStartTimer);
+    roadmapTimer = null;
+    roadmapStartTimer = null;
+    activeRoadmapItem = 0;
+    roadmapItems.forEach((item) => item.classList.remove("is-active"));
+  }
+
+  function startRoadmapCycle() {
+    stopRoadmapCycle();
+    if (!roadmapItems.length || reduceMotion) return;
+
+    const begin = () => {
+      highlightRoadmapItem(0);
+      roadmapTimer = window.setInterval(() => {
+        highlightRoadmapItem(activeRoadmapItem + 1);
+      }, ROADMAP_STEP);
+    };
+
+    // Как и со счётчиками: пока идёт view transition, на экране снимок,
+    // и подсветка под ним не видна. Ждём конца перехода, потом небольшая пауза.
+    const schedule = () => {
+      if (slides[currentSlide] !== roadmapSlide) return;
+      roadmapStartTimer = window.setTimeout(begin, 320);
+    };
+
+    const transition = activeViewTransition;
+    if (transition?.finished) {
+      transition.finished.catch(() => {}).finally(schedule);
+      return;
+    }
+    schedule();
   }
 
   function clearMagicMoveElements() {
@@ -909,12 +959,24 @@
     nextSlideElement.classList.add("is-planet-next");
     planetWipe.classList.add("is-running");
 
+    // Солнечная система уходит вместе с приходом сферы. Иначе слева от неё
+    // до самого конца прохода остаётся видно ядро с логотипом ReAlgo и
+    // планеты команды — в кадре оказывается два разных шара сразу.
+    // К 480мс сфера уже перевалила за середину кадра, так что система
+    // успевает исчезнуть до того, как проход дойдёт до её места.
+    const solar = slides[previousIndex]?.querySelector(".solar");
+    const solarFade = solar?.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: 480, easing: "cubic-bezier(0.4, 0, 0.6, 1)", fill: "both" },
+    );
+
     try {
       await animateProgress(PLANET_FLIGHT_DURATION, render);
       commitSlide(nextIndex, previousIndex, options);
     } finally {
       window.cancelAnimationFrame(planetFrame);
       planetFrame = null;
+      solarFade?.cancel();
       nextSlideElement.classList.remove("is-planet-next");
       nextSlideElement.style.removeProperty("clip-path");
       planetWipe.classList.remove("is-running");
@@ -980,6 +1042,11 @@
     }
     if (currentSlide === teamSlide.dataset.slide * 1 && previousSlide !== currentSlide) {
       startTeamRotation();
+    }
+
+    if (roadmapSlide) {
+      if (slides[currentSlide] === roadmapSlide) startRoadmapCycle();
+      else stopRoadmapCycle();
     }
 
     const progress = (currentSlide + 1) / slides.length;
