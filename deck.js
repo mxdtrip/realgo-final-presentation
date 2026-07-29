@@ -6,6 +6,11 @@
   const dots = document.getElementById("dots");
   const timer = document.getElementById("timer");
   const help = document.getElementById("help");
+  const priceBackdrop = document.getElementById("priceBackdrop");
+  const priceCounter = document.getElementById("priceCounter");
+  const priceCounterValue = document.getElementById("priceCounterValue");
+  const planetWipe = document.getElementById("planetWipe");
+  const planetWipeBody = document.getElementById("planetWipeBody");
   const marketCounter = document.getElementById("marketCounter");
   const marketCounterRow = document.getElementById("marketCounterRow");
   const marketCounterMain = document.getElementById("marketCounterMain");
@@ -86,28 +91,27 @@
       [".comparison-arrow", ".cycle > i:first-of-type", "morph-kicker"],
       [".comparison > div:last-child", ".cycle > div:last-child", "morph-card-b"],
     ],
+    // Слайды с MacBook (10–13): текстовые блоки намеренно НЕ участвуют в
+    // magic move. View transition растягивает снимок старого элемента до
+    // габаритов нового (у псевдоэлементов задан height: 100%), а блоки здесь
+    // разной высоты — из-за этого текст сплющивало. Без имени перехода текст
+    // попадает в общий снимок root и просто плавно перетекает через
+    // scene-dissolve. Поверхности морфим по-прежнему: рамки .macbook-3d-slot
+    // совпадают (inset: 0), искажения там нет, зато ноутбук не моргает.
     [
       [".cycle", ".macbook-3d-slot", "morph-surface"],
-      [".cycle-keynote h2", ".product-heading h2", "morph-primary"],
-      [".cycle-keynote .kicker", ".product-heading .kicker", "morph-kicker"],
     ],
     [
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
-      [".product-heading", ".ai-copy", "morph-primary"],
     ],
     [
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
-      [".ai-copy", ".product-demo-copy", "morph-primary"],
     ],
     [
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
-      [".product-demo-copy", ".product-demo-copy", "morph-primary"],
-      [".product-demo-rail", ".product-demo-rail", "morph-kicker"],
     ],
     [
-      [".product-demo-copy h2", ".cards-copy h2", "morph-primary"],
       [".macbook-3d-slot", ".memory-cards", "morph-surface"],
-      [".product-demo-copy .kicker", ".cards-copy .kicker", "morph-kicker"],
     ],
     [
       [".giant-dark", ".atlas-numbers", "morph-surface"],
@@ -124,11 +128,9 @@
       [".roadmap-keynote h2", ".price-keynote h2", "morph-primary"],
       [".roadmap-keynote .kicker", ".price-keynote .kicker", "morph-kicker"],
     ],
-    [
-      [".price", ".price", "morph-primary"],
-      [".price-keynote h2", ".price-keynote h2", "morph-secondary"],
-      [".price-keynote .kicker", ".price-keynote .kicker", "morph-kicker"],
-    ],
+    // 17 ↔ 18 обслуживает runPriceTransition (счёт цены + перекраска фона),
+    // magic move здесь не нужен и только конфликтовал бы с ним.
+    [],
     [
       [".price-keynote h2", ".closing-keynote h2", "morph-primary"],
       [".price-keynote .kicker", ".closing-keynote .kicker", "morph-kicker"],
@@ -149,11 +151,19 @@
   let activeMagicMoveElements = [];
   let viewTransitionSequence = 0;
   let marketTransitionRunning = false;
+  let planetTransitionRunning = false;
+  let priceTransitionRunning = false;
+  const PRICE_TRANSITION_DURATION = 1400;
+  let planetFrame = null;
+  const PLANET_FLIGHT_DURATION = 1500;
+  // Диаметр сферы относительно высоты кадра. Должен быть > 1, иначе диск
+  // перестанет перекрывать шов между слайдами по всей высоте.
+  const PLANET_DIAMETER_RATIO = 1.35;
   let marketCounterFrame = null;
   let countUpFrame = null;
   let countUpTimer = null;
-  // Счёт стартует после того, как отыграет переход между слайдами.
-  const COUNT_UP_DELAY = 1000;
+  // Пауза после окончания перехода между слайдами, перед стартом счёта.
+  const COUNT_UP_DELAY = 500;
   const counterMetrics = { slot: 0.62, decimal: 0.72, percent: 0.92 };
   const countUpTargets = Array.from(document.querySelectorAll("[data-count-to]"));
 
@@ -425,7 +435,7 @@
   // Статичные числа на слайдах используют ту же разметку слотов,
   // чтобы при передаче анимации счётчику не было скачка.
   function applyDigitSlotsToStaticNumbers() {
-    document.querySelectorAll(".giant-number[data-value]").forEach((element) => {
+    document.querySelectorAll(".giant-number[data-value], .slide .price-value").forEach((element) => {
       const source = element.dataset.display || element.textContent.trim();
       element.dataset.display = source;
       renderDigits(element, source);
@@ -469,7 +479,22 @@
     });
     if (reduceMotion) return;
 
-    countUpTimer = window.setTimeout(() => startCountUpFrames(targets), COUNT_UP_DELAY);
+    // Пауза отсчитывается от КОНЦА перехода между слайдами, а не от commitSlide.
+    // Пока идёт view transition, на экране снимок, а не живой элемент, — счёт
+    // под ним просто не виден. Переходы разной длины (860мс root, 1240мс
+    // morph-surface на слайде Pattern Atlas), поэтому фиксированный таймер
+    // где-то съедал бы начало анимации.
+    const startCounting = () => {
+      if (slides[currentSlide] !== slide) return;
+      countUpTimer = window.setTimeout(() => startCountUpFrames(targets), COUNT_UP_DELAY);
+    };
+
+    const transition = activeViewTransition;
+    if (transition?.finished) {
+      transition.finished.catch(() => {}).finally(startCounting);
+      return;
+    }
+    startCounting();
   }
 
   function startCountUpFrames(targets) {
@@ -629,6 +654,201 @@
     return animations;
   }
 
+  function readPrice(slide) {
+    const element = slide?.querySelector(".price[data-price]");
+    if (!element) return null;
+    const value = Number.parseInt(element.dataset.price, 10);
+    return Number.isFinite(value) ? value : null;
+  }
+
+  function isPriceTransition(previousIndex, nextIndex) {
+    return Math.abs(nextIndex - previousIndex) === 1
+      && readPrice(slides[previousIndex]) !== null
+      && readPrice(slides[nextIndex]) !== null;
+  }
+
+  // Центр связки «$ + цифры» в координатах сцены. Именно по нему выравнивается
+  // счётчик: у слайдов разная композиция (у Pro есть «/месяц» и сноска снизу),
+  // поэтому число стоит в разных местах, и концы анимации надо брать из
+  // реальной раскладки, а не из констант.
+  function priceGroupCenter(slide) {
+    const currency = slide?.querySelector(".price-currency");
+    const value = slide?.querySelector(".price-value");
+    if (!currency || !value) return null;
+
+    const a = currency.getBoundingClientRect();
+    const b = value.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    const scale = getStageScale();
+    return {
+      x: ((Math.min(a.left, b.left) + Math.max(a.right, b.right)) / 2 - stageRect.left) / scale,
+      y: ((Math.min(a.top, b.top) + Math.max(a.bottom, b.bottom)) / 2 - stageRect.top) / scale,
+    };
+  }
+
+  async function runPriceTransition(nextIndex, previousIndex, options) {
+    if (priceTransitionRunning) return;
+    const previousSlide = slides[previousIndex];
+    const nextSlide = slides[nextIndex];
+    const fromValue = readPrice(previousSlide);
+    const toValue = readPrice(nextSlide);
+    const fromCenter = priceGroupCenter(previousSlide);
+    const toCenter = priceGroupCenter(nextSlide);
+
+    if (fromValue === null || toValue === null || !fromCenter || !toCenter
+      || typeof Element.prototype.animate !== "function") {
+      commitSlide(nextIndex, previousIndex, options);
+      return;
+    }
+
+    priceTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+
+    // Цвета читаем до того, как слайды станут прозрачными.
+    const fromBackground = window.getComputedStyle(previousSlide).backgroundColor;
+    const toBackground = window.getComputedStyle(nextSlide).backgroundColor;
+    const fromColor = window.getComputedStyle(previousSlide.querySelector(".price")).color;
+    const toColor = window.getComputedStyle(nextSlide.querySelector(".price")).color;
+
+    priceBackdrop.style.backgroundColor = fromBackground;
+    priceBackdrop.classList.add("is-running");
+    stage.classList.add("is-price-counting");
+    nextSlide.classList.add("is-price-next");
+    renderDigits(priceCounterValue, String(fromValue));
+    priceCounter.classList.add("is-visible");
+
+    const easing = "cubic-bezier(0.65, 0, 0.35, 1)";
+    const animations = [
+      priceBackdrop.animate(
+        [{ backgroundColor: fromBackground }, { backgroundColor: toBackground }],
+        { duration: PRICE_TRANSITION_DURATION, easing, fill: "both" },
+      ),
+      previousSlide.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: PRICE_TRANSITION_DURATION * 0.5, easing, fill: "both" },
+      ),
+      nextSlide.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        {
+          duration: PRICE_TRANSITION_DURATION * 0.62,
+          delay: PRICE_TRANSITION_DURATION * 0.38,
+          easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+          fill: "both",
+        },
+      ),
+      // translate(-50%, -50%) считается от текущего размера счётчика, а он
+      // меняется на разряде 9 → 10. Поэтому центрирование самокорректируется
+      // покадрово, и число растёт симметрично, а не съезжает вправо.
+      priceCounter.animate([
+        {
+          transform: `translate(-50%, -50%) translate(${fromCenter.x.toFixed(2)}px, ${fromCenter.y.toFixed(2)}px)`,
+          color: fromColor,
+        },
+        {
+          transform: `translate(-50%, -50%) translate(${toCenter.x.toFixed(2)}px, ${toCenter.y.toFixed(2)}px)`,
+          color: toColor,
+        },
+      ], { duration: PRICE_TRANSITION_DURATION, easing, fill: "both" }),
+    ];
+
+    try {
+      await animateProgress(PRICE_TRANSITION_DURATION, (progress) => {
+        const eased = easeInOutCubic(progress);
+        renderDigits(priceCounterValue, String(Math.round(fromValue + (toValue - fromValue) * eased)));
+      });
+      commitSlide(nextIndex, previousIndex, options);
+    } finally {
+      animations.forEach((animation) => animation.cancel());
+      priceCounter.classList.remove("is-visible");
+      nextSlide.classList.remove("is-price-next");
+      stage.classList.remove("is-price-counting");
+      priceBackdrop.classList.remove("is-running");
+      priceTransitionRunning = false;
+    }
+  }
+
+  function isPlanetTransition(previousIndex, nextIndex) {
+    return nextIndex === previousIndex + 1
+      && Boolean(slides[previousIndex]?.hasAttribute("data-planet-exit"));
+  }
+
+  function animateProgress(duration, onFrame) {
+    return new Promise((resolve) => {
+      const startedAt = performance.now();
+      const step = (now) => {
+        const progress = clamp01((now - startedAt) / duration);
+        onFrame(progress);
+        if (progress < 1) {
+          planetFrame = window.requestAnimationFrame(step);
+          return;
+        }
+        planetFrame = null;
+        resolve();
+      };
+      planetFrame = window.requestAnimationFrame(step);
+    });
+  }
+
+  // Сфера выезжает из-за правого края и проходит через весь кадр влево,
+  // открывая за собой следующий слайд.
+  //
+  // Шов между слайдами — вертикальная линия ровно по центру сферы. Он всегда
+  // спрятан под диском: в своей центральной колонке диск имеет полную высоту
+  // (диаметр 1.35 высоты кадра), то есть перекрывает шов с запасом сверху и
+  // снизу. Позиция сферы и позиция шва считаются в одном кадре из одного
+  // значения прогресса — рассинхрона между ними быть не может.
+  async function runPlanetTransition(nextIndex, previousIndex, options) {
+    if (planetTransitionRunning) return;
+    const nextSlideElement = slides[nextIndex];
+    if (!nextSlideElement) {
+      commitSlide(nextIndex, previousIndex, options);
+      return;
+    }
+
+    planetTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+
+    const stageWidth = stage.clientWidth;
+    const stageHeight = stage.clientHeight;
+    const diameter = stageHeight * PLANET_DIAMETER_RATIO;
+    const radius = diameter / 2;
+    const fromX = stageWidth + radius;
+    const toX = -radius;
+
+    planetWipeBody.style.width = `${diameter}px`;
+    planetWipeBody.style.height = `${diameter}px`;
+    planetWipeBody.style.left = "0px";
+    planetWipeBody.style.top = `${stageHeight / 2}px`;
+
+    const render = (progress) => {
+      // Скорость намеренно постоянная. С ease-in-out пик скорости приходится
+      // на середину пути — то есть ровно на проход по кадру, и вытирание
+      // проскакивает. Рывка на старте не видно: сфера стартует за краем.
+      const centerX = fromX + (toX - fromX) * progress;
+      const seam = Math.max(0, Math.min(stageWidth, centerX));
+      planetWipeBody.style.transform = `translate(-50%, -50%) translateX(${centerX.toFixed(2)}px)`;
+      nextSlideElement.style.clipPath = `inset(0 0 0 ${seam.toFixed(2)}px)`;
+    };
+
+    render(0);
+    nextSlideElement.classList.add("is-planet-next");
+    planetWipe.classList.add("is-running");
+
+    try {
+      await animateProgress(PLANET_FLIGHT_DURATION, render);
+      commitSlide(nextIndex, previousIndex, options);
+    } finally {
+      window.cancelAnimationFrame(planetFrame);
+      planetFrame = null;
+      nextSlideElement.classList.remove("is-planet-next");
+      nextSlideElement.style.removeProperty("clip-path");
+      planetWipe.classList.remove("is-running");
+      planetTransitionRunning = false;
+    }
+  }
+
   async function runMarketMetricTransition(nextIndex, previousIndex, options) {
     if (marketTransitionRunning) return;
     const previousSlide = slides[previousIndex];
@@ -702,6 +922,26 @@
   function showSlide(index, options = {}) {
     const nextSlide = Math.max(0, Math.min(index, slides.length - 1));
     const previousSlide = currentSlide;
+    const canFlyPlanet = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isPlanetTransition(previousSlide, nextSlide);
+
+    if (canFlyPlanet) {
+      runPlanetTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
+    const canCountPrice = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isPriceTransition(previousSlide, nextSlide);
+
+    if (canCountPrice) {
+      runPriceTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
     const canAnimateMarketMetric = nextSlide !== previousSlide
       && !reduceMotion
       && !options.instant

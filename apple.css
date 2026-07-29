@@ -252,9 +252,16 @@ html[data-market-number-direction="down"]::view-transition-new(morph-market-numb
   animation: market-copy-in 980ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
+/* Затухание доводится строго до нуля.
+   При 0.12 старый снимок оставался призраком на 12% и висел так до конца
+   всего перехода: анимация root длится 860мс, а снимки живут столько,
+   сколько самая долгая группа (morph-surface — 1240мс). В этот момент
+   призрак исчезал скачком — второе «мерцание» уже после того, как текст
+   вроде бы сменился. Раньше это не бросалось в глаза только потому, что
+   текст жил в отдельных группах morph-*, а не в снимке root. */
 @keyframes scene-dissolve-out {
   to {
-    opacity: 0.12;
+    opacity: 0;
     filter: blur(2px);
   }
 }
@@ -707,6 +714,35 @@ h2 {
      совпадать с расчётной, и число дёргалось по горизонтали. */
   letter-spacing: normal;
   white-space: nowrap;
+}
+
+/* Переход со слайда команды: сфера выезжает из-за правого края,
+   проходит по горизонтали через весь кадр и открывает за собой
+   следующий слайд. Сам слайд лежит поверх текущего и обрезается
+   по вертикали ровно по центру сферы (clip-path задаётся из JS). */
+.slide.is-planet-next {
+  z-index: 4;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.planet-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  display: none;
+  pointer-events: none;
+}
+
+.planet-wipe.is-running {
+  display: block;
+}
+
+/* Без will-change: transform — иначе Chrome растрирует слой на стартовом
+   масштабе и к концу полёта поверхность планеты становится мыльной. */
+.planet-wipe-body {
+  position: absolute;
+  backface-visibility: hidden;
 }
 
 .market-counter {
@@ -1440,23 +1476,23 @@ h2 {
   background: #000;
 }
 
+/* Блок стоит в левом нижнем углу, над строкой подписей
+   (.platforms / .product-demo-rail живут на bottom: 76–78px).
+   Текст не гаснет: читается в полную силу всё время показа слайда. */
 .slide-macbook .product-overlay {
   position: absolute;
-  top: 112px;
+  bottom: 128px;
   left: 130px;
   z-index: 5;
   width: 430px;
   pointer-events: none;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.92);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.95), 0 0 46px rgba(0, 0, 0, 0.8);
 }
 
-.slide-macbook.is-active .product-overlay {
-  animation: product-overlay-settle 3.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-@keyframes product-overlay-settle {
-  0%, 42% { opacity: 1; }
-  100% { opacity: 0.08; }
+/* Нижний отступ заголовка обнулён: при привязке к низу он превращался
+   в пустую полосу между текстом и краем блока. */
+.slide-macbook .product-overlay h2 {
+  margin-bottom: 0;
 }
 
 .product-heading {
@@ -1509,7 +1545,7 @@ h2 {
   position: absolute;
   bottom: 76px;
   left: 130px;
-  z-index: 5;
+  z-index: 6;
   display: flex;
   gap: 24px;
   color: rgba(244, 247, 251, 0.34);
@@ -1775,10 +1811,12 @@ h2 {
   font-size: 11px;
 }
 
+/* Выше 3D-слота с ноутбуком (z-index: 2), иначе строка уходит под сцену. */
 .platforms {
   position: absolute;
   bottom: 78px;
   left: 130px;
+  z-index: 6;
   color: #666;
   font-family: "JetBrains Mono", monospace;
   font-size: 10px;
@@ -2002,7 +2040,21 @@ h2 {
   letter-spacing: -0.07em;
 }
 
-.atlas-numbers span {
+/* Счётные числа — те же слоты, что и на слайде «о нас»: место под итоговое
+   число разрядов резервируется заранее, поэтому при 1 → 111 подпись справа
+   не сдвигается. Трекинг переезжает с letter-spacing на --num-tracking,
+   иначе он применился бы дважды. */
+.atlas-numbers strong[data-count-to] {
+  --num-tracking: -0.07em;
+  --num-char-tracking: -0.07em;
+  letter-spacing: normal;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+/* Только прямой потомок: иначе правило подписи перебивало бы стиль
+   спанов-слотов с цифрами внутри <strong>. */
+.atlas-numbers div > span {
   color: var(--gray);
   font-size: 24px;
 }
@@ -2063,11 +2115,108 @@ h2 {
   letter-spacing: -0.085em;
 }
 
-.price span {
+/* Знак валюты поднят к капительной высоте — обычная типографика ценника.
+   Та же разметка используется в счётчике, поэтому геометрия совпадает. */
+.price-currency {
+  margin-right: 0.02em;
+  font-size: 0.4em;
+  vertical-align: baseline;
+  position: relative;
+  /* Посчитано по метрикам Manrope: верх «0» — 191px над базовой линией при
+     260px, верх «$» — 85px при своих 104px. Разница 106px = 1.017em кегля. */
+  top: -1.017em;
+  letter-spacing: normal;
+}
+
+/* Цифры в слотах постоянной ширины: при счёте 0 → 12 разряды не дрожат.
+   Трекинг только через --num-tracking, letter-spacing здесь дал бы вторую порцию. */
+.price-value {
+  --num-tracking: -0.085em;
+  --num-char-tracking: -0.085em;
+  display: inline-block;
+  letter-spacing: normal;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.price-period {
   margin-left: 18px;
   color: var(--gray);
   font-size: 30px;
   letter-spacing: -0.03em;
+}
+
+/* Едва различимая надпись во весь фон. Кегли подобраны по метрикам Manrope
+   так, чтобы оба слова заняли одинаковую ширину (~1560px). */
+.price-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Manrope", sans-serif;
+  font-size: 877px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.slide-price-free .price-watermark {
+  font-size: 764px;
+  color: rgba(0, 0, 0, 0.032);
+}
+
+.slide-price-pro .price-watermark {
+  color: rgba(120, 178, 255, 0.055);
+}
+
+/* Фон перехода 17 → 18: цвет интерполируется на отдельном слое под слайдами,
+   а сами слайды на это время становятся прозрачными. Так фон именно
+   перекрашивается, а не кросс-фейдится через серую середину. */
+.price-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  pointer-events: none;
+}
+
+.price-backdrop.is-running {
+  display: block;
+}
+
+.stage.is-price-counting .slide {
+  background: transparent;
+}
+
+.slide.is-price-next {
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Живые цифры прячем, но место за ними сохраняем: «/месяц» остаётся
+   ровно там, где встанет число в конце перехода.
+   Обязательно через .slide — сам счётчик тоже лежит внутри .stage
+   и без этого спрятал бы собственные цифры. */
+.stage.is-price-counting .slide .price-currency,
+.stage.is-price-counting .slide .price-value {
+  visibility: hidden;
+}
+
+.price-counter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 46;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.price-counter.is-visible {
+  opacity: 1;
 }
 
 .price-keynote h2 {

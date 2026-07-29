@@ -134,7 +134,7 @@
           <aside class="speaker-notes"><strong>01:50–02:15</strong><p>Нас шесть. За 15 дней мы прошли путь от идеи до работающего production. Не собрали макет — замкнули полный продуктовый цикл.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-team" data-slide="6" data-theme="dark">
+        <section class="slide theme-dark slide-team" data-slide="6" data-theme="dark" data-planet-exit>
           <div class="team-copy reveal">
             <p class="kicker">Команда ReAlgo</p>
             <h2>Шесть орбит.<br />Одна система.</h2>
@@ -247,7 +247,7 @@
           <div class="atlas-keynote reveal">
             <p class="kicker dark-kicker">Pattern Atlas</p>
             <h2>Не 500 случайных задач.</h2>
-            <div class="atlas-numbers"><div><strong>22</strong><span>семейства</span></div><div><strong>111</strong><span>подпаттернов</span></div></div>
+            <div class="atlas-numbers"><div><strong data-count-to="22">22</strong><span>семейства</span></div><div><strong data-count-to="111">111</strong><span>подпаттернов</span></div></div>
             <p>Единица обучения в ReAlgo — не задача, а алгоритмическая идея.</p>
           </div>
           <aside class="speaker-notes"><strong>05:55–06:25</strong><p>Несколько задач закрепляют одну идею. Поэтому мы строим карту паттернов, а не бесконечный список задач.</p></aside>
@@ -262,20 +262,22 @@
           <aside class="speaker-notes"><strong>06:25–06:55</strong><p>Путь можно строить сбалансированно, от простого к сложному, по частоте конкретной компании или по персональным пробелам.</p></aside>
         </section>
 
-        <section class="slide theme-light" data-slide="16" data-theme="light">
+        <section class="slide theme-light slide-price slide-price-free" data-slide="16" data-theme="light">
+          <div class="price-watermark" aria-hidden="true">FREE</div>
           <div class="price-keynote reveal">
             <p class="kicker dark-kicker">Коммерциализация · Free</p>
-            <div class="price">$0</div>
+            <div class="price" data-price="0"><span class="price-currency">$</span><span class="price-value">0</span></div>
             <h2>Начать и сформировать привычку.</h2>
             <p>Сохранение задач · оценка уверенности · spaced repetition · базовая статистика</p>
           </div>
           <aside class="speaker-notes"><strong>06:55–07:25</strong><p>Free даёт законченный базовый цикл и формирует привычку возвращаться к решённым задачам.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="17" data-theme="dark">
+        <section class="slide theme-dark slide-price slide-price-pro" data-slide="17" data-theme="dark">
+          <div class="price-watermark" aria-hidden="true">PRO</div>
           <div class="price-keynote pro reveal">
             <p class="kicker">Коммерциализация · Pro</p>
-            <div class="price">$12<span>/месяц</span></div>
+            <div class="price" data-price="12"><span class="price-currency">$</span><span class="price-value">12</span><span class="price-period">/месяц</span></div>
             <h2>Подготовиться к конкретному интервью.</h2>
             <p>Roadmap по роли и дате · продвинутые карточки · mock-режим · Anki · приоритеты</p>
             <small>Целевая цена. Billing — следующий релиз.</small>
@@ -293,6 +295,13 @@
           <div class="final-line">ReAlgo не решает задачу за тебя. <strong>Он помогает решить её снова — в нужный момент.</strong></div>
           <aside class="speaker-notes"><strong>08:05–08:50</strong><p>Прозрачно развести хакатонный snapshot и последующее развитие. Завершить финальной фразой, показать realgo.dev и оставить время на переход к вопросам.</p></aside>
         </section>
+      </div>
+
+      <div id="priceBackdrop" class="price-backdrop" aria-hidden="true"></div>
+      <div id="priceCounter" class="price price-counter" aria-hidden="true"><span class="price-currency">$</span><span id="priceCounterValue" class="price-value"></span></div>
+
+      <div id="planetWipe" class="planet-wipe" aria-hidden="true">
+        <div id="planetWipeBody" class="planet-wipe-body"><img class="orb-skin" src="assets/orb-skin.png" alt="" /></div>
       </div>
 
       <div id="marketCounter" class="market-counter" aria-hidden="true">
