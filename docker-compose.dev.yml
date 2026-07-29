@@ -1,0 +1,12 @@
+services:
+  presentation:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "dev-server.mjs"]
+    ports:
+      - "4173:4173"
+    environment:
+      PORT: "4173"
+    volumes:
+      - .:/app:ro
+    restart: unless-stopped

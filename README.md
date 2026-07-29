@@ -41,6 +41,24 @@ docker run --rm -p 8080:80 realgo-final-presentation
 docker compose down
 ```
 
+### Live development
+
+Для работы прямо с файлами репозитория без пересборки образа:
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+Открыть `http://localhost:4173`. Папка репозитория подключается в контейнер через read-only bind mount. После изменения HTML, CSS, JavaScript или ассетов открытая вкладка автоматически перезагрузится примерно за одну секунду.
+
+Остановить dev-контейнер:
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+Live reload меняет только локальное отображение. Фиксация истории и отправка изменений на GitHub по-прежнему выполняются через обычные `git commit` и `git push`.
+
 ## Управление
 
 - `←` / `→` — предыдущий или следующий слайд
