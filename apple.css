@@ -815,7 +815,20 @@ h2 {
   letter-spacing: -0.075em;
 }
 
-.about-line span {
+/* Счётные числа используют те же слоты фиксированной ширины, что и большие
+   цифры на слайдах рынка: место под итоговое количество разрядов резервируется
+   заранее (min-width из JS), поэтому подпись справа не прыгает во время счёта. */
+.about-line strong[data-count-to] {
+  --num-tracking: -0.075em;
+  --num-char-tracking: -0.075em;
+  letter-spacing: normal;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+/* Только прямой потомок: иначе правило подписи перебивало стиль
+   спанов-слотов с цифрами внутри <strong> (38px и серый вместо 150px/650). */
+.about-line > span {
   color: var(--gray);
   font-size: 38px;
 }

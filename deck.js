@@ -149,7 +149,12 @@
   let viewTransitionSequence = 0;
   let marketTransitionRunning = false;
   let marketCounterFrame = null;
-  const counterMetrics = { decimal: 0.72, percent: 0.92 };
+  let countUpFrame = null;
+  let countUpTimer = null;
+  // Счёт стартует после того, как отыграет переход между слайдами.
+  const COUNT_UP_DELAY = 1000;
+  const counterMetrics = { slot: 0.62, decimal: 0.72, percent: 0.92 };
+  const countUpTargets = Array.from(document.querySelectorAll("[data-count-to]"));
 
   function getInitialSlide() {
     const hashSlide = Number.parseInt(window.location.hash.replace("#", ""), 10);
@@ -399,6 +404,7 @@
 
   function calibrateCounterMetrics() {
     const slotEm = measureDigitSlotEm(marketCounter);
+    counterMetrics.slot = slotEm;
     document.documentElement.style.setProperty("--digit-slot", `${slotEm.toFixed(4)}em`);
 
     const fontSizePx = Number.parseFloat(window.getComputedStyle(marketCounter).fontSize) || 310;
@@ -429,6 +435,61 @@
     return value < 0.5
       ? 4 * value * value * value
       : 1 - ((-2 * value + 2) ** 3) / 2;
+  }
+
+  function easeOutCubic(value) {
+    return 1 - (1 - value) ** 3;
+  }
+
+  // Резервируем ширину под итоговое число разрядов: пока счёт идёт от 1,
+  // левый край и подпись справа стоят на месте.
+  function reserveCountUpWidth(element) {
+    const digits = String(element.dataset.countTo || "").length || 1;
+    const tracking = Math.abs(Number.parseFloat(
+      window.getComputedStyle(element).getPropertyValue("--num-tracking"),
+    )) || 0.075;
+    element.style.minWidth = `${(digits * (counterMetrics.slot - tracking)).toFixed(4)}em`;
+  }
+
+  function runCountUp(slide) {
+    window.cancelAnimationFrame(countUpFrame);
+    window.clearTimeout(countUpTimer);
+    countUpFrame = null;
+    countUpTimer = null;
+
+    const targets = countUpTargets.filter((element) => slide.contains(element));
+    if (!targets.length) return;
+
+    // Сразу ставим «1»: пока идёт переход, число просто стоит на старте,
+    // а сам счёт целиком попадает в поле зрения.
+    targets.forEach((element) => {
+      reserveCountUpWidth(element);
+      renderDigits(element, reduceMotion ? String(element.dataset.countTo) : "1");
+    });
+    if (reduceMotion) return;
+
+    countUpTimer = window.setTimeout(() => startCountUpFrames(targets), COUNT_UP_DELAY);
+  }
+
+  function startCountUpFrames(targets) {
+    const startedAt = performance.now();
+    const frame = (now) => {
+      const progress = clamp01((now - startedAt) / 1150);
+      const easedProgress = easeOutCubic(progress);
+
+      targets.forEach((element) => {
+        const target = Number.parseInt(element.dataset.countTo, 10);
+        if (!Number.isFinite(target)) return;
+        renderDigits(element, String(Math.round(1 + (target - 1) * easedProgress)));
+      });
+
+      if (progress < 1) {
+        countUpFrame = window.requestAnimationFrame(frame);
+        return;
+      }
+      countUpFrame = null;
+    };
+    countUpFrame = window.requestAnimationFrame(frame);
   }
 
   function optionalPresence(fromVisible, toVisible, progress, timing) {
@@ -617,6 +678,8 @@
     window.dispatchEvent(new CustomEvent("realgo:slidechange", {
       detail: { index: currentSlide, slide: slides[currentSlide] },
     }));
+
+    runCountUp(slides[currentSlide]);
 
     if (previousSlide === teamSlide.dataset.slide * 1 && currentSlide !== previousSlide) {
       stopTeamRotation();
@@ -841,6 +904,10 @@
     document.fonts.ready.then(() => {
       calibrateCounterMetrics();
       applyDigitSlotsToStaticNumbers();
+      // Слот мог измениться после подмены фолбэка на Manrope — пересчитываем резерв.
+      countUpTargets.forEach((element) => {
+        if (element.style.minWidth) reserveCountUpWidth(element);
+      });
     });
   }
   resizeStage();
