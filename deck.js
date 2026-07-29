@@ -667,22 +667,20 @@
       && readPrice(slides[nextIndex]) !== null;
   }
 
-  // Центр связки «$ + цифры» в координатах сцены. Именно по нему выравнивается
-  // счётчик: у слайдов разная композиция (у Pro есть «/месяц» и сноска снизу),
-  // поэтому число стоит в разных местах, и концы анимации надо брать из
-  // реальной раскладки, а не из констант.
-  function priceGroupCenter(slide) {
-    const currency = slide?.querySelector(".price-currency");
-    const value = slide?.querySelector(".price-value");
-    if (!currency || !value) return null;
+  // Якорь — левый верхний угол знака валюты, а НЕ центр связки «$ + цифры».
+  // При центрировании на разряде 9 → 10 бокс цифр разом становится шире на
+  // слот, и всё содержимое рывком съезжает влево на пол-слота. С привязкой
+  // по левому краю «$» стоит на месте, а число растёт вправо — как в одометре.
+  function priceAnchor(root) {
+    const currency = root?.querySelector(".price-currency");
+    if (!currency) return null;
 
-    const a = currency.getBoundingClientRect();
-    const b = value.getBoundingClientRect();
+    const rect = currency.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     const scale = getStageScale();
     return {
-      x: ((Math.min(a.left, b.left) + Math.max(a.right, b.right)) / 2 - stageRect.left) / scale,
-      y: ((Math.min(a.top, b.top) + Math.max(a.bottom, b.bottom)) / 2 - stageRect.top) / scale,
+      x: (rect.left - stageRect.left) / scale,
+      y: (rect.top - stageRect.top) / scale,
     };
   }
 
@@ -692,10 +690,10 @@
     const nextSlide = slides[nextIndex];
     const fromValue = readPrice(previousSlide);
     const toValue = readPrice(nextSlide);
-    const fromCenter = priceGroupCenter(previousSlide);
-    const toCenter = priceGroupCenter(nextSlide);
+    const fromAnchor = priceAnchor(previousSlide);
+    const toAnchor = priceAnchor(nextSlide);
 
-    if (fromValue === null || toValue === null || !fromCenter || !toCenter
+    if (fromValue === null || toValue === null || !fromAnchor || !toAnchor
       || typeof Element.prototype.animate !== "function") {
       commitSlide(nextIndex, previousIndex, options);
       return;
@@ -716,6 +714,21 @@
     stage.classList.add("is-price-counting");
     nextSlide.classList.add("is-price-next");
     renderDigits(priceCounterValue, String(fromValue));
+
+    // Собственный якорь счётчика меряем при нулевом сдвиге и дальше двигаем
+    // его дельтами. Разметка у счётчика и у живой цены одна и та же, поэтому
+    // совмещение «$» совмещает и цифры — на обоих концах перехода стык точный.
+    priceCounter.style.transform = "translate(0px, 0px)";
+    const selfAnchor = priceAnchor(priceCounter);
+    const fromShift = {
+      x: fromAnchor.x - selfAnchor.x,
+      y: fromAnchor.y - selfAnchor.y,
+    };
+    const toShift = {
+      x: toAnchor.x - selfAnchor.x,
+      y: toAnchor.y - selfAnchor.y,
+    };
+    priceCounter.style.transform = `translate(${fromShift.x.toFixed(2)}px, ${fromShift.y.toFixed(2)}px)`;
     priceCounter.classList.add("is-visible");
 
     const easing = "cubic-bezier(0.65, 0, 0.35, 1)";
@@ -737,16 +750,13 @@
           fill: "both",
         },
       ),
-      // translate(-50%, -50%) считается от текущего размера счётчика, а он
-      // меняется на разряде 9 → 10. Поэтому центрирование самокорректируется
-      // покадрово, и число растёт симметрично, а не съезжает вправо.
       priceCounter.animate([
         {
-          transform: `translate(-50%, -50%) translate(${fromCenter.x.toFixed(2)}px, ${fromCenter.y.toFixed(2)}px)`,
+          transform: `translate(${fromShift.x.toFixed(2)}px, ${fromShift.y.toFixed(2)}px)`,
           color: fromColor,
         },
         {
-          transform: `translate(-50%, -50%) translate(${toCenter.x.toFixed(2)}px, ${toCenter.y.toFixed(2)}px)`,
+          transform: `translate(${toShift.x.toFixed(2)}px, ${toShift.y.toFixed(2)}px)`,
           color: toColor,
         },
       ], { duration: PRICE_TRANSITION_DURATION, easing, fill: "both" }),

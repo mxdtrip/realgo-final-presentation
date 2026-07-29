@@ -2138,11 +2138,18 @@ h2 {
   font-variant-numeric: lining-nums tabular-nums;
 }
 
+/* Нулевая ширина: «/месяц» свисает вправо, но в ширину строки не входит,
+   поэтому «$12» центрируется ровно так же, как «$0» на слайде Free, и число
+   не уезжает вбок при переходе. Отступ задан transform-ом — он не влияет
+   на раскладку, в отличие от margin. */
 .price-period {
-  margin-left: 18px;
+  display: inline-block;
+  width: 0;
+  transform: translateX(18px);
   color: var(--gray);
   font-size: 30px;
   letter-spacing: -0.03em;
+  white-space: nowrap;
 }
 
 /* Едва различимая надпись во весь фон. Кегли подобраны по метрикам Manrope
