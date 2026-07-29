@@ -56,7 +56,15 @@
   --green: #30d158;
   --line-dark: rgba(255, 255, 255, 0.16);
   --line-light: rgba(0, 0, 0, 0.14);
+  --gold: #e8d094;
   --stage-scale: 1;
+}
+
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 * {
@@ -562,6 +570,47 @@ kbd {
   padding: 0 150px;
   text-align: center;
   transform: translate(-50%, -50%);
+}
+
+/* Номинации: лавровые венки в стиле кинопостеров.
+   Одна ветвь описана как <symbol> в index.html, правая — та же ветвь по scaleX(-1). */
+.awards {
+  position: absolute;
+  right: 120px;
+  bottom: 88px;
+  left: 120px;
+  display: flex;
+  gap: 58px;
+  align-items: center;
+  justify-content: center;
+}
+
+.award {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.award-branch {
+  flex: none;
+  width: 36px;
+  height: 72px;
+  filter: drop-shadow(0 0 13px rgba(212, 175, 55, 0.2));
+}
+
+.award-branch.is-mirrored {
+  transform: scaleX(-1);
+}
+
+.award-label {
+  color: var(--gold);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.055em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .kicker {

@@ -12,6 +12,29 @@
     </script>
   </head>
   <body>
+    <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="laurelGold" x1="0" y1="0" x2="0.3" y2="1">
+          <stop offset="0" stop-color="#fbf1c7" />
+          <stop offset="0.36" stop-color="#e6c86a" />
+          <stop offset="0.72" stop-color="#c99a2e" />
+          <stop offset="1" stop-color="#8d6d21" />
+        </linearGradient>
+        <g id="laurelBranch">
+          <path d="M52 124 C14 104 4 52 38 4" fill="none" stroke="url(#laurelGold)" stroke-width="2.6" stroke-linecap="round" />
+          <g fill="url(#laurelGold)">
+            <ellipse cx="34.24" cy="118.75" rx="8.61" ry="3.49" transform="rotate(166.93 34.24 118.75)" />
+            <ellipse cx="23.11" cy="106.48" rx="9.36" ry="3.80" transform="rotate(-179.60 23.11 106.48)" />
+            <ellipse cx="15.13" cy="91.88" rx="10.10" ry="4.10" transform="rotate(-166.47 15.13 91.88)" />
+            <ellipse cx="10.89" cy="75.68" rx="10.35" ry="4.20" transform="rotate(-153.95 10.89 75.68)" />
+            <ellipse cx="10.73" cy="58.86" rx="9.61" ry="3.90" transform="rotate(-142.18 10.73 58.86)" />
+            <ellipse cx="13.83" cy="41.57" rx="8.86" ry="3.59" transform="rotate(-131.15 13.83 41.57)" />
+            <ellipse cx="20.25" cy="24.11" rx="8.11" ry="3.29" transform="rotate(-120.85 20.25 24.11)" />
+            <ellipse cx="30.06" cy="6.77" rx="7.37" ry="2.99" transform="rotate(-111.24 30.06 6.77)" />
+          </g>
+        </g>
+      </defs>
+    </svg>
     <main id="stage" class="stage" data-theme="dark" aria-label="Презентация ReAlgo">
       <div class="deck-chrome" aria-hidden="true">
         <a class="brand" href="https://realgo.dev" target="_blank" rel="noreferrer">
@@ -27,6 +50,28 @@
             <p class="kicker">Финал хакатона · AI</p>
             <h1>Код прошёл.<br /><span class="accent-blue">Память — нет.</span></h1>
             <p class="subhead">ReAlgo превращает решённые задачи в навык, который возвращается на собеседовании.</p>
+          </div>
+          <div class="awards" aria-label="Номинации хакатона">
+            <div class="award">
+              <svg class="award-branch" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+              <span class="award-label">Лучший проект<br />хакатона</span>
+              <svg class="award-branch is-mirrored" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+            </div>
+            <div class="award">
+              <svg class="award-branch" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+              <span class="award-label">Проект с максимальным<br />коммерческим<br />потенциалом</span>
+              <svg class="award-branch is-mirrored" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+            </div>
+            <div class="award">
+              <svg class="award-branch" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+              <span class="award-label">Лучший инструмент<br />для разработчика</span>
+              <svg class="award-branch is-mirrored" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+            </div>
+            <div class="award">
+              <svg class="award-branch" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+              <span class="award-label">Выбор<br />Kodik</span>
+              <svg class="award-branch is-mirrored" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
+            </div>
           </div>
           <aside class="speaker-notes"><strong>00:00–00:20</strong><p>«Кто видел Accepted, а через две недели уже не мог воспроизвести решение?» Это не проблема интеллекта. Между решением и памятью просто нет системы.</p></aside>
         </section>
