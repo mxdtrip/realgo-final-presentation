@@ -130,7 +130,12 @@ createServer((request, response) => {
   }
 
   if (extname(filePath).toLowerCase() === ".html") {
-    const html = readFileSync(filePath, "utf8").replace("</body>", `${liveReloadScript}\n</body>`);
+    const assetVersion = encodeURIComponent(getProjectVersion());
+    const html = readFileSync(filePath, "utf8")
+      .replace(/(href="apple\.css)(?:\?[^\"]*)?"/g, `$1?dev=${assetVersion}"`)
+      .replace(/(src="deck\.js)(?:\?[^\"]*)?"/g, `$1?dev=${assetVersion}"`)
+      .replace(/(src="macbook-3d\.js)(?:\?[^\"]*)?"/g, `$1?dev=${assetVersion}"`)
+      .replace("</body>", `${liveReloadScript}\n</body>`);
     response.writeHead(200, {
       "Cache-Control": "no-store",
       "Content-Length": Buffer.byteLength(html),
