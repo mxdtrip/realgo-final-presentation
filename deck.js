@@ -27,7 +27,7 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const teamMembers = [
     {
-      name: "xdtrip",
+      name: "Mxdtrip",
       duty: "Координация, продукт, AI-интеграция, браузерное расширение и deploy.",
     },
     {
@@ -39,16 +39,16 @@
       duty: "Backend и DevOps: API, инфраструктура, надёжность и идемпотентность операций.",
     },
     {
-      name: "P1xart",
-      duty: "Миграции, контракты данных и согласованность состояния между слоями продукта.",
-    },
-    {
       name: "bryack",
       duty: "Backend и тестирование: серверная логика, проверки и устойчивость критических потоков.",
     },
     {
       name: "pagister",
       duty: "QA: пользовательские сценарии, интеграционные проверки и валидация релизов.",
+    },
+    {
+      name: "P1xart",
+      duty: "Миграции, контракты данных и согласованность состояния между слоями продукта.",
     },
   ];
   const magicMovePairs = [
