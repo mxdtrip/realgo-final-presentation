@@ -96,17 +96,18 @@
       [".product-heading", ".ai-copy", "morph-primary"],
     ],
     [
-      [".macbook-3d-slot", ".stage-cards", "morph-surface"],
-      [".ai-copy h2", ".three-stages .kicker", "morph-primary"],
+      [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
+      [".ai-copy", ".product-demo-copy", "morph-primary"],
     ],
     [
-      [".stage-cards", ".rating", "morph-surface"],
-      [".three-stages .kicker", ".difficulty-keynote .kicker", "morph-kicker"],
+      [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
+      [".product-demo-copy", ".product-demo-copy", "morph-primary"],
+      [".product-demo-rail", ".product-demo-rail", "morph-kicker"],
     ],
     [
-      [".difficulty-keynote h2", ".cards-copy h2", "morph-primary"],
-      [".rating", ".memory-cards", "morph-surface"],
-      [".difficulty-keynote .kicker", ".cards-copy .kicker", "morph-kicker"],
+      [".product-demo-copy h2", ".cards-copy h2", "morph-primary"],
+      [".macbook-3d-slot", ".memory-cards", "morph-surface"],
+      [".product-demo-copy .kicker", ".cards-copy .kicker", "morph-kicker"],
     ],
     [
       [".giant-dark", ".atlas-numbers", "morph-surface"],

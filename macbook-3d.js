@@ -8,7 +8,7 @@ const KEYBOARD_ENGRAVING_MATERIAL = "sIfSZcqgDlKMJPf";
 const SCREEN_WIDTH = 1600;
 const SCREEN_HEIGHT = 1000;
 const VIDEO_FPS = 24;
-const CAMERA_MOVE_MS = 3200;
+const CAMERA_MOVE_MS = 3800;
 const stage = document.getElementById("stage");
 const slots = Array.from(document.querySelectorAll(".macbook-3d-slot"));
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -42,20 +42,47 @@ if (stage && slots.length) {
     wide: {
       camera: new THREE.Vector3(0.42, 0.16, 6.8),
       lookAt: new THREE.Vector3(0.3, 0.03, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 26,
+      arc: 1,
       position: new THREE.Vector3(0.58, -0.24, 0),
       rotation: new THREE.Vector3(-0.045, -0.035, 0),
     },
     extension: {
       camera: new THREE.Vector3(0.68, 0.2, 4.5),
       lookAt: new THREE.Vector3(0.55, 0.11, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 26,
+      arc: 1,
       position: new THREE.Vector3(0.64, -0.15, 0.02),
       rotation: new THREE.Vector3(-0.058, -0.06, 0),
     },
     agent: {
       camera: new THREE.Vector3(0.98, 0.24, 3.92),
       lookAt: new THREE.Vector3(0.73, 0.14, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 25,
+      arc: -1,
       position: new THREE.Vector3(0.82, -0.12, 0.04),
       rotation: new THREE.Vector3(-0.052, 0.028, 0),
+    },
+    stages: {
+      camera: new THREE.Vector3(1.04, 0.24, 3.35),
+      lookAt: new THREE.Vector3(0.8, 0.14, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 24,
+      arc: 1,
+      position: new THREE.Vector3(0.78, -0.1, 0.05),
+      rotation: new THREE.Vector3(-0.045, 0.055, -0.002),
+    },
+    rating: {
+      camera: new THREE.Vector3(1.08, 0.2, 3.05),
+      lookAt: new THREE.Vector3(0.82, 0.1, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 23.5,
+      arc: -1,
+      position: new THREE.Vector3(0.72, -0.08, 0.04),
+      rotation: new THREE.Vector3(-0.035, -0.015, 0.004),
     },
   };
 
@@ -63,6 +90,9 @@ if (stage && slots.length) {
     return {
       camera: pose.camera.clone(),
       lookAt: pose.lookAt.clone(),
+      up: pose.up.clone(),
+      fov: pose.fov,
+      arc: pose.arc,
       position: pose.position.clone(),
       rotation: pose.rotation.clone(),
     };
@@ -71,6 +101,8 @@ if (stage && slots.length) {
   const currentPose = clonePose(shotPoses.wide);
   let shotFrom = clonePose(shotPoses.wide);
   let shotTo = clonePose(shotPoses.extension);
+  const shotControlA = new THREE.Vector3();
+  const shotControlB = new THREE.Vector3();
   let shotStartedAt = performance.now();
 
   const environmentGenerator = new THREE.PMREMGenerator(renderer);
@@ -134,6 +166,8 @@ if (stage && slots.length) {
   const productVideos = {
     extension: createProductVideo("assets/product-extension.mp4"),
     agent: createProductVideo("assets/product-agent.mp4"),
+    stages: createProductVideo("assets/product-stages.mp4"),
+    rating: createProductVideo("assets/product-rating.mp4"),
   };
 
   let model = null;
@@ -305,7 +339,7 @@ if (stage && slots.length) {
   }
 
   function drawScreen(mode, restartVideo = false) {
-    activeMode = mode === "agent" ? "agent" : "extension";
+    activeMode = Object.hasOwn(productVideos, mode) ? mode : "extension";
     const activeVideo = productVideos[activeMode];
     Object.entries(productVideos).forEach(([name, video]) => {
       if (name !== activeMode) video.pause();
@@ -316,7 +350,7 @@ if (stage && slots.length) {
     }
     const hasVideoFrame = drawVideoScreen(activeVideo);
     if (!hasVideoFrame) {
-      if (activeMode === "agent") drawAgentScreen();
+      if (activeMode === "agent" || activeMode === "stages") drawAgentScreen();
       else drawExtensionScreen();
     }
     commitScreenTexture();
@@ -344,14 +378,34 @@ if (stage && slots.length) {
   function copyPose(target, source) {
     target.camera.copy(source.camera);
     target.lookAt.copy(source.lookAt);
+    target.up.copy(source.up);
+    target.fov = source.fov;
+    target.arc = source.arc;
     target.position.copy(source.position);
     target.rotation.copy(source.rotation);
+  }
+
+  function cubicBezierVector(target, start, controlA, controlB, end, progress) {
+    const inverse = 1 - progress;
+    target.copy(start).multiplyScalar(inverse * inverse * inverse)
+      .addScaledVector(controlA, 3 * inverse * inverse * progress)
+      .addScaledVector(controlB, 3 * inverse * progress * progress)
+      .addScaledVector(end, progress * progress * progress);
   }
 
   function startCameraMove(mode, enterFromWide = false, immediate = false) {
     if (enterFromWide) copyPose(currentPose, shotPoses.wide);
     copyPose(shotFrom, currentPose);
     copyPose(shotTo, shotPoses[mode] || shotPoses.extension);
+    const travel = shotTo.camera.clone().sub(shotFrom.camera);
+    const travelDistance = travel.length();
+    const averageUp = shotFrom.up.clone().add(shotTo.up).normalize();
+    const side = travel.clone().cross(averageUp);
+    if (side.lengthSq() < 0.0001) side.set(1, 0, 0);
+    side.normalize().multiplyScalar((shotTo.arc || 1) * Math.min(0.18, 0.06 + travelDistance * 0.055));
+    const lift = averageUp.multiplyScalar(Math.min(0.16, 0.07 + travelDistance * 0.035));
+    shotControlA.copy(shotFrom.camera).addScaledVector(travel, 0.3).add(lift).add(side);
+    shotControlB.copy(shotFrom.camera).addScaledVector(travel, 0.72).add(lift).add(side);
     shotStartedAt = performance.now();
     if (immediate || reduceMotion) copyPose(currentPose, shotTo);
   }
@@ -363,13 +417,18 @@ if (stage && slots.length) {
     const eased = progress < 0.5
       ? 4 * progress * progress * progress
       : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-    currentPose.camera.lerpVectors(shotFrom.camera, shotTo.camera, eased);
+    cubicBezierVector(currentPose.camera, shotFrom.camera, shotControlA, shotControlB, shotTo.camera, eased);
     currentPose.lookAt.lerpVectors(shotFrom.lookAt, shotTo.lookAt, eased);
+    currentPose.up.lerpVectors(shotFrom.up, shotTo.up, eased).normalize();
+    currentPose.fov = THREE.MathUtils.lerp(shotFrom.fov, shotTo.fov, eased);
     currentPose.position.lerpVectors(shotFrom.position, shotTo.position, eased);
     currentPose.rotation.lerpVectors(shotFrom.rotation, shotTo.rotation, eased);
 
     const idle = reduceMotion ? 0 : Math.sin(now * 0.00048) * 0.006;
     camera.position.copy(currentPose.camera);
+    camera.up.copy(currentPose.up);
+    camera.fov = currentPose.fov;
+    camera.updateProjectionMatrix();
     camera.lookAt(currentPose.lookAt);
     modelPivot.position.copy(currentPose.position);
     modelPivot.position.y += idle;
@@ -518,6 +577,101 @@ if (stage && slots.length) {
     model.position.copy(center).multiplyScalar(-modelScale);
     modelPivot.add(model);
     modelPivot.updateMatrixWorld(true);
+
+    // Build every close shot from the actual screen plane. The lid in this
+    // GLB is tilted, so a generic lookAt(0, 0, 0) introduces visible keystone
+    // distortion and aims below the product UI. Reading the mesh transform
+    // gives us a stable screen-local right/up/normal frame for cinematic
+    // dolly shots that remain optically aligned with the display.
+    screenMesh.geometry.computeBoundingBox();
+    const screenCenter = screenMesh.geometry.boundingBox
+      .getCenter(new THREE.Vector3());
+    screenMesh.localToWorld(screenCenter);
+    modelPivot.worldToLocal(screenCenter);
+
+    const screenQuaternion = screenMesh.getWorldQuaternion(new THREE.Quaternion());
+    const pivotQuaternionInverse = modelPivot
+      .getWorldQuaternion(new THREE.Quaternion())
+      .invert();
+    screenQuaternion.premultiply(pivotQuaternionInverse);
+
+    const screenSize = screenMesh.geometry.boundingBox.getSize(new THREE.Vector3());
+    const localAxes = [
+      new THREE.Vector3(1, 0, 0),
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(0, 0, 1),
+    ];
+    const screenAxes = localAxes.map((axis) => axis.applyQuaternion(screenQuaternion).normalize());
+    const dimensions = [screenSize.x, screenSize.y, screenSize.z];
+    const normalAxisIndex = dimensions.indexOf(Math.min(...dimensions));
+    const surfaceAxisIndexes = [0, 1, 2].filter((index) => index !== normalAxisIndex);
+    const upAxisIndex = surfaceAxisIndexes.reduce((best, index) => (
+      Math.abs(screenAxes[index].y) > Math.abs(screenAxes[best].y) ? index : best
+    ));
+    const screenNormal = screenAxes[normalAxisIndex].clone();
+    const screenUp = screenAxes[upAxisIndex].clone();
+    if (screenNormal.dot(shotPoses.wide.camera.clone().sub(screenCenter)) < 0) {
+      screenNormal.negate();
+    }
+    screenUp.addScaledVector(screenNormal, -screenUp.dot(screenNormal)).normalize();
+    if (screenUp.y < 0) screenUp.negate();
+    const screenRight = screenUp.clone().cross(screenNormal).normalize();
+
+    function configureScreenShot(mode, config) {
+      const pose = shotPoses[mode];
+      const modelQuaternion = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(pose.rotation.x, pose.rotation.y, pose.rotation.z)
+      );
+      const centerInShot = screenCenter.clone()
+        .applyQuaternion(modelQuaternion)
+        .add(pose.position);
+      const normalInShot = screenNormal.clone().applyQuaternion(modelQuaternion).normalize();
+      const upInShot = screenUp.clone().applyQuaternion(modelQuaternion).normalize();
+      const rightInShot = screenRight.clone().applyQuaternion(modelQuaternion).normalize();
+
+      pose.camera.copy(centerInShot)
+        .addScaledVector(normalInShot, config.distance)
+        .addScaledVector(rightInShot, config.cameraX)
+        .addScaledVector(upInShot, config.cameraY);
+      pose.lookAt.copy(centerInShot)
+        .addScaledVector(rightInShot, config.targetX)
+        .addScaledVector(upInShot, config.targetY);
+      pose.up.copy(upInShot);
+      pose.fov = config.fov;
+    }
+
+    configureScreenShot("extension", {
+      distance: 4.5,
+      cameraX: -0.04,
+      cameraY: 0.18,
+      targetX: 0.08,
+      targetY: -0.02,
+      fov: 26,
+    });
+    configureScreenShot("agent", {
+      distance: 3.72,
+      cameraX: 0.04,
+      cameraY: 0.14,
+      targetX: 0.34,
+      targetY: -0.01,
+      fov: 25,
+    });
+    configureScreenShot("stages", {
+      distance: 3.45,
+      cameraX: 0.1,
+      cameraY: 0.08,
+      targetX: 0.44,
+      targetY: -0.12,
+      fov: 25,
+    });
+    configureScreenShot("rating", {
+      distance: 3.25,
+      cameraX: 0.14,
+      cameraY: 0.05,
+      targetX: 0.46,
+      targetY: -0.14,
+      fov: 25,
+    });
 
     const engravingCenter = new THREE.Box3()
       .setFromObject(keyboardEngraving)
