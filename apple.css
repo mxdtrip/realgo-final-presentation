@@ -640,6 +640,8 @@ h2 {
 }
 
 .giant-number {
+  --num-tracking: -0.09em;
+  --num-char-tracking: -0.02em;
   position: absolute;
   top: 48%;
   left: 50%;
@@ -650,11 +652,17 @@ h2 {
   font-weight: 650;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 0.84;
-  letter-spacing: -0.09em;
+  /* Трекинг задаётся ТОЛЬКО margin-ом слотов (--num-tracking).
+     letter-spacing здесь дал бы вторую, неучтённую порцию трекинга
+     после каждого атомарного бокса — ширина строки переставала бы
+     совпадать с расчётной, и число дёргалось по горизонтали. */
+  letter-spacing: normal;
   white-space: nowrap;
 }
 
 .market-counter {
+  --num-tracking: -0.09em;
+  --num-char-tracking: -0.02em;
   position: absolute;
   top: 48%;
   left: 50%;
@@ -667,7 +675,7 @@ h2 {
   font-weight: 650;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 0.84;
-  letter-spacing: -0.09em;
+  letter-spacing: normal;
   text-align: center;
   white-space: nowrap;
   opacity: 0;
@@ -679,11 +687,47 @@ h2 {
   opacity: 1;
 }
 
+/* Строка счётчика имеет постоянную ширину: «,X» и «%» всегда занимают
+   свои слоты. Оптическое центрирование при появлении/исчезновении частей
+   делается transform-ом — он не вызывает reflow и не округляется до пикселя. */
+.market-counter-row {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.market-counter.is-visible .market-counter-row,
+.market-counter.is-visible .market-counter-optional {
+  will-change: transform;
+}
+
 .market-counter-optional {
   display: inline-block;
-  overflow: hidden;
   vertical-align: top;
   transform-origin: left center;
+}
+
+/* Каждая цифра занимает слот постоянной ширины (по самой широкой цифре шрифта),
+   поэтому смена значения не меняет ширину строки и число не дёргается по горизонтали.
+   Трекинг задаётся margin-ом самих боксов, а не letter-spacing контейнера:
+   иначе статичное число и анимированный счётчик получают разную ширину строки.
+   --num-tracking — расстояние между цифрами, --num-char-tracking — воздух
+   вокруг запятой и «%» (они узкие и слипаются сильнее цифр). */
+.num-slot,
+.num-char {
+  display: inline-block;
+  margin-right: var(--num-tracking, -0.09em);
+  letter-spacing: normal;
+}
+
+.num-char {
+  margin-right: var(--num-char-tracking, -0.02em);
+  margin-left: var(--num-char-tracking, -0.02em);
+}
+
+.num-slot {
+  width: var(--digit-slot, 0.62em);
+  text-align: center;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .stage.is-market-counting .stat-keynote .giant-number {

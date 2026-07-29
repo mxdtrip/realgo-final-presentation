@@ -7,6 +7,7 @@
   const timer = document.getElementById("timer");
   const help = document.getElementById("help");
   const marketCounter = document.getElementById("marketCounter");
+  const marketCounterRow = document.getElementById("marketCounterRow");
   const marketCounterMain = document.getElementById("marketCounterMain");
   const marketCounterDecimal = document.getElementById("marketCounterDecimal");
   const marketCounterPercent = document.getElementById("marketCounterPercent");
@@ -148,6 +149,7 @@
   let viewTransitionSequence = 0;
   let marketTransitionRunning = false;
   let marketCounterFrame = null;
+  const counterMetrics = { decimal: 0.72, percent: 0.92 };
 
   function getInitialSlide() {
     const hashSlide = Number.parseInt(window.location.hash.replace("#", ""), 10);
@@ -349,6 +351,80 @@
     return Math.max(0, Math.min(1, value));
   }
 
+  // Ширина слота цифры и ширины «,X» / «%» измеряются по реальному шрифту:
+  // хардкод em-значений давал рассинхрон и горизонтальный сдвиг.
+  function measureDigitSlotEm(referenceElement) {
+    const styles = window.getComputedStyle(referenceElement);
+    const probe = document.createElement("span");
+    probe.style.cssText = "position:absolute;top:-9999px;left:-9999px;visibility:hidden;white-space:pre;letter-spacing:normal;font-size:1000px;";
+    probe.style.fontFamily = styles.fontFamily;
+    probe.style.fontWeight = styles.fontWeight;
+    probe.style.fontStyle = styles.fontStyle;
+    probe.style.fontVariantNumeric = styles.fontVariantNumeric;
+    probe.style.fontFeatureSettings = styles.fontFeatureSettings;
+    document.body.appendChild(probe);
+
+    let widest = 0;
+    for (const digit of "0123456789") {
+      probe.textContent = digit;
+      widest = Math.max(widest, probe.getBoundingClientRect().width);
+    }
+    probe.remove();
+    return widest > 0 ? widest / 1000 : 0.62;
+  }
+
+  function getStageScale() {
+    const raw = Number.parseFloat(window.getComputedStyle(stage).getPropertyValue("--stage-scale"));
+    return Number.isFinite(raw) && raw > 0 ? raw : 1;
+  }
+
+  // Меряем субпиксельно (getBoundingClientRect, а не offsetWidth): целочисленное
+  // округление ширины давало ошибку, которая каждый кадр падала на разные пиксели.
+  function measureOptionalWidthEm(element, fontSizePx, fallback) {
+    const inlineWidth = element.style.width;
+    const inlineOpacity = element.style.opacity;
+    const inlineTransform = element.style.transform;
+    const inlineFilter = element.style.filter;
+    element.style.width = "auto";
+    element.style.transform = "none";
+    element.style.filter = "none";
+    element.style.opacity = "0";
+    const measured = element.getBoundingClientRect().width / (getStageScale() * fontSizePx);
+    element.style.width = inlineWidth;
+    element.style.opacity = inlineOpacity;
+    element.style.transform = inlineTransform;
+    element.style.filter = inlineFilter;
+    return measured > 0 ? measured : fallback;
+  }
+
+  function calibrateCounterMetrics() {
+    const slotEm = measureDigitSlotEm(marketCounter);
+    document.documentElement.style.setProperty("--digit-slot", `${slotEm.toFixed(4)}em`);
+
+    const fontSizePx = Number.parseFloat(window.getComputedStyle(marketCounter).fontSize) || 310;
+    renderDigits(marketCounterMain, "0");
+    renderDigits(marketCounterDecimal, ",0");
+    // «%» тоже через слоты — иначе у счётчика и статичного числа разный бокс-модель.
+    renderDigits(marketCounterPercent, "%");
+    marketCounterDecimal.style.width = "";
+    marketCounterPercent.style.width = "";
+    counterMetrics.decimal = measureOptionalWidthEm(marketCounterDecimal, fontSizePx, 0.72);
+    counterMetrics.percent = measureOptionalWidthEm(marketCounterPercent, fontSizePx, 0.92);
+    // Ширина фиксируется один раз: во время анимации layout не меняется вообще.
+    marketCounterDecimal.style.width = `${counterMetrics.decimal.toFixed(4)}em`;
+    marketCounterPercent.style.width = `${counterMetrics.percent.toFixed(4)}em`;
+  }
+
+  // Статичные числа на слайдах используют ту же разметку слотов,
+  // чтобы при передаче анимации счётчику не было скачка.
+  function applyDigitSlotsToStaticNumbers() {
+    document.querySelectorAll(".giant-number[data-value]").forEach((element) => {
+      const source = element.dataset.display || element.textContent.trim();
+      element.dataset.display = source;
+      renderDigits(element, source);
+    });
+  }
+
   function easeInOutCubic(value) {
     return value < 0.5
       ? 4 * value * value * value
@@ -362,24 +438,58 @@
     return toVisible ? easedProgress : 1 - easedProgress;
   }
 
-  function styleOptionalCounterPart(element, presence, width) {
-    element.style.width = `${width * presence}em`;
+  // Ширина не трогается: часть «схлопывается» сдвигом по X, а не reflow-ом.
+  function styleOptionalCounterPart(element, presence, shiftEm) {
     element.style.opacity = presence.toFixed(3);
-    element.style.filter = `blur(${((1 - presence) * 5).toFixed(2)}px)`;
-    element.style.transform = `translateY(${((1 - presence) * 0.11).toFixed(3)}em)`;
+    element.style.filter = presence >= 1 ? "none" : `blur(${((1 - presence) * 5).toFixed(2)}px)`;
+    element.style.transform = `translate(${shiftEm.toFixed(4)}em, ${((1 - presence) * 0.11).toFixed(3)}em)`;
+  }
+
+  // Цифры рендерятся в слоты фиксированной ширины: ширина строки не зависит
+  // от того, какие именно цифры показаны, поэтому счётчик не дёргается по горизонтали.
+  function renderDigits(container, text) {
+    // Исходная разметка — текстовый узел («10,3», «%»). Его нужно удалить,
+    // иначе спаны-слоты добавятся рядом и значение отрисуется дважды.
+    Array.from(container.childNodes).forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) node.remove();
+    });
+
+    if (container.dataset.digits === text) return;
+    container.dataset.digits = text;
+
+    const characters = Array.from(text);
+    while (container.childElementCount > characters.length) {
+      container.lastElementChild.remove();
+    }
+    while (container.childElementCount < characters.length) {
+      container.appendChild(document.createElement("span"));
+    }
+
+    characters.forEach((character, index) => {
+      const cell = container.children[index];
+      const isDigit = character >= "0" && character <= "9";
+      cell.className = isDigit ? "num-slot" : "num-char";
+      if (cell.textContent !== character) cell.textContent = character;
+    });
   }
 
   function renderMarketCounter(value, decimalPresence, percentPresence) {
-    if (decimalPresence > 0.01) {
-      const tenths = Math.round(value * 10);
-      marketCounterMain.textContent = String(Math.floor(tenths / 10));
-      marketCounterDecimal.textContent = `,${Math.abs(tenths % 10)}`;
-    } else {
-      marketCounterMain.textContent = String(Math.round(value));
-      marketCounterDecimal.textContent = ",0";
-    }
-    styleOptionalCounterPart(marketCounterDecimal, decimalPresence, 0.72);
-    styleOptionalCounterPart(marketCounterPercent, percentPresence, 0.92);
+    // Единая основа округления: целая часть не «перепрыгивает» в момент,
+    // когда десятичная часть скрывается.
+    const tenths = Math.round(value * 10);
+    renderDigits(marketCounterMain, String(Math.trunc(tenths / 10)));
+    renderDigits(marketCounterDecimal, `,${Math.abs(tenths % 10)}`);
+
+    // Скрытые части не удаляются из потока, а «съезжают»:
+    // «%» подтягивается влево на схлопнувшуюся десятичную часть,
+    // а вся строка компенсируется на половину освободившейся ширины,
+    // чтобы число осталось оптически по центру. Один плавный transform
+    // вместо двух встречных анимаций ширины — горизонтальных рывков нет.
+    const decimalCollapse = (1 - decimalPresence) * counterMetrics.decimal;
+    const percentCollapse = (1 - percentPresence) * counterMetrics.percent;
+    styleOptionalCounterPart(marketCounterDecimal, decimalPresence, 0);
+    styleOptionalCounterPart(marketCounterPercent, percentPresence, -decimalCollapse);
+    marketCounterRow.style.transform = `translateX(${((decimalCollapse + percentCollapse) / 2).toFixed(4)}em)`;
   }
 
   function animateMarketCounter(fromMetric, toMetric, duration) {
@@ -725,6 +835,14 @@
   });
 
   buildDots();
+  calibrateCounterMetrics();
+  applyDigitSlotsToStaticNumbers();
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      calibrateCounterMetrics();
+      applyDigitSlotsToStaticNumbers();
+    });
+  }
   resizeStage();
   showSlide(currentSlide, { skipHash: true });
   if (slides[currentSlide] === teamSlide) {
