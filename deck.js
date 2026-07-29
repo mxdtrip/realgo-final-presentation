@@ -153,6 +153,7 @@
   let marketTransitionRunning = false;
   let planetTransitionRunning = false;
   let priceTransitionRunning = false;
+  let productCopyTransitionRunning = false;
   const PRICE_TRANSITION_DURATION = 1400;
   let planetFrame = null;
   const PLANET_FLIGHT_DURATION = 1500;
@@ -654,6 +655,68 @@
     return animations;
   }
 
+  function isProductCopyTransition(previousIndex, nextIndex) {
+    return Math.abs(nextIndex - previousIndex) === 1
+      && Boolean(slides[previousIndex]?.querySelector(".macbook-3d-slot"))
+      && Boolean(slides[nextIndex]?.querySelector(".macbook-3d-slot"));
+  }
+
+  // Переход между слайдами с MacBook идёт БЕЗ view transition.
+  // View transition подменяет страницу статичными снимками, а 3D-сцена в это
+  // время живёт: движение камеры длится 3800мс. Снимок замораживал ракурс на
+  // время перехода, а в конце управление возвращалось живому канвасу, который
+  // уже уехал на треть пути, — отсюда второй «скачок» всей сцены.
+  // Здесь канвас не прерывается ни на кадр: он физически один и переезжает
+  // в новый слот сразу, а подписи старого слайда доигрывают затухание поверх.
+  async function runProductCopyTransition(nextIndex, previousIndex, options) {
+    if (productCopyTransitionRunning) return;
+    const previousSlide = slides[previousIndex];
+    const nextSlide = slides[nextIndex];
+    if (!previousSlide || !nextSlide || typeof Element.prototype.animate !== "function") {
+      commitSlide(nextIndex, previousIndex, options);
+      return;
+    }
+
+    productCopyTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+
+    previousSlide.classList.add("is-copy-fading");
+    commitSlide(nextIndex, previousIndex, options);
+
+    const selectors = [".product-overlay", ".platforms", ".product-demo-rail", ".model-credit"];
+    const animations = [];
+
+    selectors.forEach((selector) => {
+      const element = previousSlide.querySelector(selector);
+      if (!element) return;
+      animations.push(element.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 420,
+        easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+        fill: "both",
+      }));
+    });
+
+    selectors.forEach((selector, index) => {
+      const element = nextSlide.querySelector(selector);
+      if (!element) return;
+      animations.push(element.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 520,
+        delay: 300 + index * 45,
+        easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+        fill: "both",
+      }));
+    });
+
+    try {
+      await Promise.all(animations.map((animation) => animation.finished.catch(() => {})));
+    } finally {
+      animations.forEach((animation) => animation.cancel());
+      previousSlide.classList.remove("is-copy-fading");
+      productCopyTransitionRunning = false;
+    }
+  }
+
   function readPrice(slide) {
     const element = slide?.querySelector(".price[data-price]");
     if (!element) return null;
@@ -949,6 +1012,16 @@
 
     if (canCountPrice) {
       runPriceTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
+    const canFadeProductCopy = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isProductCopyTransition(previousSlide, nextSlide);
+
+    if (canFadeProductCopy) {
+      runProductCopyTransition(nextSlide, previousSlide, options);
       return;
     }
 

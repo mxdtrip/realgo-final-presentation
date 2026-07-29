@@ -463,7 +463,11 @@ if (stage && slots.length) {
       activeSlot = slot;
       activeSlot.appendChild(renderer.domElement);
     }
-    revealStartedAt = performance.now();
+    // Разгорание света — эффект ВХОДА в блок с MacBook, а не смены слайда
+    // внутри него. Раньше строка стояла безусловно: на каждом переходе
+    // 10 → 11 → 12 → 13 все четыре источника гасли в ноль и заново
+    // разгорались 1650мс, из-за чего сцена вспыхивала повторно.
+    if (enterFromWide) revealStartedAt = performance.now();
     drawScreen(activeSlot.dataset.macbookMode, true);
     startCameraMove(activeMode, enterFromWide, !isVisible);
     if (!isVisible) Object.values(productVideos).forEach((video) => video.pause());
