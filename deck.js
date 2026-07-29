@@ -12,6 +12,8 @@
   const marketCounterPercent = document.getElementById("marketCounterPercent");
   const teamSlide = document.querySelector(".slide-team");
   const teamHandles = Array.from(document.querySelectorAll("[data-team-index]"));
+  const teamOrbits = Array.from(document.querySelectorAll(".team-orbit"));
+  const teamPlanets = Array.from(document.querySelectorAll(".team-planet"));
   const memberRole = document.getElementById("memberRole");
   const memberNumber = document.getElementById("memberNumber");
   const memberName = document.getElementById("memberName");
@@ -138,6 +140,9 @@
   let activeTeamMember = 0;
   let teamRotationTimer = null;
   let teamSwitchTimer = null;
+  let teamOrbitFrame = null;
+  let teamOrbitElapsed = 0;
+  let teamOrbitStartedAt = 0;
   let activeViewTransition = null;
   let activeMagicMoveElements = [];
   let viewTransitionSequence = 0;
@@ -218,12 +223,61 @@
     }, 5000);
   }
 
+  function positionTeamPlanets(elapsedMilliseconds) {
+    const tilt = -6 * (Math.PI / 180);
+    const tiltCosine = Math.cos(tilt);
+    const tiltSine = Math.sin(tilt);
+
+    teamPlanets.forEach((planet) => {
+      const orbit = teamOrbits[Number(planet.dataset.orbitIndex)];
+      if (!orbit) return;
+      const duration = Number(planet.dataset.duration) || 24;
+      const phase = Number(planet.dataset.phase) || 0;
+      const angle = phase + (elapsedMilliseconds / 1000 / duration) * Math.PI * 2;
+      const ellipseX = Math.cos(angle) * orbit.offsetWidth * 0.5;
+      const ellipseY = Math.sin(angle) * orbit.offsetHeight * 0.5;
+      const orbitX = ellipseX * tiltCosine - ellipseY * tiltSine;
+      const orbitY = ellipseX * tiltSine + ellipseY * tiltCosine;
+      const depth = (Math.sin(angle) + 1) * 0.5;
+
+      planet.style.setProperty("--orbit-x", `${orbitX.toFixed(2)}px`);
+      planet.style.setProperty("--orbit-y", `${orbitY.toFixed(2)}px`);
+      planet.style.setProperty("--planet-depth-scale", (0.84 + depth * 0.22).toFixed(3));
+      planet.style.setProperty("--planet-depth-opacity", (0.56 + depth * 0.44).toFixed(3));
+      planet.style.zIndex = depth > 0.52 ? "12" : "6";
+    });
+  }
+
+  function animateTeamOrbits(now) {
+    positionTeamPlanets(teamOrbitElapsed + now - teamOrbitStartedAt);
+    teamOrbitFrame = window.requestAnimationFrame(animateTeamOrbits);
+  }
+
+  function startTeamOrbitMotion() {
+    if (reduceMotion) {
+      positionTeamPlanets(teamOrbitElapsed);
+      return;
+    }
+    if (teamOrbitFrame !== null) return;
+    teamOrbitStartedAt = performance.now();
+    teamOrbitFrame = window.requestAnimationFrame(animateTeamOrbits);
+  }
+
+  function stopTeamOrbitMotion() {
+    if (teamOrbitFrame === null) return;
+    teamOrbitElapsed += performance.now() - teamOrbitStartedAt;
+    window.cancelAnimationFrame(teamOrbitFrame);
+    teamOrbitFrame = null;
+  }
+
   function startTeamRotation() {
+    startTeamOrbitMotion();
     activateTeamMember(activeTeamMember, { immediate: true });
     restartTeamRotation();
   }
 
   function stopTeamRotation() {
+    stopTeamOrbitMotion();
     window.clearInterval(teamRotationTimer);
     window.clearTimeout(teamSwitchTimer);
     memberRole.classList.remove("is-running", "is-switching");
@@ -657,7 +711,7 @@
     if (distance > 0) previousSlide();
   }, { passive: true });
 
-  document.querySelectorAll(".team-handles [data-team-index]").forEach((button) => {
+  teamHandles.forEach((button) => {
     button.addEventListener("click", () => {
       activateTeamMember(Number(button.dataset.teamIndex));
       restartTeamRotation();
