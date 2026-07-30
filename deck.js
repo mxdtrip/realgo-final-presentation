@@ -111,30 +111,18 @@
     ],
     [
       [".giant-number", ".journey-candidate", "morph-card-a"],
-      [".stat-keynote h2", ".journey-keynote h2", "morph-primary"],
-      [".stat-keynote .kicker", ".journey-keynote .kicker", "morph-kicker"],
+    ],
+    [
+      [".journey-candidate", ".journey-candidate", "morph-card-a"],
+      [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
     ],
     [
       [".journey-candidate", ".journey-candidate", "morph-card-a"],
       [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
       [".journey-materials", ".journey-materials", "morph-surface"],
-      [".journey-keynote h2", ".journey-keynote h2", "morph-primary"],
-    ],
-    [
-      [".journey-candidate", ".journey-candidate", "morph-card-a"],
-      [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
-      [".journey-materials", ".journey-materials", "morph-surface"],
-      [".journey-keynote h2", ".journey-keynote h2", "morph-primary"],
-    ],
-    [
-      [".journey-candidate", ".journey-candidate", "morph-card-a"],
-      [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
-      [".journey-materials", ".journey-materials", "morph-surface"],
-      [".journey-keynote h2", ".journey-keynote h2", "morph-primary"],
     ],
     [
       [".journey-stage", ".atlas-numbers", "morph-surface"],
-      [".journey-keynote h2", ".atlas-keynote h2", "morph-primary"],
     ],
     [
       [".atlas-numbers", ".company-results", "morph-surface"],

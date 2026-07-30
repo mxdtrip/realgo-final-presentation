@@ -1176,6 +1176,14 @@ h2 {
   right: -18px;
 }
 
+.journey-proximity .journey-candidate {
+  left: 580px;
+}
+
+.journey-proximity .journey-vacancy {
+  right: 580px;
+}
+
 .journey-intro .journey-person svg {
   width: 118px;
   height: 118px;
