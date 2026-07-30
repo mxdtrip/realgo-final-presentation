@@ -182,15 +182,10 @@
       [".journey-materials", ".journey-materials", "morph-surface"],
     ],
     [
-      [".journey-stage", ".atlas-numbers", "morph-surface"],
+      [".journey-stage", ".taxonomy-flow", "morph-surface"],
     ],
     [
-      [".atlas-numbers", ".company-results", "morph-surface"],
-      [".atlas-keynote h2", ".company-keynote h2", "morph-primary"],
-    ],
-    [
-      [".company-results", ".roadmap-list", "morph-surface"],
-      [".company-keynote h2", ".roadmap-keynote h2", "morph-primary"],
+      [".taxonomy-flow", ".company-target-list", "morph-surface"],
     ],
     [
       [".roadmap-list", ".macbook-3d-slot", "morph-surface"],
@@ -209,10 +204,8 @@
       [".cards-copy h2", ".cycle-keynote h2", "morph-primary"],
     ],
     [
-      [".cycle", ".about-keynote", "morph-surface"],
-    ],
-    [
-      [".about-keynote", ".team-copy", "morph-primary"],
+      [".cycle", ".solar", "morph-surface"],
+      [".cycle-keynote h2", ".team-copy h2", "morph-primary"],
     ],
     [
       [".team-copy", ".monetization-keynote", "morph-primary"],
