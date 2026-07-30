@@ -55,6 +55,40 @@
       duty: "Миграции, контракты данных и согласованность состояния между слоями продукта.",
     },
   ];
+  const preparationFieldLabels = [
+    "Blind 75", "NeetCode", "Top Interview 150", "Cracking the Coding Interview",
+    "System Design", "Dynamic Programming", "Binary Search", "Two Pointers",
+    "Sliding Window", "Graphs", "Trees", "Heaps", "Backtracking", "Greedy",
+    "Recursion", "Intervals", "Linked Lists", "Stacks", "Queues", "Hash Maps",
+    "SQL", "Concurrency", "OOP", "Behavioral", "Mock Session", "Cheat Sheet",
+    "Discord", "Reddit", "Medium", "Подкасты", "Ментор", "Bootcamp",
+    "Daily Challenge", "Contest", "Company Tags", "Premium Lists", "Flashcards",
+    "Notion", "Obsidian", "Google Docs", "Excel", "PDF-гайды", "Статьи",
+    "Вебинары", "Интенсив", "Спринт", "Трекер", "Календарь", "Повторение",
+  ];
+
+  function buildPreparationFields() {
+    document.querySelectorAll(".journey-materials").forEach((container) => {
+      while (container.children.length < 100) {
+        const index = container.children.length;
+        const field = document.createElement("span");
+        field.className = "is-chaos-field";
+        field.textContent = preparationFieldLabels[(index - 18) % preparationFieldLabels.length];
+        container.appendChild(field);
+      }
+
+      Array.from(container.children).forEach((field, index) => {
+        if (index < 18) return;
+        const horizontal = 2 + ((index * 37 + Math.floor(index / 7) * 11) % 94);
+        const vertical = 2 + ((index * 53 + Math.floor(index / 5) * 17) % 91);
+        field.style.left = `${horizontal}%`;
+        field.style.top = `${vertical}%`;
+        field.style.setProperty("--field-delay", `${(0.95 + ((index * 7) % 58) * 0.055).toFixed(3)}s`);
+      });
+
+      container.dataset.fieldCount = String(container.children.length);
+    });
+  }
   const magicMovePairs = [
     [
       [".centered h1", ".giant-number", "morph-primary"],
@@ -1289,6 +1323,7 @@
     if (hashSlide !== currentSlide) showSlide(hashSlide, { skipHash: true });
   });
 
+  buildPreparationFields();
   buildDots();
   calibrateCounterMetrics();
   applyDigitSlotsToStaticNumbers();

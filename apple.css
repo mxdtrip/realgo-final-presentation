@@ -1098,6 +1098,14 @@ h2 {
   transition: color 650ms ease, background 650ms ease, border-color 650ms ease, filter 650ms ease, opacity 650ms ease, transform 650ms ease;
 }
 
+.journey-materials span.is-chaos-field {
+  padding: 7px 10px;
+  border-color: rgba(255, 255, 255, 0.09);
+  color: rgba(201, 211, 228, 0.48);
+  font-size: 9px;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.22);
+}
+
 .journey-materials span:nth-child(1) { left: 5%; top: 7%; }
 .journey-materials span:nth-child(2) { left: 25%; top: 2%; }
 .journey-materials span:nth-child(3) { left: 50%; top: 8%; }
@@ -1204,6 +1212,10 @@ h2 {
   animation: journey-intro-material 760ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.journey-intro.is-active .journey-materials span.is-chaos-field {
+  animation-delay: var(--field-delay);
+}
+
 .journey-intro.is-active .journey-materials span:nth-child(1) { animation-delay: 1.15s; }
 .journey-intro.is-active .journey-materials span:nth-child(2) { animation-delay: 1.32s; }
 .journey-intro.is-active .journey-materials span:nth-child(3) { animation-delay: 1.49s; }
@@ -1291,8 +1303,7 @@ h2 {
 }
 
 .journey-route .tangle {
-  stroke: rgba(160, 166, 178, 0.2);
-  opacity: 0.35;
+  opacity: 0;
 }
 
 .journey-route .journey-materials span {
@@ -1304,12 +1315,14 @@ h2 {
 }
 
 .journey-route .journey-materials span.is-route {
-  border-color: rgba(71, 161, 255, 0.72);
-  background: rgba(25, 116, 213, 0.2);
+  z-index: 8;
+  border-color: rgba(41, 151, 255, 0.8);
+  background: rgba(16, 64, 114, 0.82);
   color: white;
-  box-shadow: 0 0 24px rgba(41, 151, 255, 0.26);
+  box-shadow: 0 0 0 1px rgba(104, 190, 255, 0.24), 0 0 34px rgba(41, 151, 255, 0.52);
   filter: none;
   opacity: 1;
+  animation: journey-route-node 1.8s ease-in-out infinite alternate;
 }
 
 .journey-route .journey-route-line {
@@ -1325,6 +1338,13 @@ h2 {
 
 @keyframes journey-route-flow {
   to { stroke-dashoffset: -42; }
+}
+
+@keyframes journey-route-node {
+  to {
+    border-color: rgba(138, 210, 255, 1);
+    box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.12), 0 0 46px rgba(41, 151, 255, 0.72);
+  }
 }
 
 /* About */
