@@ -1060,10 +1060,13 @@
 
     runCountUp(slides[currentSlide]);
 
-    if (previousSlide === teamSlide.dataset.slide * 1 && currentSlide !== previousSlide) {
+    const previousSlideElement = slides[previousSlide];
+    const currentSlideElement = slides[currentSlide];
+
+    if (previousSlideElement === teamSlide && currentSlideElement !== teamSlide) {
       stopTeamRotation();
     }
-    if (currentSlide === teamSlide.dataset.slide * 1 && previousSlide !== currentSlide) {
+    if (currentSlideElement === teamSlide && previousSlideElement !== teamSlide) {
       startTeamRotation();
     }
 
