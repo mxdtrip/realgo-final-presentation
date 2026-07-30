@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=11" />
+    <link rel="stylesheet" href="apple.css?v=12" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -33,6 +33,18 @@
             <ellipse cx="30.06" cy="6.77" rx="7.37" ry="2.99" transform="rotate(-111.24 30.06 6.77)" />
           </g>
         </g>
+        <filter id="team-liquid-glass" x="-28%" y="-28%" width="156%" height="156%" color-interpolation-filters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.018 0.024" numOctaves="1" seed="19" result="glass-noise" />
+          <feGaussianBlur in="glass-noise" stdDeviation="1.35" result="glass-flow" />
+          <feDisplacementMap in="SourceGraphic" in2="glass-flow" scale="11" xChannelSelector="R" yChannelSelector="B" result="glass-refraction" />
+          <feColorMatrix in="glass-refraction" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="glass-red" />
+          <feColorMatrix in="glass-refraction" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="glass-green" />
+          <feColorMatrix in="glass-refraction" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="glass-blue" />
+          <feOffset in="glass-red" dx="-1.4" dy="0.35" result="glass-red-shift" />
+          <feOffset in="glass-blue" dx="1.4" dy="-0.35" result="glass-blue-shift" />
+          <feBlend in="glass-red-shift" in2="glass-green" mode="screen" result="glass-rg" />
+          <feBlend in="glass-rg" in2="glass-blue-shift" mode="screen" />
+        </filter>
       </defs>
     </svg>
     <main id="stage" class="stage" data-theme="dark" aria-label="Презентация ReAlgo">
