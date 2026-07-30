@@ -2170,7 +2170,7 @@ h2 {
 
 .taxonomy-platform-column footer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-self: center;
   width: 430px;
   box-sizing: border-box;
@@ -2178,11 +2178,11 @@ h2 {
 }
 
 .taxonomy-platform-column footer span {
-  text-align: right;
+  text-align: center;
 }
 
 .taxonomy-platform-column footer strong {
-  text-align: right;
+  text-align: center;
 }
 
 .taxonomy-platforms {
