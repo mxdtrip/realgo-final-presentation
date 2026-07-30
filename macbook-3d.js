@@ -1,13 +1,13 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { CSS3DObject, CSS3DRenderer } from "three/addons/renderers/CSS3DRenderer.js";
 
 const MODEL_URL = "assets/models/macbook-pro-m3-16.glb";
 const SCREEN_MATERIAL = "sfCQkHOWyrsLmor";
 const KEYBOARD_ENGRAVING_MATERIAL = "sIfSZcqgDlKMJPf";
 const SCREEN_WIDTH = 1600;
 const SCREEN_HEIGHT = 1000;
-const VIDEO_FPS = 24;
 const CAMERA_MOVE_MS = 3800;
 const stage = document.getElementById("stage");
 const slots = Array.from(document.querySelectorAll(".macbook-3d-slot"));
@@ -29,6 +29,9 @@ if (stage && slots.length) {
   renderer.setClearColor(0x000000, 0);
   renderer.domElement.className = "macbook-3d-canvas";
   renderer.domElement.setAttribute("aria-hidden", "true");
+
+  const cssRenderer = new CSS3DRenderer();
+  cssRenderer.domElement.className = "macbook-css3d-renderer";
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(26, 1, 0.05, 100);
@@ -151,34 +154,37 @@ if (stage && slots.length) {
   screenTexture.flipY = false;
   screenTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
-  function createProductVideo(source) {
-    const video = document.createElement("video");
-    video.src = source;
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.preload = "auto";
-    video.setAttribute("aria-hidden", "true");
-    video.load();
-    return video;
-  }
-
-  const productVideos = {
-    extension: createProductVideo("assets/product-extension.mp4"),
-    agent: createProductVideo("assets/product-agent.mp4"),
-    stages: createProductVideo("assets/product-stages.mp4"),
-    rating: createProductVideo("assets/product-rating.mp4"),
-  };
-
   let model = null;
   let activeSlot = null;
   let activeMode = "extension";
-  let agentImage = null;
   let sceneActive = false;
   let contactShadow = null;
   let contactBaseY = 0;
-  let lastVideoFrame = -1;
   let revealStartedAt = performance.now();
+  let uiFocusStartedAt = Number.POSITIVE_INFINITY;
+  let screenPlaneWidth = 0;
+  let screenPlaneHeight = 0;
+  let screenCenter = null;
+  let screenNormal = null;
+  let screenUp = null;
+  let screenRight = null;
+  let productUiObject = null;
+  let trackedPanel = null;
+  let trackedPanelWidth = 400;
+  let trackedPanelHeight = 372;
+  const planeCenter = new THREE.Vector3();
+  const screenBasisMatrix = new THREE.Matrix4();
+  const panelResizeObserver = typeof ResizeObserver === "undefined"
+    ? null
+    : new ResizeObserver((entries) => {
+      const entry = entries.at(-1);
+      if (!entry || entry.target !== trackedPanel) return;
+      const borderSize = Array.isArray(entry.borderBoxSize)
+        ? entry.borderBoxSize[0]
+        : entry.borderBoxSize;
+      trackedPanelWidth = borderSize?.inlineSize || entry.contentRect.width || trackedPanelWidth;
+      trackedPanelHeight = borderSize?.blockSize || entry.contentRect.height || trackedPanelHeight;
+    });
 
   function roundedRect(context, x, y, width, height, radius) {
     const corner = Math.min(radius, width / 2, height / 2);
@@ -205,127 +211,69 @@ if (stage && slots.length) {
 
   function drawExtensionScreen() {
     const context = screenContext;
-    context.fillStyle = "#0a0b0e";
+    context.fillStyle = "#0f1115";
     context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    context.fillStyle = "#111319";
-    context.fillRect(0, 0, 1080, SCREEN_HEIGHT);
-    context.fillStyle = "#07080a";
-    context.fillRect(1080, 0, 520, SCREEN_HEIGHT);
-    context.fillStyle = "#282b32";
-    context.fillRect(1078, 0, 2, SCREEN_HEIGHT);
-
-    context.fillStyle = "#0d0f13";
-    context.fillRect(0, 0, 1080, 68);
+    context.fillStyle = "#17191e";
+    context.fillRect(0, 0, SCREEN_WIDTH, 72);
+    context.fillStyle = "#292d34";
+    context.fillRect(0, 71, SCREEN_WIDTH, 2);
     ["#ff5f57", "#febc2e", "#28c840"].forEach((color, index) => {
       context.beginPath();
-      context.arc(34 + index * 28, 34, 8, 0, Math.PI * 2);
+      context.arc(34 + index * 28, 36, 8, 0, Math.PI * 2);
       context.fillStyle = color;
       context.fill();
     });
-    drawText(context, "leetcode.com/problems/two-sum", 138, 42, 17, "#686b73", 500, "JetBrains Mono");
+    fillRoundedRect(context, 382, 17, 834, 39, 10, "#0d0f13");
+    drawText(context, "leetcode.com/problems/longest-substring-without-repeating-characters", 446, 43, 14, "#7d8590", 500, "JetBrains Mono");
 
-    drawText(context, "1. Two Sum", 72, 146, 38, "#f5f5f7", 650);
-    drawText(context, "Easy", 948, 143, 20, "#30d158", 650, "JetBrains Mono");
-    fillRoundedRect(context, 66, 190, 948, 630, 18, "#08090c");
-    context.strokeStyle = "#282b32";
-    context.lineWidth = 2;
-    roundedRect(context, 66, 190, 948, 630, 18);
-    context.stroke();
+    context.fillStyle = "#111318";
+    context.fillRect(0, 73, 640, 927);
+    context.fillStyle = "#0d0f13";
+    context.fillRect(642, 73, 958, 927);
+    context.fillStyle = "#292d34";
+    context.fillRect(640, 73, 2, 927);
+    drawText(context, "Description     Editorial     Solutions", 34, 118, 16, "#8b929d", 500);
+    drawText(context, "3. Longest Substring Without", 42, 190, 29, "#f0f3f6", 650);
+    drawText(context, "Repeating Characters", 42, 230, 29, "#f0f3f6", 650);
+    fillRoundedRect(context, 42, 258, 104, 34, 8, "rgba(255, 161, 22, 0.13)");
+    drawText(context, "Medium", 61, 281, 14, "#ffa116", 650, "JetBrains Mono");
+    drawText(context, "Given a string s, find the length of the", 42, 350, 17, "#b4bbc5", 500);
+    drawText(context, "longest substring without repeating characters.", 42, 384, 17, "#b4bbc5", 500);
+    drawText(context, "Example 1", 42, 458, 20, "#f0f3f6", 650);
+    fillRoundedRect(context, 42, 482, 554, 176, 12, "#1a1d23");
+    drawText(context, 'Input:  s = "abcabcbb"', 68, 530, 16, "#c9d1d9", 500, "JetBrains Mono");
+    drawText(context, "Output: 3", 68, 571, 16, "#c9d1d9", 500, "JetBrains Mono");
+    drawText(context, 'The answer is "abc".', 68, 612, 16, "#8b929d", 500, "JetBrains Mono");
+
+    drawText(context, "C++", 675, 119, 15, "#d7dce2", 600, "JetBrains Mono");
+    context.fillStyle = "#292d34";
+    context.fillRect(642, 139, 958, 2);
 
     const code = [
-      ["class", "#bf8cff", 92],
-      [" Solution {", "#f5f5f7", 188],
-      ["vector<int> twoSum(vector<int>& nums, int target) {", "#d4d4d8", 132],
-      ["unordered_map<int, int> seen;", "#d4d4d8", 180],
-      ["for (int i = 0; i < nums.size(); i++) {", "#d4d4d8", 180],
-      ["if (seen.count(target - nums[i]))", "#2997ff", 228],
-      ["return {seen[target - nums[i]], i};", "#30d158", 276],
-      ["seen[nums[i]] = i;", "#d4d4d8", 228],
-      ["}", "#d4d4d8", 180],
-      ["}", "#d4d4d8", 132],
-      ["};", "#d4d4d8", 92],
+      ["class Solution {", "#ff7b72", 710],
+      ["public:", "#ff7b72", 742],
+      ["int lengthOfLongestSubstring(string s) {", "#c9d1d9", 742],
+      ["unordered_map<char, int> last;", "#c9d1d9", 782],
+      ["int left = 0, answer = 0;", "#79c0ff", 782],
+      ["for (int right = 0; right < s.size(); right++) {", "#c9d1d9", 782],
+      ["// move left when a character repeats", "#8b949e", 822],
+      ["left = max(left, last[s[right]] + 1);", "#79c0ff", 822],
+      ["last[s[right]] = right;", "#c9d1d9", 822],
+      ["answer = max(answer, right - left + 1);", "#c9d1d9", 822],
+      ["}", "#c9d1d9", 782],
+      ["return answer;", "#ff7b72", 782],
+      ["}", "#c9d1d9", 742],
+      ["};", "#c9d1d9", 710],
     ];
-    code.forEach(([line, color, x], index) => drawText(context, line, x, 260 + index * 45, 23, color, 500, "JetBrains Mono"));
+    code.forEach(([line, color, x], index) => drawText(context, line, x, 202 + index * 42, 18, color, 500, "JetBrains Mono"));
 
-    fillRoundedRect(context, 66, 850, 948, 82, 13, "#0c1711");
+    fillRoundedRect(context, 690, 835, 850, 92, 13, "#0f1c14");
     context.strokeStyle = "#1f7139";
-    roundedRect(context, 66, 850, 948, 82, 13);
+    context.lineWidth = 2;
+    roundedRect(context, 690, 835, 850, 92, 13);
     context.stroke();
-    drawText(context, "✓  ACCEPTED", 98, 902, 23, "#30d158", 700, "JetBrains Mono");
-
-    drawText(context, "◆", 1132, 67, 34, "#f5f5f7", 700);
-    drawText(context, "ReAlgo", 1180, 65, 30, "#f5f5f7", 700);
-    drawText(context, "ЗАДАЧА НАЙДЕНА", 1132, 172, 18, "#30d158", 700, "JetBrains Mono");
-    drawText(context, "Two Sum", 1132, 242, 48, "#f5f5f7", 650);
-    drawText(context, "Hash Map  ·  Arrays", 1132, 286, 20, "#2997ff", 600, "JetBrains Mono");
-
-    fillRoundedRect(context, 1130, 350, 400, 76, 14, "#0a84ff");
-    drawText(context, "Сохранить решение", 1202, 398, 24, "#ffffff", 650);
-
-    ["AI-подсказка", "Оценить лёгкость", "Карточки"].forEach((label, index) => {
-      const y = 468 + index * 104;
-      fillRoundedRect(context, 1130, y, 400, 78, 14, "#0c0d10");
-      context.strokeStyle = "#292c32";
-      roundedRect(context, 1130, y, 400, 78, 14);
-      context.stroke();
-      drawText(context, label, 1160, y + 49, 22, index === 0 ? "#f5f5f7" : "#a1a1a6", 550);
-      drawText(context, "→", 1482, y + 50, 24, "#5c5d62", 500);
-    });
-
-    drawText(context, "ReAlgo работает прямо поверх задачи", 1132, 885, 17, "#696a70", 500);
-    drawText(context, "Без смены контекста.", 1132, 917, 17, "#696a70", 500);
-  }
-
-  function drawAgentScreen() {
-    const context = screenContext;
-    context.fillStyle = "#070b10";
-    context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (!agentImage) return;
-
-    const imageRatio = agentImage.naturalWidth / agentImage.naturalHeight;
-    const canvasRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
-    let sourceWidth = agentImage.naturalWidth;
-    let sourceHeight = agentImage.naturalHeight;
-    let sourceX = 0;
-    let sourceY = 0;
-    if (imageRatio > canvasRatio) {
-      sourceWidth = sourceHeight * canvasRatio;
-      sourceX = (agentImage.naturalWidth - sourceWidth) / 2;
-    } else {
-      sourceHeight = sourceWidth / canvasRatio;
-      sourceY = (agentImage.naturalHeight - sourceHeight) / 2;
-    }
-    context.drawImage(agentImage, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  }
-
-  function drawVideoScreen(video) {
-    if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return false;
-    const sourceRatio = video.videoWidth / video.videoHeight;
-    const targetRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
-    let sourceWidth = video.videoWidth;
-    let sourceHeight = video.videoHeight;
-    let sourceX = 0;
-    let sourceY = 0;
-    if (sourceRatio > targetRatio) {
-      sourceWidth = sourceHeight * targetRatio;
-      sourceX = (video.videoWidth - sourceWidth) / 2;
-    } else {
-      sourceHeight = sourceWidth / targetRatio;
-      sourceY = (video.videoHeight - sourceHeight) / 2;
-    }
-    screenContext.drawImage(
-      video,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      0,
-      0,
-      SCREEN_WIDTH,
-      SCREEN_HEIGHT
-    );
-    return true;
+    drawText(context, "✓  ACCEPTED", 722, 891, 23, "#3fb950", 700, "JetBrains Mono");
+    drawText(context, "Runtime 3 ms", 1260, 890, 16, "#7d8590", 500, "JetBrains Mono");
   }
 
   function commitScreenTexture() {
@@ -335,35 +283,29 @@ if (stage && slots.length) {
     screenOutputContext.scale(1, -1);
     screenOutputContext.drawImage(screenArtwork, 0, 0);
     screenOutputContext.setTransform(1, 0, 0, 1, 0, 0);
+    // Physical-display texture: mostly invisible in wide shots, but individual
+    // RGB columns and the row grid emerge naturally during the camera dolly.
+    screenOutputContext.save();
+    screenOutputContext.globalAlpha = 0.012;
+    for (let x = 0; x < SCREEN_WIDTH; x += 6) {
+      screenOutputContext.fillStyle = "#ff3158";
+      screenOutputContext.fillRect(x, 0, 1, SCREEN_HEIGHT);
+      screenOutputContext.fillStyle = "#42ff8a";
+      screenOutputContext.fillRect(x + 1, 0, 1, SCREEN_HEIGHT);
+      screenOutputContext.fillStyle = "#3a7cff";
+      screenOutputContext.fillRect(x + 2, 0, 1, SCREEN_HEIGHT);
+    }
+    screenOutputContext.globalAlpha = 0.025;
+    screenOutputContext.fillStyle = "#000";
+    for (let y = 0; y < SCREEN_HEIGHT; y += 4) screenOutputContext.fillRect(0, y, SCREEN_WIDTH, 1);
+    screenOutputContext.restore();
     screenTexture.needsUpdate = true;
   }
 
   function drawScreen(mode, restartVideo = false) {
-    activeMode = Object.hasOwn(productVideos, mode) ? mode : "extension";
-    const activeVideo = productVideos[activeMode];
-    Object.entries(productVideos).forEach(([name, video]) => {
-      if (name !== activeMode) video.pause();
-    });
-    if (restartVideo) {
-      activeVideo.currentTime = 0;
-      lastVideoFrame = -1;
-    }
-    const hasVideoFrame = drawVideoScreen(activeVideo);
-    if (!hasVideoFrame) {
-      if (activeMode === "agent" || activeMode === "stages") drawAgentScreen();
-      else drawExtensionScreen();
-    }
+    activeMode = Object.hasOwn(shotPoses, mode) ? mode : "extension";
+    drawExtensionScreen();
     commitScreenTexture();
-    void activeVideo.play().catch(() => undefined);
-  }
-
-  function updateVideoTexture() {
-    const activeVideo = productVideos[activeMode];
-    if (!activeVideo || activeVideo.paused || activeVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
-    const videoFrame = Math.floor(activeVideo.currentTime * VIDEO_FPS);
-    if (videoFrame === lastVideoFrame) return;
-    lastVideoFrame = videoFrame;
-    if (drawVideoScreen(activeVideo)) commitScreenTexture();
   }
 
   function resizeRenderer() {
@@ -371,6 +313,7 @@ if (stage && slots.length) {
     const width = Math.max(1, activeSlot.clientWidth);
     const height = Math.max(1, activeSlot.clientHeight);
     renderer.setSize(width, height, false);
+    cssRenderer.setSize(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
@@ -424,7 +367,9 @@ if (stage && slots.length) {
     currentPose.position.lerpVectors(shotFrom.position, shotTo.position, eased);
     currentPose.rotation.lerpVectors(shotFrom.rotation, shotTo.rotation, eased);
 
-    const idle = reduceMotion ? 0 : Math.sin(now * 0.00048) * 0.006;
+    // Close product shots must be optically locked. Even a tiny idle drift is
+    // magnified by the projected DOM plane and reads as camera shake.
+    const idle = reduceMotion || sceneActive ? 0 : Math.sin(now * 0.00048) * 0.006;
     camera.position.copy(currentPose.camera);
     camera.up.copy(currentPose.up);
     camera.fov = currentPose.fov;
@@ -446,11 +391,96 @@ if (stage && slots.length) {
     }
   }
 
+  function trackPanelMetrics(ui) {
+    if (trackedPanel === ui) return;
+    panelResizeObserver?.disconnect();
+    trackedPanel = ui;
+    // Read layout once when React mounts a new production component. The
+    // animation loop thereafter uses cached metrics supplied by ResizeObserver,
+    // so projecting the plane never forces synchronous layout on every frame.
+    trackedPanelWidth = ui.offsetWidth || 400;
+    trackedPanelHeight = ui.offsetHeight || (activeMode === "agent" || activeMode === "stages" ? 520 : 372);
+    panelResizeObserver?.observe(ui, { box: "border-box" });
+  }
+
+  function detachProductObject() {
+    if (!productUiObject) return;
+    productUiObject.removeFromParent();
+    productUiObject = null;
+    panelResizeObserver?.disconnect();
+    trackedPanel = null;
+  }
+
+  function ensureProductObject() {
+    if (!activeSlot || !screenCenter || !screenRight || !screenUp || !screenNormal) return null;
+    const slide = activeSlot.closest(".slide.is-active");
+    const card = slide?.querySelector(".product-ui-card");
+    const ui = card?.querySelector(".realgo-popup, .realgo-assistant");
+    if (!card || !ui) {
+      detachProductObject();
+      return null;
+    }
+    if (productUiObject?.element === card) {
+      trackPanelMetrics(ui);
+      return productUiObject;
+    }
+
+    detachProductObject();
+    card.classList.remove("is-plane-tracked");
+    card.classList.add("is-css3d-object");
+    card.style.removeProperty("transform");
+    productUiObject = new CSS3DObject(card);
+    productUiObject.name = "ReAlgo extension interface";
+    screenBasisMatrix.makeBasis(screenRight, screenUp, screenNormal);
+    productUiObject.quaternion.setFromRotationMatrix(screenBasisMatrix);
+    modelPivot.add(productUiObject);
+    trackPanelMetrics(ui);
+    return productUiObject;
+  }
+
+  function updateProductObject(now) {
+    if (!activeSlot || !screenCenter || !screenRight || !screenUp || !screenNormal || !screenPlaneWidth || !screenPlaneHeight) return;
+    const object = ensureProductObject();
+    if (!object) return;
+    const panelWidth = trackedPanelWidth;
+    const panelHeight = trackedPanelHeight;
+    const rawProgress = Number.isFinite(uiFocusStartedAt)
+      ? THREE.MathUtils.clamp((now - uiFocusStartedAt) / 1450, 0, 1)
+      : 0;
+    const progress = 1 - Math.pow(1 - rawProgress, 4);
+    const tallPanel = panelHeight > 450;
+    const initialWidthFraction = tallPanel ? 0.29 : 0.35;
+    const focusWidthFraction = activeMode === "rating"
+      ? 0.28
+      : tallPanel
+        ? 0.22
+        : 0.36;
+    const worldWidth = screenPlaneWidth * THREE.MathUtils.lerp(
+      initialWidthFraction,
+      focusWidthFraction,
+      progress,
+    );
+    const margin = screenPlaneWidth * 0.045;
+    const initialCenterX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5;
+    planeCenter.copy(screenCenter)
+      .addScaledVector(screenRight, initialCenterX + screenPlaneWidth * 0.04 * progress)
+      .addScaledVector(screenUp, -screenPlaneHeight * 0.025 * progress)
+      .addScaledVector(screenNormal, screenPlaneWidth * 0.025 * progress);
+    object.position.copy(planeCenter);
+    // CSS3DObject uses one uniform world-units-per-CSS-pixel scale. The DOM
+    // panel therefore keeps its native aspect ratio; camera perspective is
+    // supplied by the same Three.js camera that renders the MacBook.
+    object.scale.setScalar(worldWidth / panelWidth);
+  }
+
   function renderNow() {
     if (!model || !activeSlot) return;
     resizeRenderer();
     updateCameraMove(performance.now());
+    modelPivot.updateMatrixWorld(true);
+    updateProductObject(performance.now());
     renderer.render(scene, camera);
+    cssRenderer.render(scene, camera);
   }
 
   function mountSlot(slot) {
@@ -459,18 +489,23 @@ if (stage && slots.length) {
     const enterFromWide = isVisible && !sceneActive;
     sceneActive = isVisible;
     if (activeSlot !== slot) {
+      detachProductObject();
       activeSlot?.classList.remove("is-ready");
       activeSlot = slot;
       activeSlot.appendChild(renderer.domElement);
     }
+    const slide = activeSlot.closest(".slide");
+    if (slide && cssRenderer.domElement.parentElement !== slide) slide.appendChild(cssRenderer.domElement);
     // Разгорание света — эффект ВХОДА в блок с MacBook, а не смены слайда
     // внутри него. Раньше строка стояла безусловно: на каждом переходе
     // 10 → 11 → 12 → 13 все четыре источника гасли в ноль и заново
     // разгорались 1650мс, из-за чего сцена вспыхивала повторно.
     if (enterFromWide) revealStartedAt = performance.now();
+    uiFocusStartedAt = slot.closest(".slide")?.classList.contains("is-product-focus")
+      ? performance.now() - 1450
+      : Number.POSITIVE_INFINITY;
     drawScreen(activeSlot.dataset.macbookMode, true);
     startCameraMove(activeMode, enterFromWide, !isVisible);
-    if (!isVisible) Object.values(productVideos).forEach((video) => video.pause());
     if (model) {
       activeSlot.classList.add("is-ready");
       renderNow();
@@ -483,28 +518,21 @@ if (stage && slots.length) {
       mountSlot(nextSlot);
       return;
     }
+    detachProductObject();
+    cssRenderer.domElement.remove();
     sceneActive = false;
-    Object.values(productVideos).forEach((video) => video.pause());
-  }
-
-  function loadImage(url) {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = reject;
-      image.src = url;
-    });
   }
 
   window.addEventListener("realgo:slidechange", syncActiveSlot);
+  window.addEventListener("realgo:productfocus", () => {
+    uiFocusStartedAt = performance.now();
+  });
   window.addEventListener("resize", resizeRenderer);
 
   Promise.all([
     new GLTFLoader().loadAsync(MODEL_URL),
-    loadImage("assets/agent.png"),
     document.fonts?.ready || Promise.resolve(),
-  ]).then(([gltf, loadedAgentImage]) => {
-    agentImage = loadedAgentImage;
+  ]).then(([gltf]) => {
     model = gltf.scene;
     let screenMesh = null;
     let keyboardEngraving = null;
@@ -587,39 +615,90 @@ if (stage && slots.length) {
     // distortion and aims below the product UI. Reading the mesh transform
     // gives us a stable screen-local right/up/normal frame for cinematic
     // dolly shots that remain optically aligned with the display.
-    screenMesh.geometry.computeBoundingBox();
-    const screenCenter = screenMesh.geometry.boundingBox
-      .getCenter(new THREE.Vector3());
+    // Derive the display basis from its UV mapping, not from the mesh bounding
+    // box. In this GLB the visible screen rectangle is rotated relative to the
+    // object's local XYZ axes; UV derivatives are the only axes guaranteed to
+    // match the browser pixels painted by screenTexture.
+    const positions = screenMesh.geometry.getAttribute("position");
+    const uvs = screenMesh.geometry.getAttribute("uv");
+    const geometryCenter = new THREE.Vector3();
+    let meanU = 0;
+    let meanV = 0;
+    for (let index = 0; index < positions.count; index += 1) {
+      geometryCenter.x += positions.getX(index);
+      geometryCenter.y += positions.getY(index);
+      geometryCenter.z += positions.getZ(index);
+      meanU += uvs.getX(index);
+      meanV += uvs.getY(index);
+    }
+    geometryCenter.multiplyScalar(1 / positions.count);
+    meanU /= positions.count;
+    meanV /= positions.count;
+
+    let covarianceUU = 0;
+    let covarianceUV = 0;
+    let covarianceVV = 0;
+    const positionU = new THREE.Vector3();
+    const positionV = new THREE.Vector3();
+    for (let index = 0; index < positions.count; index += 1) {
+      const deltaU = uvs.getX(index) - meanU;
+      const deltaV = uvs.getY(index) - meanV;
+      const position = new THREE.Vector3(
+        positions.getX(index),
+        positions.getY(index),
+        positions.getZ(index),
+      );
+      covarianceUU += deltaU * deltaU;
+      covarianceUV += deltaU * deltaV;
+      covarianceVV += deltaV * deltaV;
+      positionU.addScaledVector(position, deltaU);
+      positionV.addScaledVector(position, deltaV);
+    }
+    const determinant = covarianceUU * covarianceVV - covarianceUV * covarianceUV;
+    if (Math.abs(determinant) < 1e-9) throw new Error("MacBook screen UV basis is degenerate");
+    const derivativeU = positionU.clone().multiplyScalar(covarianceVV)
+      .addScaledVector(positionV, -covarianceUV)
+      .multiplyScalar(1 / determinant);
+    const derivativeV = positionV.clone().multiplyScalar(covarianceUU)
+      .addScaledVector(positionU, -covarianceUV)
+      .multiplyScalar(1 / determinant);
+
+    function directionToPivot(direction) {
+      const origin = geometryCenter.clone();
+      const endpoint = geometryCenter.clone().add(direction);
+      screenMesh.localToWorld(origin);
+      screenMesh.localToWorld(endpoint);
+      modelPivot.worldToLocal(origin);
+      modelPivot.worldToLocal(endpoint);
+      return endpoint.sub(origin).normalize();
+    }
+
+    screenCenter = geometryCenter.clone();
     screenMesh.localToWorld(screenCenter);
     modelPivot.worldToLocal(screenCenter);
-
-    const screenQuaternion = screenMesh.getWorldQuaternion(new THREE.Quaternion());
-    const pivotQuaternionInverse = modelPivot
-      .getWorldQuaternion(new THREE.Quaternion())
-      .invert();
-    screenQuaternion.premultiply(pivotQuaternionInverse);
-
-    const screenSize = screenMesh.geometry.boundingBox.getSize(new THREE.Vector3());
-    const localAxes = [
-      new THREE.Vector3(1, 0, 0),
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 1),
-    ];
-    const screenAxes = localAxes.map((axis) => axis.applyQuaternion(screenQuaternion).normalize());
-    const dimensions = [screenSize.x, screenSize.y, screenSize.z];
-    const normalAxisIndex = dimensions.indexOf(Math.min(...dimensions));
-    const surfaceAxisIndexes = [0, 1, 2].filter((index) => index !== normalAxisIndex);
-    const upAxisIndex = surfaceAxisIndexes.reduce((best, index) => (
-      Math.abs(screenAxes[index].y) > Math.abs(screenAxes[best].y) ? index : best
-    ));
-    const screenNormal = screenAxes[normalAxisIndex].clone();
-    const screenUp = screenAxes[upAxisIndex].clone();
-    if (screenNormal.dot(shotPoses.wide.camera.clone().sub(screenCenter)) < 0) {
-      screenNormal.negate();
-    }
-    screenUp.addScaledVector(screenNormal, -screenUp.dot(screenNormal)).normalize();
+    screenRight = directionToPivot(derivativeU);
+    screenUp = directionToPivot(derivativeV);
+    if (screenRight.x < 0) screenRight.negate();
     if (screenUp.y < 0) screenUp.negate();
-    const screenRight = screenUp.clone().cross(screenNormal).normalize();
+    screenRight.addScaledVector(screenUp, -screenRight.dot(screenUp)).normalize();
+    screenNormal = screenRight.clone().cross(screenUp).normalize();
+    if (screenNormal.dot(shotPoses.wide.camera.clone().sub(screenCenter)) < 0) screenNormal.negate();
+
+    const screenCornerPoints = [];
+    for (let index = 0; index < positions.count; index += 1) {
+      const point = new THREE.Vector3(
+        positions.getX(index),
+        positions.getY(index),
+        positions.getZ(index),
+      );
+      screenMesh.localToWorld(point);
+      modelPivot.worldToLocal(point);
+      screenCornerPoints.push(point);
+    }
+    const rightOffsets = screenCornerPoints.map((point) => point.clone().sub(screenCenter).dot(screenRight));
+    const upOffsets = screenCornerPoints.map((point) => point.clone().sub(screenCenter).dot(screenUp));
+    screenPlaneWidth = Math.max(...rightOffsets) - Math.min(...rightOffsets);
+    screenPlaneHeight = Math.max(...upOffsets) - Math.min(...upOffsets);
 
     function configureScreenShot(mode, config) {
       const pose = shotPoses[mode];
@@ -645,36 +724,36 @@ if (stage && slots.length) {
     }
 
     configureScreenShot("extension", {
-      distance: 4.5,
-      cameraX: -0.04,
-      cameraY: 0.18,
-      targetX: 0.08,
-      targetY: -0.02,
-      fov: 26,
+      distance: 2.76,
+      cameraX: -1.46,
+      cameraY: 0.34,
+      targetX: 0.38,
+      targetY: 0.02,
+      fov: 23,
     });
     configureScreenShot("agent", {
-      distance: 3.72,
-      cameraX: 0.04,
-      cameraY: 0.14,
-      targetX: 0.34,
-      targetY: -0.01,
-      fov: 25,
+      distance: 2.62,
+      cameraX: -1.26,
+      cameraY: 0.28,
+      targetX: 0.44,
+      targetY: 0,
+      fov: 22.5,
     });
     configureScreenShot("stages", {
-      distance: 3.45,
-      cameraX: 0.1,
-      cameraY: 0.08,
-      targetX: 0.44,
-      targetY: -0.12,
-      fov: 25,
+      distance: 2.52,
+      cameraX: -1.08,
+      cameraY: 0.21,
+      targetX: 0.48,
+      targetY: -0.05,
+      fov: 22,
     });
     configureScreenShot("rating", {
-      distance: 3.25,
-      cameraX: 0.14,
-      cameraY: 0.05,
-      targetX: 0.46,
-      targetY: -0.14,
-      fov: 25,
+      distance: 2.44,
+      cameraX: -0.94,
+      cameraY: 0.17,
+      targetX: 0.5,
+      targetY: -0.08,
+      fov: 21.5,
     });
 
     const engravingCenter = new THREE.Box3()
@@ -717,6 +796,7 @@ if (stage && slots.length) {
     activeSlot?.classList.add("is-ready");
     renderNow();
     stage.classList.add("has-macbook-3d");
+    window.dispatchEvent(new CustomEvent("realgo:macbookready"));
   }).catch((error) => {
     stage.classList.add("macbook-3d-failed");
     console.error("MacBook 3D failed to load", error);
@@ -733,9 +813,11 @@ if (stage && slots.length) {
       fillLight.intensity = 0.12 * lightReveal;
       topLight.intensity = 0.72 * lightReveal;
       renderer.toneMappingExposure = 0.48 + 0.31 * lightReveal;
-      updateVideoTexture();
       updateCameraMove(now);
+      modelPivot.updateMatrixWorld(true);
+      updateProductObject(now);
       renderer.render(scene, camera);
+      cssRenderer.render(scene, camera);
     }
     requestAnimationFrame(animate);
   }

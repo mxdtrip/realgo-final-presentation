@@ -739,7 +739,7 @@ h2 {
   position: absolute;
   top: 48%;
   left: 50%;
-  width: 100%;
+  width: max-content;
   transform: translate(-50%, -50%);
   font-family: "Manrope", sans-serif;
   font-size: 310px;
@@ -752,6 +752,11 @@ h2 {
      совпадать с расчётной, и число дёргалось по горизонтали. */
   letter-spacing: normal;
   white-space: nowrap;
+  color: transparent;
+  background: linear-gradient(90deg, #00fff0 0%, #0083fe 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Переход со слайда команды: сфера выезжает из-за правого края,
@@ -817,7 +822,7 @@ h2 {
   z-index: 12;
   display: block;
   width: 100%;
-  color: var(--ink);
+  color: #0083fe;
   font-family: "Manrope", sans-serif;
   font-size: 310px;
   font-weight: 650;
@@ -841,6 +846,23 @@ h2 {
 .market-counter-row {
   display: inline-block;
   white-space: nowrap;
+}
+
+#marketCounterMain,
+#marketCounterDecimal,
+#marketCounterPercent {
+  color: transparent;
+  background: linear-gradient(90deg, #00fff0 0%, #0083fe 100%);
+  background-repeat: no-repeat;
+  background-size: var(--market-gradient-width, 100%) 100%;
+  background-position: calc(-1 * var(--market-gradient-offset, 0em)) 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#marketCounterMain {
+  display: inline-block;
 }
 
 .market-counter.is-visible .market-counter-row,
@@ -877,6 +899,32 @@ h2 {
   text-align: center;
   font-variant-numeric: lining-nums tabular-nums;
 }
+
+/* Отрицательный трекинг нужен только между символами. На внешних краях
+   он уменьшал paint-box, и общий градиент обрезал правый штрих последней
+   цифры и края знака процента во время анимации. */
+.giant-number > :last-child,
+#marketCounterMain > :last-child,
+#marketCounterDecimal > :last-child,
+#marketCounterPercent > :last-child {
+  margin-right: 0;
+}
+
+/* Сохраняем после анимации тот же выразительный зазор перед знаком процента:
+   граница между числом и единицей измерения больше не схлопывается. */
+.giant-number[data-percent="true"] > .num-slot:nth-last-child(2) {
+  margin-right: 0;
+}
+
+.giant-number[data-percent="true"] > .num-char:last-child {
+  margin-left: 0;
+}
+
+#marketCounterDecimal > :first-child,
+#marketCounterPercent > :first-child {
+  margin-left: 0;
+}
+
 
 .stage.is-market-counting .stat-keynote .giant-number {
   opacity: 0;
@@ -1940,9 +1988,7 @@ h2 {
   transform: translate(-50%, -50%);
 }
 
-.cycle-keynote h2 {
-  font-size: 92px;
-}
+.cycle-keynote h2 { font-size: 92px; }
 
 .cycle {
   display: grid;
@@ -1959,9 +2005,7 @@ h2 {
 }
 
 .cycle b,
-.cycle span {
-  display: block;
-}
+.cycle span { display: block; }
 
 .cycle b {
   margin-bottom: 48px;
@@ -1975,19 +2019,382 @@ h2 {
   font-size: 27px;
 }
 
-.cycle .cycle-last {
-  border-color: var(--blue);
-}
-
-.cycle .cycle-last span {
-  color: var(--blue);
-}
+.cycle .cycle-last { border-color: var(--blue); }
+.cycle .cycle-last span { color: var(--blue); }
 
 .cycle i {
   color: #555;
   font-size: 18px;
   font-style: normal;
   text-align: center;
+}
+
+/* Platform corpus → Pattern Atlas knowledge graph */
+
+.slide-taxonomy-graph {
+  background:
+    radial-gradient(circle at 54% 51%, rgba(41, 151, 255, 0.055), transparent 34%),
+    radial-gradient(circle at 82% 50%, rgba(94, 92, 230, 0.04), transparent 27%),
+    #000;
+}
+
+.taxonomy-keynote {
+  position: absolute;
+  inset: 118px 130px 72px;
+}
+
+.taxonomy-flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 470px 430px 540px;
+  column-gap: 90px;
+  justify-content: center;
+  height: 100%;
+}
+
+.taxonomy-links {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.taxonomy-links path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 1.05;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 7 9;
+  opacity: 0;
+}
+
+.taxonomy-links-platforms path {
+  --edge-opacity: 0.34;
+  stroke: url(#taxonomyInputFlow);
+  stroke-width: 0.9;
+}
+
+.taxonomy-links-platforms path:nth-child(29n + 1) {
+  --edge-opacity: 0.58;
+  stroke: #64d2ff;
+}
+
+.taxonomy-links-patterns path {
+  --edge-opacity: 0.66;
+  stroke: url(#taxonomyMainFlow);
+  stroke-width: 1.05;
+  stroke-dasharray: 5 10;
+}
+
+.taxonomy-column {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 126px;
+  min-width: 0;
+}
+
+.taxonomy-column footer {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  width: 100%;
+  padding-top: 8px;
+  opacity: 0;
+}
+
+.taxonomy-column footer strong {
+  color: #f4f7fb;
+  font-family: "Manrope", sans-serif;
+  font-size: 45px;
+  font-weight: 650;
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+
+.taxonomy-column footer span {
+  color: #a1a1a6;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 620;
+  letter-spacing: 0;
+}
+
+.taxonomy-platform-column footer {
+  display: flex;
+  align-items: flex-end;
+  justify-self: center;
+  width: 430px;
+  box-sizing: border-box;
+  padding: 8px 20px 0;
+}
+
+.taxonomy-platform-column footer span {
+  text-align: right;
+}
+
+.taxonomy-platform-column footer strong {
+  text-align: right;
+}
+
+.taxonomy-platforms {
+  display: grid;
+  gap: 14px;
+  align-self: center;
+  justify-self: center;
+  width: 430px;
+}
+
+.taxonomy-platforms article {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  min-height: 84px;
+  padding: 14px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  transform: translateX(-18px);
+}
+
+.taxonomy-platform-logo {
+  width: 24px;
+  height: 24px;
+  color: #d1d1d6;
+  overflow: visible;
+}
+
+.logo-leetcode path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.logo-leetcode .logo-accent { stroke: currentColor; }
+.logo-hackerrank > path:first-child { fill: none; stroke: currentColor; stroke-linejoin: round; stroke-width: 3.2; }
+.logo-hackerrank .logo-letter { fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 3.2; }
+.logo-gfg path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3.2; }
+.logo-codeforces rect,
+.logo-codeforces .logo-blue,
+.logo-codeforces .logo-yellow { fill: currentColor; }
+
+.taxonomy-platforms > article > strong {
+  color: #f5f5f7;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 620;
+}
+
+.taxonomy-platform-count {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.taxonomy-platform-count b {
+  color: #f5f5f7;
+  font-family: "Manrope", sans-serif;
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -0.05em;
+}
+
+.taxonomy-platform-count small {
+  color: #f4f7fb;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.taxonomy-node-shell {
+  position: relative;
+  align-self: center;
+  justify-self: center;
+}
+
+.taxonomy-pattern-shell {
+  display: grid;
+  width: 340px;
+  height: 430px;
+  place-items: center;
+}
+
+.taxonomy-subpattern-shell {
+  display: grid;
+  width: 520px;
+  height: 650px;
+  place-items: center;
+}
+
+.taxonomy-node-field {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.taxonomy-pattern-shell .taxonomy-node-field {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px 54px;
+  width: 96px;
+}
+
+.taxonomy-subpattern-shell .taxonomy-node-field {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 25px;
+  width: 70px;
+}
+
+.taxonomy-node-field i {
+  display: block;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.25);
+}
+
+.taxonomy-pattern-shell .taxonomy-node-field i {
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(100, 210, 255, 0.68);
+  background: rgba(41, 151, 255, 0.24);
+  box-shadow: 0 0 13px rgba(41, 151, 255, 0.2);
+}
+
+.taxonomy-subpattern-shell .taxonomy-node-field i {
+  width: 6px;
+  height: 6px;
+  background: rgba(41, 151, 255, 0.82);
+  box-shadow: 0 0 8px rgba(41, 151, 255, 0.2);
+}
+
+.taxonomy-subpattern-shell .taxonomy-node-field i:nth-child(5n) { background: rgba(94, 92, 230, 0.82); }
+.taxonomy-subpattern-shell .taxonomy-node-field i:nth-child(29n + 1) { background: #64d2ff; }
+
+.taxonomy-pattern-column footer strong,
+.taxonomy-subpattern-column footer strong {
+  color: #f4f7fb;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-platforms article {
+  animation: taxonomy-platform-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(1) { animation-delay: 240ms; }
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(2) { animation-delay: 410ms; }
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(3) { animation-delay: 580ms; }
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(4) { animation-delay: 750ms; }
+
+.taxonomy-platforms article:nth-child(1) { --logo-brand: #ffa116; }
+.taxonomy-platforms article:nth-child(2) { --logo-brand: #00ea64; }
+.taxonomy-platforms article:nth-child(3) { --logo-brand: #2f8d46; }
+.taxonomy-platforms article:nth-child(4) { --logo-brand: #2997ff; }
+
+.slide-taxonomy-graph.is-active .taxonomy-platform-logo {
+  animation: taxonomy-logo-settle 900ms ease-out both;
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(1) .taxonomy-platform-logo { animation-delay: 240ms; }
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(2) .taxonomy-platform-logo { animation-delay: 410ms; }
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(3) .taxonomy-platform-logo { animation-delay: 580ms; }
+.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(4) .taxonomy-platform-logo { animation-delay: 750ms; }
+
+.slide-taxonomy-graph.is-active .taxonomy-links-platforms path {
+  animation: taxonomy-input-edge-in 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: calc(1000ms + var(--edge-index) * 3ms);
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-pattern-shell .taxonomy-node-field i {
+  animation: taxonomy-node-in 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(1600ms + var(--node-index) * 20ms);
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-links-patterns path {
+  animation: taxonomy-main-edge-in 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: calc(2020ms + var(--edge-index) * 4ms);
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-subpattern-shell .taxonomy-node-field i {
+  animation: taxonomy-node-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(2360ms + var(--node-index) * 6ms);
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-pattern-column footer {
+  animation: taxonomy-total-in 480ms ease-out 1950ms both;
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-subpattern-column footer {
+  animation: taxonomy-total-in 480ms ease-out 3150ms both;
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-platform-column footer {
+  animation: taxonomy-total-in 560ms ease-out 3200ms both;
+}
+
+.slide-taxonomy-graph.is-settled .taxonomy-links-platforms path {
+  animation: none;
+  opacity: 0.34;
+}
+
+.slide-taxonomy-graph.is-settled .taxonomy-links-patterns path {
+  animation: none;
+  opacity: 0.66;
+}
+
+.slide-taxonomy-graph.is-settled .taxonomy-platforms article,
+.slide-taxonomy-graph.is-settled .taxonomy-node-field i,
+.slide-taxonomy-graph.is-settled .taxonomy-column footer {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.slide-taxonomy-graph.is-settled .taxonomy-platform-logo {
+  animation: none;
+  color: #d1d1d6;
+}
+
+@keyframes taxonomy-platform-in {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes taxonomy-input-edge-in {
+  from { opacity: 0; stroke-dashoffset: 72; }
+  to { opacity: 0.34; stroke-dashoffset: 0; }
+}
+
+@keyframes taxonomy-main-edge-in {
+  from { opacity: 0; stroke-dashoffset: 72; }
+  to { opacity: 0.66; stroke-dashoffset: 0; }
+}
+
+@keyframes taxonomy-node-in {
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes taxonomy-logo-settle {
+  0%, 35% { color: var(--logo-brand); }
+  100% { color: #d1d1d6; }
+}
+
+@keyframes taxonomy-total-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Promo */
@@ -2168,6 +2575,173 @@ h2 {
 
 .macbook-3d-slot.is-ready .macbook-3d-canvas {
   opacity: 1;
+}
+
+.macbook-css3d-renderer {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The production extension is mounted as live DOM above the WebGL scene.
+   It first shares the lid's perspective, then lifts into a clean focus plane. */
+.product-ui-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1500px;
+}
+
+.product-focus-dim {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 72% 43%, rgba(2, 5, 10, 0.08), rgba(0, 0, 0, 0.42) 56%, rgba(0, 0, 0, 0.56)),
+    rgba(0, 0, 0, 0.16);
+  backdrop-filter: saturate(0.78) blur(0.7px);
+  transition: opacity 1100ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.product-ui-card {
+  --product-final-scale: 1.62;
+  position: absolute;
+  top: 286px;
+  right: 382px;
+  width: 400px;
+  opacity: 0;
+  transform: translate3d(55px, 30px, -170px) rotateX(5deg) rotateY(-21deg) rotateZ(0.8deg) scale(0.9);
+  transform-origin: 82% 58%;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.38));
+  transition:
+    opacity 520ms ease,
+    top 1450ms cubic-bezier(0.16, 1, 0.3, 1),
+    right 1450ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1450ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1450ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, top, right, filter;
+}
+
+/* CSS3DRenderer owns the transform. The card is a real object in the same
+   scene graph and camera as the MacBook, with a uniform non-stretching scale. */
+.product-ui-card.is-css3d-object {
+  top: 0 !important;
+  right: auto !important;
+  left: 0 !important;
+  transform-origin: 0 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition: opacity 520ms ease, filter 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-ui-card::before {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: -13px;
+  z-index: -1;
+  width: 14px;
+  border: 1px solid rgba(93, 151, 222, 0.22);
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: linear-gradient(90deg, rgba(19, 35, 54, 0.92), rgba(7, 12, 20, 0.28));
+  box-shadow: -10px 5px 24px rgba(0, 0, 0, 0.42);
+  content: "";
+  opacity: 0;
+  transform: translateX(8px) scaleX(0.25);
+  transform-origin: right center;
+  transition: opacity 900ms ease, transform 1450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-ui-stage--agent .product-ui-card,
+.product-ui-stage--stages .product-ui-card {
+  --product-final-scale: 1.4;
+  top: 220px;
+  right: 374px;
+}
+
+.is-product-screen .product-ui-card {
+  opacity: 1;
+}
+
+.is-product-focus .product-focus-dim {
+  opacity: 1;
+}
+
+.is-product-focus .product-ui-card {
+  top: 186px;
+  right: 148px;
+  transform: translate3d(0, 0, 210px) rotateX(1.5deg) rotateY(-16deg) rotateZ(-0.45deg) scale(var(--product-final-scale));
+  filter:
+    drop-shadow(-28px 42px 48px rgba(0, 0, 0, 0.68))
+    drop-shadow(0 0 34px rgba(47, 129, 247, 0.18));
+}
+
+.is-product-focus .product-ui-card.is-css3d-object {
+  top: 0 !important;
+  right: auto !important;
+  left: 0 !important;
+}
+
+.is-product-focus .product-ui-card::before {
+  opacity: 1;
+  transform: translateX(0) scaleX(1);
+}
+
+.is-product-focus .product-ui-stage--agent .product-ui-card,
+.is-product-focus .product-ui-stage--stages .product-ui-card {
+  top: 140px;
+  right: 158px;
+}
+
+.product-ui-root {
+  width: 400px;
+  transform: translateZ(0);
+}
+
+.product-ui-glint {
+  position: absolute;
+  z-index: 20;
+  inset: -3px;
+  overflow: hidden;
+  border: 1px solid rgba(121, 192, 255, 0.12);
+  border-radius: 15px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.product-ui-glint::after {
+  position: absolute;
+  top: -45%;
+  left: -72%;
+  width: 34%;
+  height: 190%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  content: "";
+  transform: rotate(14deg);
+}
+
+.is-product-focus .product-ui-glint {
+  opacity: 1;
+}
+
+.is-product-focus .product-ui-glint::after {
+  animation: product-ui-glint 1500ms 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes product-ui-glint {
+  from { left: -72%; }
+  to { left: 142%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-focus-dim,
+  .product-ui-card { transition-duration: 1ms; }
+  .is-product-focus .product-ui-glint::after { animation: none; }
 }
 
 .model-credit {
@@ -2594,6 +3168,156 @@ h2 {
 }
 
 /* Atlas and roadmap */
+
+.slide-company-targets {
+  background:
+    radial-gradient(circle at 74% 48%, rgba(0, 131, 254, 0.085), transparent 31%),
+    #050607;
+}
+
+.company-target-keynote {
+  position: absolute;
+  inset: 145px 150px 112px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 650px;
+  gap: 120px;
+  align-items: center;
+}
+
+.company-target-copy h2 {
+  max-width: 820px;
+  margin: 22px 0 0;
+  font-size: 72px;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.company-target-copy > p:last-child {
+  max-width: 630px;
+  margin: 34px 0 0;
+  color: rgba(211, 220, 234, 0.5);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.company-target-list {
+  display: grid;
+  gap: 14px;
+  width: 650px;
+}
+
+.company-target-list article {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+  min-height: 112px;
+  padding: 18px 28px;
+  border: 1px solid rgba(149, 171, 206, 0.16);
+  border-radius: 18px;
+  background: linear-gradient(105deg, rgba(18, 24, 34, 0.95), rgba(8, 11, 17, 0.8));
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateX(22px);
+}
+
+.company-target-list article > strong {
+  color: #f2f6fc;
+  font-size: 25px;
+  font-weight: 620;
+}
+
+.company-target-logo {
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+}
+
+.company-logo-google {
+  color: transparent;
+  background: conic-gradient(from -42deg, #4285f4 0 28%, #34a853 28% 48%, #fbbc05 48% 70%, #ea4335 70% 82%, #4285f4 82%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-size: 38px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.company-logo-amazon {
+  color: #f4f7fb;
+  font-family: Arial, sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 0.8;
+}
+
+.company-logo-amazon i {
+  position: absolute;
+  right: 3px;
+  bottom: 4px;
+  left: 5px;
+  height: 10px;
+  border-bottom: 3px solid #ff9900;
+  border-radius: 0 0 50% 50%;
+  transform: rotate(5deg);
+}
+
+.company-logo-microsoft {
+  grid-template-columns: repeat(2, 18px);
+  grid-template-rows: repeat(2, 18px);
+  gap: 3px;
+}
+
+.company-logo-microsoft i { display: block; width: 18px; height: 18px; }
+.company-logo-microsoft i:nth-child(1) { background: #f25022; }
+.company-logo-microsoft i:nth-child(2) { background: #7fba00; }
+.company-logo-microsoft i:nth-child(3) { background: #00a4ef; }
+.company-logo-microsoft i:nth-child(4) { background: #ffb900; }
+
+.company-logo-meta path {
+  fill: none;
+  stroke: #1685f8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.company-target-count {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.company-target-count b {
+  color: #f4f7fb;
+  font-size: 31px;
+  font-weight: 650;
+  letter-spacing: -0.055em;
+}
+
+.company-target-count small {
+  color: rgba(190, 204, 226, 0.42);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.slide-company-targets.is-active .company-target-list article {
+  animation: company-target-in 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.slide-company-targets.is-active .company-target-list article:nth-child(1) { animation-delay: 260ms; }
+.slide-company-targets.is-active .company-target-list article:nth-child(2) { animation-delay: 350ms; }
+.slide-company-targets.is-active .company-target-list article:nth-child(3) { animation-delay: 440ms; }
+.slide-company-targets.is-active .company-target-list article:nth-child(4) { animation-delay: 530ms; }
+
+@keyframes company-target-in {
+  to { opacity: 1; transform: translateX(0); }
+}
 
 .company-keynote {
   position: absolute;

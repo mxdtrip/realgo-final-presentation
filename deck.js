@@ -89,6 +89,66 @@
       container.dataset.fieldCount = String(container.children.length);
     });
   }
+
+  function buildTaxonomyGraphFields() {
+    document.querySelectorAll("[data-taxonomy-nodes]").forEach((container) => {
+      const nodeCount = Number.parseInt(container.dataset.taxonomyNodes || "0", 10);
+      if (!Number.isFinite(nodeCount) || nodeCount <= 0) return;
+      const fragment = document.createDocumentFragment();
+      for (let index = 0; index < nodeCount; index += 1) {
+        const node = document.createElement("i");
+        node.style.setProperty("--node-index", String(index));
+        fragment.appendChild(node);
+      }
+      container.replaceChildren(fragment);
+    });
+  }
+
+  function buildTaxonomyConnections() {
+    const flow = document.querySelector(".taxonomy-flow");
+    if (!flow) return;
+    const svg = flow.querySelector(".taxonomy-links");
+    const platformLinks = svg?.querySelector(".taxonomy-links-platforms");
+    const patternLinks = svg?.querySelector(".taxonomy-links-patterns");
+    if (!svg || !platformLinks || !patternLinks) return;
+
+    const flowRect = flow.getBoundingClientRect();
+    if (!flowRect.width || !flowRect.height) return;
+    svg.setAttribute("viewBox", `0 0 ${flowRect.width} ${flowRect.height}`);
+
+    const pointFor = (element, edge = "center") => {
+      const rect = element.getBoundingClientRect();
+      const x = edge === "right" ? rect.right : edge === "left" ? rect.left : rect.left + rect.width / 2;
+      return { x: x - flowRect.left, y: rect.top + rect.height / 2 - flowRect.top };
+    };
+
+    const appendConnection = (group, from, to, index) => {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const bend = Math.max(34, (to.x - from.x) * 0.42);
+      path.setAttribute("d", `M ${from.x.toFixed(1)} ${from.y.toFixed(1)} C ${(from.x + bend).toFixed(1)} ${from.y.toFixed(1)}, ${(to.x - bend).toFixed(1)} ${to.y.toFixed(1)}, ${to.x.toFixed(1)} ${to.y.toFixed(1)}`);
+      path.setAttribute("stroke", group === platformLinks ? "url(#taxonomyInputFlow)" : "url(#taxonomyMainFlow)");
+      path.style.setProperty("--edge-index", String(index));
+      group.appendChild(path);
+    };
+
+    platformLinks.replaceChildren();
+    patternLinks.replaceChildren();
+    const platforms = Array.from(flow.querySelectorAll(".taxonomy-platforms article"));
+    const patterns = Array.from(flow.querySelectorAll('[data-taxonomy-nodes="22"] i'));
+    const subpatterns = Array.from(flow.querySelectorAll('[data-taxonomy-nodes="111"] i'));
+
+    let platformEdgeIndex = 0;
+    platforms.forEach((platform) => {
+      patterns.forEach((pattern) => {
+        appendConnection(platformLinks, pointFor(platform, "right"), pointFor(pattern), platformEdgeIndex);
+        platformEdgeIndex += 1;
+      });
+    });
+    subpatterns.forEach((subpattern, index) => {
+      const patternIndex = Math.min(patterns.length - 1, Math.floor(index * patterns.length / subpatterns.length));
+      appendConnection(patternLinks, pointFor(patterns[patternIndex]), pointFor(subpattern), index);
+    });
+  }
   const magicMovePairs = [
     [
       [".centered h1", ".giant-number", "morph-primary"],
@@ -193,6 +253,9 @@
   let marketCounterFrame = null;
   let countUpFrame = null;
   let countUpTimer = null;
+  let taxonomyCountFrame = null;
+  let taxonomyCountTimer = null;
+  let taxonomySettleTimer = null;
   // Пауза после окончания перехода между слайдами, перед стартом счёта.
   const COUNT_UP_DELAY = 500;
   const counterMetrics = { slot: 0.62, decimal: 0.72, percent: 0.92 };
@@ -571,6 +634,54 @@
     startCounting();
   }
 
+  function runTaxonomyCountUp(slide) {
+    window.cancelAnimationFrame(taxonomyCountFrame);
+    window.clearTimeout(taxonomyCountTimer);
+    window.clearTimeout(taxonomySettleTimer);
+    taxonomyCountFrame = null;
+    taxonomyCountTimer = null;
+    taxonomySettleTimer = null;
+    document.querySelectorAll(".slide-taxonomy-graph.is-settled").forEach((element) => {
+      element.classList.remove("is-settled");
+    });
+
+    const targets = Array.from(slide.querySelectorAll("[data-taxonomy-count]"));
+    if (!targets.length) return;
+
+    const formatValue = (value) => Math.round(value).toLocaleString("ru-RU").replace(/\u00a0/g, " ");
+    targets.forEach((element) => {
+      const target = Number.parseInt(element.dataset.taxonomyCount || "0", 10);
+      element.textContent = reduceMotion ? formatValue(target) : "0";
+    });
+    if (reduceMotion) {
+      slide.classList.add("is-settled");
+      return;
+    }
+
+    taxonomySettleTimer = window.setTimeout(() => {
+      if (slides[currentSlide] === slide) slide.classList.add("is-settled");
+    }, 3800);
+
+    taxonomyCountTimer = window.setTimeout(() => {
+      if (slides[currentSlide] !== slide) return;
+      const startedAt = performance.now();
+      const frame = (now) => {
+        const progress = clamp01((now - startedAt) / 680);
+        const easedProgress = easeOutCubic(progress);
+        targets.forEach((element) => {
+          const target = Number.parseInt(element.dataset.taxonomyCount || "0", 10);
+          element.textContent = formatValue(target * easedProgress);
+        });
+        if (progress < 1) {
+          taxonomyCountFrame = window.requestAnimationFrame(frame);
+          return;
+        }
+        taxonomyCountFrame = null;
+      };
+      taxonomyCountFrame = window.requestAnimationFrame(frame);
+    }, 820);
+  }
+
   function startCountUpFrames(targets) {
     const startedAt = performance.now();
     const frame = (now) => {
@@ -640,6 +751,24 @@
     const tenths = Math.round(value * 10);
     renderDigits(marketCounterMain, String(Math.trunc(tenths / 10)));
     renderDigits(marketCounterDecimal, `,${Math.abs(tenths % 10)}`);
+
+    // Один непрерывный градиент распределяется по всем видимым частям числа.
+    // Фон задаётся каждой части отдельно, но с общей шириной и собственным
+    // смещением: так Chrome не отрывает маску от цифр во время transform-анимации.
+    const fontSizePx = Number.parseFloat(window.getComputedStyle(marketCounter).fontSize) || 310;
+    const mainWidth = marketCounterMain.getBoundingClientRect().width / (getStageScale() * fontSizePx);
+    const decimalWidth = decimalPresence > 0 ? counterMetrics.decimal : 0;
+    const percentWidth = percentPresence > 0 ? counterMetrics.percent : 0;
+    const gradientWidth = Math.max(mainWidth + decimalWidth + percentWidth, mainWidth);
+    const gradientParts = [
+      [marketCounterMain, 0],
+      [marketCounterDecimal, mainWidth],
+      [marketCounterPercent, mainWidth + decimalWidth],
+    ];
+    gradientParts.forEach(([element, offset]) => {
+      element.style.setProperty("--market-gradient-width", `${gradientWidth.toFixed(4)}em`);
+      element.style.setProperty("--market-gradient-offset", `${offset.toFixed(4)}em`);
+    });
 
     // Скрытые части не удаляются из потока, а «съезжают»:
     // «%» подтягивается влево на схлопнувшуюся десятичную часть,
@@ -1059,6 +1188,7 @@
     }));
 
     runCountUp(slides[currentSlide]);
+    runTaxonomyCountUp(slides[currentSlide]);
 
     const previousSlideElement = slides[previousSlide];
     const currentSlideElement = slides[currentSlide];
@@ -1308,13 +1438,17 @@
     });
   });
 
-  window.addEventListener("resize", resizeStage);
+  window.addEventListener("resize", () => {
+    resizeStage();
+    requestAnimationFrame(buildTaxonomyConnections);
+  });
   window.addEventListener("hashchange", () => {
     const hashSlide = getInitialSlide();
     if (hashSlide !== currentSlide) showSlide(hashSlide, { skipHash: true });
   });
 
   buildPreparationFields();
+  buildTaxonomyGraphFields();
   buildDots();
   calibrateCounterMetrics();
   applyDigitSlotsToStaticNumbers();
@@ -1326,9 +1460,11 @@
       countUpTargets.forEach((element) => {
         if (element.style.minWidth) reserveCountUpWidth(element);
       });
+      requestAnimationFrame(buildTaxonomyConnections);
     });
   }
   resizeStage();
+  requestAnimationFrame(buildTaxonomyConnections);
   showSlide(currentSlide, { skipHash: true });
   if (slides[currentSlide] === teamSlide) {
     startTeamRotation();

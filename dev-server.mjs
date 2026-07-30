@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 
 const root = resolve(process.env.ROOT || ".");
-const port = Number.parseInt(process.env.PORT || "4173", 10);
+const port = Number.parseInt(process.env.PORT || "8080", 10);
 const ignoredDirectories = new Set([".git", "archive", "qa"]);
 const mimeTypes = new Map([
   [".css", "text/css; charset=utf-8"],
