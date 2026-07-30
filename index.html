@@ -116,19 +116,30 @@
           <aside class="speaker-notes"><strong>00:26–00:35</strong><p>Навыки уже важнее перечня технологий. На интервью нужно показать не только знания, но и мышление под давлением.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-chaos" data-slide="4" data-order="4" data-theme="dark">
-          <div class="chaos-keynote reveal">
+        <section class="slide theme-dark slide-journey journey-intro" data-slide="4" data-order="4" data-theme="dark">
+          <div class="journey-keynote reveal">
             <p class="kicker">Проблема подготовки</p>
-            <h2>Материалов достаточно.<br /><span class="accent-blue">Системы — нет.</span></h2>
-            <div class="chaos-cloud" aria-label="Источники подготовки">
-              <span>LeetCode</span><span>HackerRank</span><span>Roadmap</span><span>Курсы</span><span>Заметки</span><span>AI-чаты</span><span>Разборы</span><span>Таблицы</span>
+            <h2>Есть кандидат.<br /><span class="accent-blue">Есть вакансия.</span></h2>
+            <div class="journey-stage" aria-label="Путь кандидата к вакансии">
+              <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+                <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
+                <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
+                <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
+                <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
+                <path class="journey-route-line" d="M150 220 C320 220 360 125 500 125 S650 315 790 315 S930 125 1050 125 S1140 220 1250 220" />
+              </svg>
+              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+              <div class="journey-materials" aria-hidden="true">
+                <span>LeetCode</span><span>HackerRank</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span>Anki</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+              </div>
+              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
             </div>
-            <p>Тысячи задач создают шум, но не отвечают, что изучить и повторить сегодня.</p>
+            <p>Но между ними пока нет понятного пути.</p>
           </div>
-          <aside class="speaker-notes"><strong>00:35–00:55</strong><p>Материалов уже более чем достаточно: задачи, подборки, курсы, roadmap и AI-чаты. Проблема теперь не в поиске информации, а в том, как извлечь из неё максимум пользы.</p></aside>
+          <aside class="speaker-notes"><strong>00:35–00:45</strong><p>У кандидата есть понятная цель — конкретная вакансия. Кажется, остаётся только подготовиться и пройти путь до неё.</p></aside>
         </section>
 
-        <section class="slide theme-light" data-slide="5" data-order="14" data-theme="light">
+        <section class="slide theme-light" data-slide="5" data-order="16" data-theme="light">
           <div class="about-keynote reveal">
             <div class="about-line"><strong data-count-to="15">15</strong><span>дней</span></div>
             <div class="about-line"><strong data-count-to="6">6</strong><span>человек</span></div>
@@ -138,7 +149,7 @@
           <aside class="speaker-notes"><strong>03:35–03:45</strong><p>Всё это создано за пятнадцать дней командой FreeBurger — шестью людьми, которые до хакатона почти не знали друг друга.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-team" data-slide="6" data-order="15" data-theme="dark" data-planet-exit>
+        <section class="slide theme-dark slide-team" data-slide="6" data-order="17" data-theme="dark" data-planet-exit>
           <div class="team-copy reveal">
             <p class="kicker">Команда FreeBurger</p>
             <h2>Шесть орбит.<br />Одна система.</h2>
@@ -192,16 +203,76 @@
           <aside class="speaker-notes"><strong>03:45–04:15</strong><p>Mxdtrip — координация, продукт, AI, расширение и deploy. MixKage — frontend. MikebangSfilya — backend и инфраструктура. Bryack — автор идеи и backend. Pagister — QA. P1xart — миграции и согласованность данных. За 15 дней мы стали командой, способной довести идею до продукта.</p></aside>
         </section>
 
-        <section class="slide theme-light" data-slide="7" data-order="5" data-theme="light">
-          <div class="centered comparison reveal">
-            <div><span>Обычно</span><strong>Решил → забыл</strong></div>
-            <div class="comparison-arrow">→</div>
-            <div><span>С ReAlgo</span><strong>Решил → вспомнил</strong></div>
+        <section class="slide theme-dark slide-journey journey-chaos" data-slide="7" data-order="5" data-theme="dark">
+          <div class="journey-keynote reveal">
+            <p class="kicker">Материалов более чем достаточно</p>
+            <h2>Тысячи способов<br /><span class="accent-blue">начать подготовку.</span></h2>
+            <div class="journey-stage" aria-label="Материалы между кандидатом и вакансией">
+              <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+                <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
+                <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
+                <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
+                <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
+                <path class="journey-route-line" d="M150 220 C320 220 360 125 500 125 S650 315 790 315 S930 125 1050 125 S1140 220 1250 220" />
+              </svg>
+              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+              <div class="journey-materials" aria-hidden="true">
+                <span>LeetCode</span><span>HackerRank</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span>Anki</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+              </div>
+              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
+            </div>
+            <p>Задачи. Подборки компаний. Roadmap. Курсы. Разборы. AI-чаты.</p>
           </div>
-          <aside class="speaker-notes"><strong>00:55–01:15</strong><p>Можно решить двести задач, но через месяц снова застрять на знакомом условии. Accepted ещё не означает, что навык можно воспроизвести.</p></aside>
+          <aside class="speaker-notes"><strong>00:45–01:00</strong><p>Но материалов уже слишком много: тысячи задач, подборки по компаниям, roadmap, курсы, заметки и AI-чаты. Каждый источник обещает свой путь.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="8" data-order="13" data-theme="dark">
+        <section class="slide theme-dark slide-journey journey-overload" data-slide="19" data-order="6" data-theme="dark">
+          <div class="journey-keynote reveal">
+            <p class="kicker">Информационный перегруз</p>
+            <h2>Чем больше выбор,<br /><span class="accent-blue">тем сложнее следующий шаг.</span></h2>
+            <div class="journey-stage" aria-label="Запутанный путь через материалы">
+              <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+                <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
+                <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
+                <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
+                <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
+                <path class="journey-route-line" d="M150 220 C320 220 360 125 500 125 S650 315 790 315 S930 125 1050 125 S1140 220 1250 220" />
+              </svg>
+              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+              <div class="journey-materials" aria-hidden="true">
+                <span>LeetCode</span><span>HackerRank</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span>Anki</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+              </div>
+              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
+            </div>
+            <p>Человек может решить двести задач — и через месяц снова застрять на знакомом условии.</p>
+          </div>
+          <aside class="speaker-notes"><strong>01:00–01:15</strong><p>Этот хаос не помогает выбрать следующий шаг. Можно решить двести задач, но через месяц снова застрять на знакомом условии.</p></aside>
+        </section>
+
+        <section class="slide theme-dark slide-journey journey-route" data-slide="20" data-order="7" data-theme="dark">
+          <div class="journey-keynote reveal">
+            <p class="kicker">ReAlgo превращает хаос в маршрут</p>
+            <h2>Лишнее становится тише.<br /><span class="accent-blue">Нужное — складывается в путь.</span></h2>
+            <div class="journey-stage" aria-label="Маршрут ReAlgo от кандидата к вакансии">
+              <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+                <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
+                <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
+                <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
+                <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
+                <path class="journey-route-line" d="M150 220 C320 220 360 125 500 125 S650 315 790 315 S930 125 1050 125 S1140 220 1250 220" />
+              </svg>
+              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+              <div class="journey-materials" aria-hidden="true">
+                <span>LeetCode</span><span>HackerRank</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span>Anki</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+              </div>
+              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
+            </div>
+            <p>Компания → необходимые паттерны → практика → повторение → готовность.</p>
+          </div>
+          <aside class="speaker-notes"><strong>01:15–01:30</strong><p>ReAlgo приглушает информационный шум и выделяет только те элементы, которые ведут кандидата к его цели.</p></aside>
+        </section>
+
+        <section class="slide theme-dark" data-slide="8" data-order="15" data-theme="dark">
           <div class="cycle-keynote reveal">
             <p class="kicker">Повторение</p>
             <h2>Маршрут адаптируется.</h2>
@@ -216,7 +287,7 @@
           <aside class="speaker-notes"><strong>03:20–03:35</strong><p>Знания возвращаются в работу перед забыванием. Закреплённый навык уходит дальше, а ошибка возвращает нужный подпаттерн в roadmap.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-macbook slide-macbook-extension" data-slide="9" data-order="9" data-theme="dark">
+        <section class="slide theme-dark slide-macbook slide-macbook-extension" data-slide="9" data-order="11" data-theme="dark">
           <div class="product-heading product-overlay reveal"><p class="kicker">Расширение поверх задачи</p><h2>Никакой смены<br />контекста.</h2><p>ReAlgo появляется там, где пользователь уже решает.</p></div>
           <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension" aria-label="Трёхмерная модель MacBook с расширением ReAlgo на экране"></div>
           <div class="platforms">LeetCode · HackerRank · GeeksforGeeks · Codeforces</div>
@@ -224,14 +295,14 @@
           <aside class="speaker-notes"><strong>02:05–02:25</strong><p>Пользователь продолжает решать задачи на привычной платформе. Расширение распознаёт задачу и сопровождает практику без смены контекста.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-macbook slide-macbook-agent" data-slide="10" data-order="10" data-theme="dark">
+        <section class="slide theme-dark slide-macbook slide-macbook-agent" data-slide="10" data-order="12" data-theme="dark">
           <div class="ai-copy product-overlay reveal"><p class="kicker">AI-агент</p><h2>Не ответ.<br /><span class="accent-blue">Следующий шаг.</span></h2><p>AI видит задачу и дозирует помощь, не раскрывая решение раньше времени.</p></div>
           <div class="macbook-3d-slot macbook-3d-agent" data-macbook-mode="agent" aria-label="Трёхмерная модель MacBook с AI-агентом ReAlgo на экране"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
           <aside class="speaker-notes"><strong>02:25–02:45</strong><p>Если пользователь застрял, AI не пишет код за него. Он указывает на ограничение, напоминает о паттерне и задаёт наводящий вопрос — возвращает мышление в нужное русло.</p></aside>
         </section>
 
-        <section class="slide theme-light slide-company" data-slide="11" data-order="7" data-theme="light">
+        <section class="slide theme-light slide-company" data-slide="11" data-order="9" data-theme="light">
           <div class="company-keynote reveal">
             <p class="kicker dark-kicker">Подготовка под карьерную цель</p>
             <h2>Не ко всему сразу.<br /><span class="accent-blue">В конкретную компанию.</span></h2>
@@ -239,10 +310,10 @@
             <div class="company-results"><span>Two Pointers</span><span>Graphs</span><span>Dynamic Programming</span><span>Binary Search</span><span>Intervals</span></div>
             <p>Задачи компании связываются с подпаттернами и превращаются в целевую практику.</p>
           </div>
-          <aside class="speaker-notes"><strong>01:35–01:50</strong><p>Пользователю не нужно решать все задачи мира. Он выбирает компанию и получает практику, связанную с её техническими собеседованиями.</p></aside>
+          <aside class="speaker-notes"><strong>01:42–01:54</strong><p>Пользователю не нужно решать все задачи мира. Он выбирает компанию и получает практику, связанную с её техническими собеседованиями.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-macbook slide-macbook-rating" data-slide="12" data-order="11" data-theme="dark">
+        <section class="slide theme-dark slide-macbook slide-macbook-rating" data-slide="12" data-order="13" data-theme="dark">
           <div class="product-demo-copy product-overlay reveal"><p class="kicker">После Accepted — один вопрос</p><h2>Как далась<br /><span class="accent-blue">эта задача?</span></h2><p>Личный сигнал для следующего повторения</p></div>
           <div class="macbook-3d-slot macbook-3d-rating" data-macbook-mode="rating" aria-label="MacBook с демонстрацией оценки сложности и постановки задачи в повторение"></div>
           <div class="product-demo-rail product-demo-rail--rating" aria-hidden="true"><span>Accepted</span><span>оценка</span><span>FSRS</span><span>карточки</span></div>
@@ -250,7 +321,7 @@
           <aside class="speaker-notes"><strong>02:45–03:05</strong><p>После Accepted пользователь отмечает, насколько легко далась задача. Одинаковый статус может скрывать десять минут самостоятельной работы или час с подсказками — для готовности это разные результаты.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="13" data-order="12" data-theme="dark">
+        <section class="slide theme-dark" data-slide="13" data-order="14" data-theme="dark">
           <div class="cards-keynote reveal">
             <div class="cards-copy"><p class="kicker">После решения</p><div class="giant-dark">3</div><h2>проверяемых<br />навыка.</h2><p>Пользователь повторяет не код, а способ мышления.</p></div>
             <div class="memory-cards memory-cards-three"><article><small>PATTERN RECOGNITION</small><h3>Как распознать<br />подход?</h3><p>Сигналы в условии и ключевое ограничение.</p></article><article><small>ALGORITHM MECHANICS</small><h3>Почему решение<br />работает?</h3><p>Инвариант, переход и оценка сложности.</p></article><article class="personal"><small>EDGE CASES</small><h3>Где решение<br />сломается?</h3><p>Границы, исключения и типичная ошибка.</p></article></div>
@@ -258,26 +329,26 @@
           <aside class="speaker-notes"><strong>03:05–03:20</strong><p>Решённая задача превращается в три проверки: распознать паттерн, объяснить механику и вспомнить крайние случаи. Мы повторяем способ мышления, а не готовый код.</p></aside>
         </section>
 
-        <section class="slide theme-light" data-slide="14" data-order="6" data-theme="light">
+        <section class="slide theme-light" data-slide="14" data-order="8" data-theme="light">
           <div class="atlas-keynote reveal">
             <p class="kicker dark-kicker">Pattern Atlas</p>
             <h2>95% задач.<br />111 повторяющихся идей.</h2>
             <div class="atlas-numbers"><div><strong data-count-to="22">22</strong><span>семейства</span></div><div><strong data-count-to="111">111</strong><span>подпаттернов</span></div></div>
             <p>Мы проанализировали десятки тысяч задач и разложили их по повторяющимся подпаттернам без потери смысла объяснения.</p>
           </div>
-          <aside class="speaker-notes"><strong>01:15–01:35</strong><p>ReAlgo анализирует задачи разных платформ. Более 95% из них можно объяснить через 111 повторяющихся подпаттернов — единицей обучения становится идея, а не случайная задача.</p></aside>
+          <aside class="speaker-notes"><strong>01:30–01:42</strong><p>ReAlgo анализирует задачи разных платформ. Более 95% из них можно объяснить через 111 повторяющихся подпаттернов — единицей обучения становится идея, а не случайная задача.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="15" data-order="8" data-theme="dark">
+        <section class="slide theme-dark" data-slide="15" data-order="10" data-theme="dark">
           <div class="roadmap-keynote reveal">
             <p class="kicker">Персональный roadmap</p>
             <h2>Что изучить.<br /><span class="accent-blue">Что делать сегодня.</span></h2>
             <div class="roadmap-list"><span>Цель: компания и роль</span><span>Следующий подпаттерн</span><span>Практика сегодня</span><span>Повторение сегодня</span></div>
           </div>
-          <aside class="speaker-notes"><strong>01:50–02:05</strong><p>ReAlgo объединяет цель, необходимые паттерны, текущий уровень и следующий пробел. Вместо списка задач пользователь видит, что изучить, решить и повторить сегодня.</p></aside>
+          <aside class="speaker-notes"><strong>01:54–02:05</strong><p>ReAlgo объединяет цель, необходимые паттерны, текущий уровень и следующий пробел. Вместо списка задач пользователь видит, что изучить, решить и повторить сегодня.</p></aside>
         </section>
 
-        <section class="slide theme-light slide-monetization" data-slide="16" data-order="16" data-theme="light">
+        <section class="slide theme-light slide-monetization" data-slide="16" data-order="18" data-theme="light">
           <div class="monetization-keynote reveal">
             <p class="kicker dark-kicker">Коммерциализация · freemium</p>
             <h2>Бесплатно начать.<br /><span class="accent-blue">Платно — ускорить цель.</span></h2>
@@ -303,7 +374,7 @@
           <aside class="speaker-notes"><strong>07:25–08:05</strong><p>Не заявляем платящих пользователей. Это целевая модель после запуска billing. Pro продаёт персонализацию под конкретное интервью.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="18" data-order="17" data-theme="dark">
+        <section class="slide theme-dark" data-slide="18" data-order="19" data-theme="dark">
           <div class="closing-keynote reveal">
             <p class="kicker">Новая единица подготовки</p>
             <h2>Не «я это решал».<br /><span class="accent-green">«Я умею решить это сейчас».</span></h2>

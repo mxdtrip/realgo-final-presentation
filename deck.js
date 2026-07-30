@@ -76,16 +76,31 @@
       [".source-line", ".source-line", "morph-market-source"],
     ],
     [
-      [".giant-number", ".chaos-keynote h2", "morph-primary"],
-      [".stat-keynote h2", ".chaos-keynote .kicker", "morph-kicker"],
+      [".giant-number", ".journey-candidate", "morph-card-a"],
+      [".stat-keynote h2", ".journey-keynote h2", "morph-primary"],
+      [".stat-keynote .kicker", ".journey-keynote .kicker", "morph-kicker"],
     ],
     [
-      [".chaos-keynote h2", ".comparison > div:first-child", "morph-primary"],
-      [".chaos-cloud", ".comparison > div:last-child", "morph-surface"],
+      [".journey-candidate", ".journey-candidate", "morph-card-a"],
+      [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
+      [".journey-materials", ".journey-materials", "morph-surface"],
+      [".journey-keynote h2", ".journey-keynote h2", "morph-primary"],
     ],
     [
-      [".comparison > div:last-child", ".atlas-numbers", "morph-surface"],
-      [".comparison > div:first-child", ".atlas-keynote h2", "morph-primary"],
+      [".journey-candidate", ".journey-candidate", "morph-card-a"],
+      [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
+      [".journey-materials", ".journey-materials", "morph-surface"],
+      [".journey-keynote h2", ".journey-keynote h2", "morph-primary"],
+    ],
+    [
+      [".journey-candidate", ".journey-candidate", "morph-card-a"],
+      [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
+      [".journey-materials", ".journey-materials", "morph-surface"],
+      [".journey-keynote h2", ".journey-keynote h2", "morph-primary"],
+    ],
+    [
+      [".journey-stage", ".atlas-numbers", "morph-surface"],
+      [".journey-keynote h2", ".atlas-keynote h2", "morph-primary"],
     ],
     [
       [".atlas-numbers", ".company-results", "morph-surface"],
@@ -97,6 +112,9 @@
     ],
     [
       [".roadmap-list", ".macbook-3d-slot", "morph-surface"],
+    ],
+    [
+      [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
     ],
     [
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
