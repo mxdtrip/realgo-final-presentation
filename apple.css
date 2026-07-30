@@ -993,6 +993,11 @@ h2 {
   transform: translate(-50%, -50%);
 }
 
+.slide-journey .journey-keynote {
+  top: 252px;
+  transform: translateX(-50%);
+}
+
 .journey-keynote h2 {
   max-width: 1420px;
   font-size: 74px;
@@ -1142,10 +1147,6 @@ h2 {
 .slide-journey .journey-stage {
   height: 560px;
   margin-top: 18px;
-}
-
-.slide-journey:not(.journey-intro) .journey-stage {
-  transform: translateY(-75px);
 }
 
 .journey-intro .journey-person {
