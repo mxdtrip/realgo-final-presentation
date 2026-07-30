@@ -1216,6 +1216,8 @@
   }
 
   function showSlide(index, options = {}) {
+    if (activeViewTransition && !options.instant) return;
+
     const nextSlide = Math.max(0, Math.min(index, slides.length - 1));
     const previousSlide = currentSlide;
     const canFlyPlanet = nextSlide !== previousSlide
