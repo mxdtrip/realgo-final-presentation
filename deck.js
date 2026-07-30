@@ -1,6 +1,7 @@
 (() => {
   const stage = document.getElementById("stage");
-  const slides = Array.from(document.querySelectorAll(".slide"));
+  const slides = Array.from(document.querySelectorAll(".slide:not([data-pitch-hidden])"))
+    .sort((firstSlide, secondSlide) => Number(firstSlide.dataset.order) - Number(secondSlide.dataset.order));
   const progressBar = document.querySelector("#progress i");
   const slideCounter = document.getElementById("slideCounter");
   const dots = document.getElementById("dots");
@@ -43,7 +44,7 @@
     },
     {
       name: "bryack",
-      duty: "Backend и тестирование: серверная логика, проверки и устойчивость критических потоков.",
+      duty: "Автор идеи, backend и серверная логика продукта.",
     },
     {
       name: "pagister",
@@ -75,40 +76,27 @@
       [".source-line", ".source-line", "morph-market-source"],
     ],
     [
-      [".giant-number", ".statement h2", "morph-primary"],
-      [".stat-keynote h2", ".statement > p", "morph-secondary"],
+      [".giant-number", ".chaos-keynote h2", "morph-primary"],
+      [".stat-keynote h2", ".chaos-keynote .kicker", "morph-kicker"],
     ],
     [
-      [".statement h2", ".about-line.word-line", "morph-primary"],
-      [".statement > p", ".about-keynote .kicker", "morph-kicker"],
+      [".chaos-keynote h2", ".comparison > div:first-child", "morph-primary"],
+      [".chaos-cloud", ".comparison > div:last-child", "morph-surface"],
     ],
     [
-      [".about-keynote", ".team-copy", "morph-primary"],
+      [".comparison > div:last-child", ".atlas-numbers", "morph-surface"],
+      [".comparison > div:first-child", ".atlas-keynote h2", "morph-primary"],
     ],
     [
-      [".team-copy", ".comparison > div:first-child", "morph-primary"],
-      [".solar", ".comparison > div:last-child", "morph-surface"],
+      [".atlas-numbers", ".company-results", "morph-surface"],
+      [".atlas-keynote h2", ".company-keynote h2", "morph-primary"],
     ],
     [
-      [".comparison > div:first-child", ".cycle > div:first-child", "morph-card-a"],
-      [".comparison-arrow", ".cycle > i:first-of-type", "morph-kicker"],
-      [".comparison > div:last-child", ".cycle > div:last-child", "morph-card-b"],
-    ],
-    // Слайды с MacBook (10–13): текстовые блоки намеренно НЕ участвуют в
-    // magic move. View transition растягивает снимок старого элемента до
-    // габаритов нового (у псевдоэлементов задан height: 100%), а блоки здесь
-    // разной высоты — из-за этого текст сплющивало. Без имени перехода текст
-    // попадает в общий снимок root и просто плавно перетекает через
-    // scene-dissolve. Поверхности морфим по-прежнему: рамки .macbook-3d-slot
-    // совпадают (inset: 0), искажения там нет, зато ноутбук не моргает.
-    [
-      [".cycle", ".macbook-3d-slot", "morph-surface"],
+      [".company-results", ".roadmap-list", "morph-surface"],
+      [".company-keynote h2", ".roadmap-keynote h2", "morph-primary"],
     ],
     [
-      [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
-    ],
-    [
-      [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
+      [".roadmap-list", ".macbook-3d-slot", "morph-surface"],
     ],
     [
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
@@ -117,27 +105,22 @@
       [".macbook-3d-slot", ".memory-cards", "morph-surface"],
     ],
     [
-      [".giant-dark", ".atlas-numbers", "morph-surface"],
-      [".cards-copy h2", ".atlas-keynote h2", "morph-primary"],
-      [".cards-copy .kicker", ".atlas-keynote .kicker", "morph-kicker"],
+      [".memory-cards", ".cycle", "morph-surface"],
+      [".cards-copy h2", ".cycle-keynote h2", "morph-primary"],
     ],
     [
-      [".atlas-numbers", ".roadmap-list", "morph-surface"],
-      [".atlas-keynote h2", ".roadmap-keynote h2", "morph-primary"],
-      [".atlas-keynote .kicker", ".roadmap-keynote .kicker", "morph-kicker"],
+      [".cycle", ".about-keynote", "morph-surface"],
     ],
     [
-      [".roadmap-list", ".price", "morph-surface"],
-      [".roadmap-keynote h2", ".price-keynote h2", "morph-primary"],
-      [".roadmap-keynote .kicker", ".price-keynote .kicker", "morph-kicker"],
+      [".about-keynote", ".team-copy", "morph-primary"],
     ],
-    // 17 ↔ 18 обслуживает runPriceTransition (счёт цены + перекраска фона),
-    // magic move здесь не нужен и только конфликтовал бы с ним.
-    [],
     [
-      [".price-keynote h2", ".closing-keynote h2", "morph-primary"],
-      [".price-keynote .kicker", ".closing-keynote .kicker", "morph-kicker"],
-      [".price-keynote > p", ".final-line", "morph-secondary"],
+      [".team-copy", ".monetization-keynote", "morph-primary"],
+      [".solar", ".plan-flow", "morph-surface"],
+    ],
+    [
+      [".monetization-keynote h2", ".closing-keynote h2", "morph-primary"],
+      [".plan-flow", ".final-line", "morph-secondary"],
     ],
   ];
 

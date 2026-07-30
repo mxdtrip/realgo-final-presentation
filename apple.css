@@ -938,6 +938,51 @@ h2 {
   font-size: 126px;
 }
 
+/* Five-minute pitch: preparation overload */
+
+.chaos-keynote {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  width: 1540px;
+  transform: translate(-50%, -50%);
+}
+
+.chaos-keynote h2 {
+  max-width: 1320px;
+  font-size: 92px;
+  line-height: 0.98;
+}
+
+.chaos-cloud {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 1350px;
+  margin-top: 62px;
+}
+
+.chaos-cloud span {
+  padding: 15px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(235, 239, 246, 0.7);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+}
+
+.chaos-cloud span:nth-child(3n + 2) {
+  color: rgba(100, 176, 255, 0.88);
+  transform: translateY(8px);
+}
+
+.chaos-keynote > p:last-child {
+  margin-top: 48px;
+  color: var(--gray);
+  font-size: 22px;
+}
+
 /* About */
 
 .about-keynote {
@@ -2071,7 +2116,102 @@ h2 {
   line-height: 1.5;
 }
 
+.memory-cards-three article {
+  top: 82px;
+  width: 350px;
+  height: 500px;
+  padding: 30px;
+}
+
+.memory-cards-three article:first-child {
+  left: 0;
+  transform: rotate(-5deg);
+}
+
+.memory-cards-three article:nth-child(2) {
+  top: 48px;
+  left: 280px;
+  z-index: 2;
+  border-color: #31597d;
+  transform: rotate(0deg);
+}
+
+.memory-cards-three article.personal {
+  right: 0;
+  transform: rotate(5deg);
+}
+
+.memory-cards-three h3 {
+  margin-top: 104px;
+  font-size: 31px;
+}
+
 /* Atlas and roadmap */
+
+.company-keynote {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  width: 1500px;
+  transform: translate(-50%, -50%);
+}
+
+.company-keynote h2 {
+  max-width: 1280px;
+  font-size: 84px;
+  line-height: 1;
+}
+
+.company-search {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  margin-top: 54px;
+  padding: 22px 28px;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.08);
+}
+
+.company-search > span {
+  color: var(--blue-dark);
+  font-size: 30px;
+}
+
+.company-search strong {
+  font-size: 26px;
+}
+
+.company-search small {
+  color: var(--gray);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.company-results {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.company-results span {
+  padding: 12px 16px;
+  border: 1px solid rgba(0, 113, 227, 0.18);
+  border-radius: 999px;
+  background: rgba(0, 113, 227, 0.055);
+  color: var(--blue-dark);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.company-keynote > p:last-child {
+  margin-top: 36px;
+  color: var(--gray);
+  font-size: 21px;
+}
 
 .atlas-keynote {
   position: absolute;
@@ -2193,6 +2333,76 @@ h2 {
 }
 
 /* Pricing */
+
+.monetization-keynote {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  width: 1500px;
+  transform: translate(-50%, -50%);
+}
+
+.monetization-keynote h2 {
+  max-width: 1320px;
+  font-size: 86px;
+  line-height: 1;
+}
+
+.plan-flow {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  align-items: stretch;
+  margin-top: 58px;
+}
+
+.plan-flow article {
+  padding: 32px 36px;
+  border: 1px solid var(--line-light);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.plan-flow article.plan-pro {
+  border-color: rgba(0, 113, 227, 0.28);
+  background: rgba(0, 113, 227, 0.055);
+}
+
+.plan-flow small,
+.plan-flow strong,
+.plan-flow p {
+  display: block;
+}
+
+.plan-flow small {
+  color: var(--blue-dark);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.plan-flow strong {
+  margin-top: 52px;
+  font-size: 34px;
+}
+
+.plan-flow p {
+  margin: 12px 0 0;
+  color: var(--gray);
+  font-size: 17px;
+}
+
+.plan-flow > i {
+  display: grid;
+  color: var(--blue-dark);
+  font-size: 28px;
+  font-style: normal;
+  place-items: center;
+}
+
+.monetization-keynote > p:last-child {
+  margin-top: 32px;
+  color: var(--gray);
+  font-size: 20px;
+}
 
 .price-keynote {
   position: absolute;
