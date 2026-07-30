@@ -1711,7 +1711,7 @@ h2 {
   font-family: "JetBrains Mono", monospace;
   font-size: 14px;
   letter-spacing: -0.05em;
-  transform: rotate(6deg) scale(var(--planet-highlight-scale));
+  transform: scale(var(--planet-highlight-scale));
   transition: color 480ms ease, transform 480ms cubic-bezier(0.22, 0.61, 0.36, 1);
   place-items: center;
 }
@@ -1775,6 +1775,8 @@ h2 {
   position: relative;
   z-index: 3;
   color: rgba(222, 232, 248, 0.72);
+  font-size: 17px;
+  font-weight: 500;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
   transition: color 480ms ease, text-shadow 480ms ease;
 }
@@ -1793,7 +1795,7 @@ h2 {
   font-size: 9px;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, 5px) rotate(6deg);
+  transform: translate(-50%, 5px);
   transition: opacity 350ms ease, transform 350ms ease;
   white-space: nowrap;
 }
@@ -1818,7 +1820,7 @@ h2 {
 
 .team-planet.is-active::after {
   opacity: 1;
-  transform: translate(-50%, 0) rotate(6deg);
+  transform: translate(-50%, 0);
 }
 
 .solar-core {
