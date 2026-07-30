@@ -169,10 +169,12 @@ if (stage && slots.length) {
   let screenUp = null;
   let screenRight = null;
   let productUiObject = null;
+  let productScreenShadow = null;
   let trackedPanel = null;
   let trackedPanelWidth = 400;
   let trackedPanelHeight = 372;
   const planeCenter = new THREE.Vector3();
+  const shadowCenter = new THREE.Vector3();
   const screenBasisMatrix = new THREE.Matrix4();
   const panelResizeObserver = typeof ResizeObserver === "undefined"
     ? null
@@ -404,11 +406,49 @@ if (stage && slots.length) {
   }
 
   function detachProductObject() {
-    if (!productUiObject) return;
-    productUiObject.removeFromParent();
-    productUiObject = null;
+    if (productUiObject) {
+      productUiObject.removeFromParent();
+      productUiObject = null;
+    }
+    if (productScreenShadow) {
+      productScreenShadow.visible = false;
+      productScreenShadow.material.opacity = 0;
+    }
     panelResizeObserver?.disconnect();
     trackedPanel = null;
+  }
+
+  function ensureProductScreenShadow() {
+    if (productScreenShadow) return productScreenShadow;
+    const shadowCanvas = document.createElement("canvas");
+    shadowCanvas.width = 256;
+    shadowCanvas.height = 256;
+    const context = shadowCanvas.getContext("2d");
+    context.shadowColor = "rgba(0, 0, 0, 0.96)";
+    context.shadowBlur = 24;
+    context.fillStyle = "rgba(0, 0, 0, 0.72)";
+    roundedRect(context, 24, 24, 208, 208, 20);
+    context.fill();
+    const texture = new THREE.CanvasTexture(shadowCanvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    productScreenShadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1),
+      new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        toneMapped: false,
+      })
+    );
+    productScreenShadow.name = "ReAlgo extension screen shadow";
+    screenBasisMatrix.makeBasis(screenRight, screenUp, screenNormal);
+    productScreenShadow.quaternion.setFromRotationMatrix(screenBasisMatrix);
+    productScreenShadow.renderOrder = 12;
+    productScreenShadow.visible = false;
+    modelPivot.add(productScreenShadow);
+    return productScreenShadow;
   }
 
   function ensureProductObject() {
@@ -449,28 +489,43 @@ if (stage && slots.length) {
       : 0;
     const progress = 1 - Math.pow(1 - rawProgress, 4);
     const tallPanel = panelHeight > 450;
-    const initialWidthFraction = tallPanel ? 0.29 : 0.35;
-    const focusWidthFraction = activeMode === "rating"
-      ? 0.28
-      : tallPanel
-        ? 0.22
-        : 0.36;
-    const worldWidth = screenPlaneWidth * THREE.MathUtils.lerp(
-      initialWidthFraction,
-      focusWidthFraction,
-      progress,
-    );
+    const extensionPanel = activeMode === "extension";
+    const widthFraction = extensionPanel
+      ? 0.31
+      : activeMode === "rating"
+        ? 0.35
+        : tallPanel
+          ? 0.27
+          : 0.35;
+    const worldWidth = screenPlaneWidth * widthFraction;
     const margin = screenPlaneWidth * 0.045;
-    const initialCenterX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5;
+    const centerX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5;
+    const centerY = extensionPanel
+      ? -screenPlaneHeight * 0.15
+      : -screenPlaneHeight * 0.065;
     planeCenter.copy(screenCenter)
-      .addScaledVector(screenRight, initialCenterX + screenPlaneWidth * 0.04 * progress)
-      .addScaledVector(screenUp, -screenPlaneHeight * 0.025 * progress)
+      .addScaledVector(screenRight, centerX)
+      .addScaledVector(screenUp, centerY)
       .addScaledVector(screenNormal, screenPlaneWidth * 0.025 * progress);
     object.position.copy(planeCenter);
     // CSS3DObject uses one uniform world-units-per-CSS-pixel scale. The DOM
     // panel therefore keeps its native aspect ratio; camera perspective is
     // supplied by the same Three.js camera that renders the MacBook.
     object.scale.setScalar(worldWidth / panelWidth);
+
+    // CSS3D elements cannot cast WebGL shadows. Render a separate soft plane
+    // directly on the display so the lifted window leaves a real projected
+    // shadow on the monitor instead of carrying a fake duplicate outline.
+    const screenShadow = ensureProductScreenShadow();
+    const worldHeight = worldWidth * panelHeight / panelWidth;
+    shadowCenter.copy(screenCenter)
+      .addScaledVector(screenRight, centerX - screenPlaneWidth * 0.045 * progress)
+      .addScaledVector(screenUp, centerY - screenPlaneHeight * 0.018 * progress)
+      .addScaledVector(screenNormal, screenPlaneWidth * 0.0012);
+    screenShadow.position.copy(shadowCenter);
+    screenShadow.scale.set(worldWidth * 1.12, worldHeight * 1.12, 1);
+    screenShadow.material.opacity = 0.62 * progress;
+    screenShadow.visible = progress > 0.001;
   }
 
   function renderNow() {
@@ -711,14 +766,15 @@ if (stage && slots.length) {
       const normalInShot = screenNormal.clone().applyQuaternion(modelQuaternion).normalize();
       const upInShot = screenUp.clone().applyQuaternion(modelQuaternion).normalize();
       const rightInShot = screenRight.clone().applyQuaternion(modelQuaternion).normalize();
+      const frameY = screenPlaneHeight * (config.frameYFraction || 0);
 
       pose.camera.copy(centerInShot)
         .addScaledVector(normalInShot, config.distance)
         .addScaledVector(rightInShot, config.cameraX)
-        .addScaledVector(upInShot, config.cameraY);
+        .addScaledVector(upInShot, config.cameraY + frameY);
       pose.lookAt.copy(centerInShot)
         .addScaledVector(rightInShot, config.targetX)
-        .addScaledVector(upInShot, config.targetY);
+        .addScaledVector(upInShot, config.targetY + frameY);
       pose.up.copy(upInShot);
       pose.fov = config.fov;
     }
@@ -729,6 +785,7 @@ if (stage && slots.length) {
       cameraY: 0.34,
       targetX: 0.38,
       targetY: 0.02,
+      frameYFraction: -0.15,
       fov: 23,
     });
     configureScreenShot("agent", {

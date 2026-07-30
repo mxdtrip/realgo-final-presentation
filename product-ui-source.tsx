@@ -151,6 +151,7 @@ function activateDemo() {
   layer.className = `product-ui-stage product-ui-stage--${mode}`;
   layer.setAttribute("aria-label", "Интерактивная демонстрация интерфейса расширения ReAlgo");
   layer.innerHTML = '<div class="product-focus-dim" aria-hidden="true"></div><div class="product-ui-card"><div class="product-ui-glint" aria-hidden="true"></div><div class="product-ui-root"></div></div>';
+  const card = layer.querySelector<HTMLElement>(".product-ui-card")!;
   slide.appendChild(layer);
   currentSlide = slide;
   currentRoot = createRoot(layer.querySelector(".product-ui-root")!);
@@ -168,8 +169,10 @@ function activateDemo() {
     // First complete the camera dolly with the panel rigidly attached to the
     // display. Only after the camera settles does the panel lift forward; UI
     // interactions wait until that second motion is complete as well.
-    if (mode === "agent") timers.push(window.setTimeout(() => layer.querySelector<HTMLButtonElement>(".realgo-agent-btn--hint")?.click(), PRODUCT_INTERACTION_DELAY_MS));
-    if (mode === "rating") timers.push(window.setTimeout(() => layer.querySelector<HTMLButtonElement>('[data-difficulty="normal"]')?.click(), PRODUCT_INTERACTION_DELAY_MS));
+    // CSS3DRenderer reparents the card into its camera layer. Keep a direct
+    // reference so the timeline remains stable regardless of DOM ancestry.
+    if (mode === "agent") timers.push(window.setTimeout(() => card.querySelector<HTMLButtonElement>(".realgo-agent-btn--hint")?.click(), PRODUCT_INTERACTION_DELAY_MS));
+    if (mode === "rating") timers.push(window.setTimeout(() => card.querySelector<HTMLButtonElement>('[data-difficulty="normal"]')?.click(), PRODUCT_INTERACTION_DELAY_MS));
   }
 
   if (document.getElementById("stage")?.classList.contains("has-macbook-3d")) {
