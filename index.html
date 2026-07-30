@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=43" />
+    <link rel="stylesheet" href="apple.css?v=55" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -57,12 +57,11 @@
       </div>
 
       <div class="slides">
-        <section class="slide theme-dark is-active" data-slide="0" data-order="0" data-theme="dark">
-          <div class="hero-orb" aria-hidden="true"><img class="orb-skin" src="assets/orb-skin.png" alt="" /></div>
+        <section class="slide theme-dark slide-cover is-active" data-slide="0" data-order="0" data-theme="dark">
+          <img class="hero-backdrop" src="assets/hero-background.jpg" alt="" aria-hidden="true" />
           <div class="centered hero reveal">
-            <p class="kicker">ReAlgo · финал хакатона</p>
-            <h1>Рынок плотнее.<br /><span class="accent-blue">Проверка — жёстче.</span></h1>
-            <p class="subhead">В какой-то момент кандидат остаётся один на один с задачей, редактором и таймером.</p>
+            <h1>ReAlgo</h1>
+            <p class="subhead">Подготовка, которая запоминает<br />ваш прогресс.</p>
           </div>
           <div class="awards" aria-label="Номинации хакатона">
             <div class="award">
@@ -86,7 +85,7 @@
               <svg class="award-branch is-mirrored" viewBox="0 0 64 128" aria-hidden="true"><use href="#laurelBranch" /></svg>
             </div>
           </div>
-          <aside class="speaker-notes"><strong>00:00–00:08</strong><p>Рынок разработки стал плотнее: вакансий меньше, кандидатов больше, а технические навыки проверяют тщательнее.</p></aside>
+          <aside class="speaker-notes"><strong>00:00–00:08</strong><p>ReAlgo — персональная система подготовки к алгоритмическим интервью: от диагностики пробелов до практики и разбора решений.</p></aside>
         </section>
 
         <section class="slide theme-light" data-slide="1" data-order="1" data-theme="light">
@@ -98,7 +97,7 @@
               <p>Нормальным hh.ru считает уровень до 8.</p>
             </div>
           </div>
-          <div class="source-line"><a href="https://career.hh.ru/article/trendy-na-rynke-truda" target="_blank" rel="noreferrer">hh.ru · «Тренды на рынке труда», 29.05.2026</a><span>Проверено 28.07.2026</span></div>
+          <div class="source-line"><a href="https://career.hh.ru/article/trendy-na-rynke-truda" target="_blank" rel="noreferrer">Источник: hh.ru · «Тренды на рынке труда», 29.05.2026</a></div>
           <aside class="speaker-notes"><strong>00:08–00:17</strong><p>На одну вакансию приходится 22 активных резюме. Работодатель может выбирать осторожнее.</p></aside>
         </section>
 
@@ -111,7 +110,7 @@
               <p>Высокая конкуренция особенно заметна на entry-level позициях.</p>
             </div>
           </div>
-          <div class="source-line"><a href="https://career.hh.ru/article/trendy-na-rynke-truda" target="_blank" rel="noreferrer">hh.ru · данные за 2025–2026 годы</a><a href="https://hh.ru/article/prognoz-chto-budet-proiskhodit-na-rynke-truda-v-2026-godu" target="_blank" rel="noreferrer">hh.ru · прогноз рынка труда — 2026</a></div>
+          <div class="source-line"><a href="https://career.hh.ru/article/trendy-na-rynke-truda" target="_blank" rel="noreferrer">Источники: hh.ru · данные за 2025–2026 годы</a><a href="https://hh.ru/article/prognoz-chto-budet-proiskhodit-na-rynke-truda-v-2026-godu" target="_blank" rel="noreferrer">hh.ru · прогноз рынка труда — 2026</a></div>
           <aside class="speaker-notes"><strong>00:17–00:26</strong><p>Для начинающих открыта лишь небольшая часть IT-вакансий — конкуренция особенно заметна в начале карьеры.</p></aside>
         </section>
 
@@ -124,7 +123,7 @@
               <p>Не на обещания. Не на список технологий. На способность показать результат.</p>
             </div>
           </div>
-          <div class="source-line"><a href="https://career.hh.ru/article/trendy-na-rynke-truda" target="_blank" rel="noreferrer">hh.ru · опрос работодателей, 2026</a><span>Проверено 28.07.2026</span></div>
+          <div class="source-line"><a href="https://career.hh.ru/article/trendy-na-rynke-truda" target="_blank" rel="noreferrer">Источник: hh.ru · опрос работодателей, 2026</a></div>
           <aside class="speaker-notes"><strong>00:26–00:35</strong><p>Навыки уже важнее перечня технологий. На интервью нужно показать не только знания, но и мышление под давлением.</p></aside>
         </section>
 
@@ -316,10 +315,10 @@
 
               <section class="taxonomy-column taxonomy-platform-column">
                 <div class="taxonomy-platforms">
-                  <article><svg class="taxonomy-platform-logo logo-leetcode" viewBox="0 0 48 48" aria-hidden="true"><path d="M29.5 7.5 15 22a8 8 0 0 0 0 11.3l8 8"/><path d="M17 24h22"/><path class="logo-accent" d="m15 22 8-8"/></svg><strong>LeetCode</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="2484">2 484</b></span></article>
-                  <article><svg class="taxonomy-platform-logo logo-hackerrank" viewBox="0 0 48 48" aria-hidden="true"><path d="m24 3 18 10.5v21L24 45 6 34.5v-21z"/><path class="logo-letter" d="M17 14v20m14-20v20M17 24h14"/></svg><strong>HackerRank</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="484">484</b></span></article>
-                  <article><svg class="taxonomy-platform-logo logo-gfg" viewBox="0 0 48 48" aria-hidden="true"><path d="M23 16c-4-5-11-5-15 0s-2 13 4 16c4 2 8 1 11-2l4-5H12m13-9c4-5 11-5 15 0s2 13-4 16c-4 2-8 1-11-2l-4-5h15"/></svg><strong>GeeksforGeeks</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="531">531</b></span></article>
-                  <article><svg class="taxonomy-platform-logo logo-codeforces" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="20" width="10" height="21" rx="2"/><rect class="logo-blue" x="19" y="8" width="10" height="33" rx="2"/><rect class="logo-yellow" x="33" y="14" width="10" height="27" rx="2"/></svg><strong>Codeforces</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="11311">11 311</b></span></article>
+                  <article><svg class="taxonomy-platform-logo logo-leetcode" viewBox="0 0 64 64" aria-hidden="true"><path class="logo-part logo-lc-accent" d="M34.5 14.2c12.6 0 22.8 10.2 22.8 22.8S47.1 59.8 34.5 59.8c-5.1 0-9.8-1.7-13.6-4.5"/><path class="logo-part logo-lc-primary" d="M42.1 7.1 18.7 30.5a10.2 10.2 0 0 0 0 14.4l11.5 11.5"/><path class="logo-part logo-lc-muted" d="M32.7 37h23.7"/></svg><strong>LeetCode</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="2484">2 484</b></span></article>
+                  <article><svg class="taxonomy-platform-logo logo-hackerrank" viewBox="0 0 64 64" aria-hidden="true"><path class="logo-part logo-hr-shell" d="M32 2.5c2 0 3.8.5 5.5 1.4l18.9 10.9c3.4 1.9 5.5 5.5 5.5 9.4v15.6c0 3.9-2.1 7.5-5.5 9.4L37.5 60.1a11 11 0 0 1-11 0L7.6 49.2a10.9 10.9 0 0 1-5.5-9.4V24.2c0-3.9 2.1-7.5 5.5-9.4L26.5 3.9A11 11 0 0 1 32 2.5Z"/><path class="logo-part logo-hr-cutout" d="m23.5 12-9 9h5v25h8V35h9v11h-5l9 9 9-9h-5V21h-8v7h-9v-7h5l-9-9Z"/></svg><strong>HackerRank</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="484">484</b></span></article>
+                  <article><svg class="taxonomy-platform-logo logo-gfg" viewBox="0 0 100 58" aria-hidden="true"><path class="logo-part logo-gfg-mark" d="M49.5 28H7.8c0 12.6 9.8 22 22.7 22 10.4 0 18.1-6.1 21-15.2M50.5 28h41.7c0 12.6-9.8 22-22.7 22-10.4 0-18.1-6.1-21-15.2M49.5 28C47 15.6 39.8 8 29.3 8 19.6 8 11.8 13.2 8 20.9M50.5 28C53 15.6 60.2 8 70.7 8c9.7 0 17.5 5.2 21.3 12.9"/></svg><strong>GeeksforGeeks</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="531">531</b></span></article>
+                  <article><svg class="taxonomy-platform-logo logo-codeforces" viewBox="0 0 64 64" aria-hidden="true"><rect class="logo-part logo-cf-yellow" x="5" y="25" width="16" height="34" rx="5"/><rect class="logo-part logo-cf-blue" x="24" y="5" width="16" height="54" rx="5"/><rect class="logo-part logo-cf-red" x="43" y="31" width="16" height="28" rx="5"/></svg><strong>Codeforces</strong><span class="taxonomy-platform-count"><b data-taxonomy-count="11311">11 311</b></span></article>
                 </div>
                 <footer><strong>14 810</strong><span>задач всего</span></footer>
               </section>
@@ -428,8 +427,8 @@
       <nav id="dots" class="slide-dots" aria-label="Навигация по слайдам"></nav>
       <div id="help" class="help-panel" aria-hidden="true"><strong>Управление</strong><span><kbd>←</kbd><kbd>→</kbd> слайды</span><span><kbd>Space</kbd> дальше</span><span><kbd>N</kbd> заметки</span><span><kbd>F</kbd> полный экран</span><span><kbd>?</kbd> закрыть</span></div>
     </main>
-    <script type="module" src="assets/product-ui.js?v=33"></script>
-    <script type="module" src="macbook-3d.js?v=34"></script>
+    <script type="module" src="assets/product-ui.js?v=35"></script>
+    <script type="module" src="macbook-3d.js?v=40"></script>
     <script src="deck.js?v=31"></script>
   </body>
 </html>

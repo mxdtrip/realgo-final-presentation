@@ -391,6 +391,21 @@ html[data-market-number-direction="down"]::view-transition-new(morph-market-numb
   letter-spacing: 0.08em;
 }
 
+.stage:has(.slide-cover.is-active) .deck-controls,
+.stage:has(.slide-cover.is-active) .slide-dots {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage:has(.slide-cover.is-active) #timer {
+  display: none;
+}
+
+.stage:has(.slide-cover.is-active) .deck-meta {
+  gap: 0;
+  color: rgba(245, 245, 247, 0.35);
+}
+
 .stage[data-theme="light"] .deck-chrome {
   color: rgba(29, 29, 31, 0.48);
 }
@@ -579,29 +594,33 @@ kbd {
   transform: translate(-50%, -50%);
 }
 
-/* Та же сфера, что несёт солнечную систему на слайде команды, — на фоне
-   первого слайда. У orb-skin.png середина прозрачная, поэтому на чёрном
-   она читается как планета со светящимся лимбом и не мешает заголовку:
-   ободок проходит снаружи строк заголовка.
-   Диаметр 838px и центр y=466 — минимальная окружность, вмещающая весь
-   текст с полем, при условии что низ (y=885) не задевает венки номинаций
-   (начинаются с y=920). */
-.hero-orb {
-  position: absolute;
-  top: 466px;
-  left: 50%;
-  z-index: 0;
-  width: 838px;
-  height: 838px;
-  opacity: 0.72;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  animation: hero-orb-drift 19s ease-in-out infinite;
+.slide-cover {
+  overflow: hidden;
+  background: #000;
 }
 
-@keyframes hero-orb-drift {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, calc(-50% - 14px)) scale(1.018); }
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  filter: saturate(0.9) contrast(1.03) brightness(0.94);
+  transform: translateX(-5%) scale(1.2);
+  transform-origin: center;
+}
+
+.slide-cover::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0.24) 42%, rgba(0, 0, 0, 0.02) 76%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.58) 0%, transparent 43%);
+  content: "";
+  pointer-events: none;
 }
 
 /* Номинации: лавровые венки в стиле кинопостеров.
@@ -615,6 +634,7 @@ kbd {
   gap: 58px;
   align-items: center;
   justify-content: center;
+  z-index: 2;
 }
 
 .award {
@@ -704,17 +724,38 @@ h2 {
   line-height: 1.45;
 }
 
-/* Первый слайд: блок поднят на 78px, а мера подзаголовка сужена до 660px,
-   чтобы весь текст уместился внутрь сферы. При 920px первая строка выходила
-   на 743px и вылезала за ободок; при 660px строки 623 и 567px, и вся
-   раскладка вписывается в окружность d=838 с запасом от 38px.
-   Подъём нужен потому, что слайд стал нижне-тяжёлым из-за венков. */
 .hero {
-  top: calc(50% - 78px);
+  top: 43%;
+  left: 138px;
+  z-index: 2;
+  width: 900px;
+  padding: 0;
+  text-align: left;
+  transform: translateY(-50%);
+}
+
+.hero h1 {
+  margin-bottom: -4px;
+  padding-bottom: 0.22em;
+  color: transparent;
+  background: linear-gradient(180deg, #ffffff 0%, #d6d7db 42%, #686b72 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 136px;
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
 }
 
 .hero .subhead {
-  max-width: 660px;
+  max-width: 600px;
+  margin: 0;
+  color: rgba(245, 245, 247, 0.62);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 /* Market */
@@ -932,7 +973,7 @@ h2 {
 
 .stat-copy {
   position: absolute;
-  top: 682px;
+  top: 700px;
   left: 50%;
   width: 1500px;
   transform: translateX(-50%);
@@ -940,7 +981,7 @@ h2 {
 
 .stat-keynote h2 {
   max-width: 1240px;
-  margin: 0 auto 20px;
+  margin: 0 auto 48px;
   font-size: 66px;
 }
 
@@ -961,7 +1002,8 @@ h2 {
   justify-content: center;
   color: rgba(0, 0, 0, 0.32);
   font-family: "JetBrains Mono", monospace;
-  font-size: 9px;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .source-line a {
@@ -2173,21 +2215,28 @@ h2 {
   overflow: visible;
 }
 
-.logo-leetcode path {
+.logo-leetcode .logo-part {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 4;
+  stroke-width: 8.5;
 }
 
-.logo-leetcode .logo-accent { stroke: currentColor; }
-.logo-hackerrank > path:first-child { fill: none; stroke: currentColor; stroke-linejoin: round; stroke-width: 3.2; }
-.logo-hackerrank .logo-letter { fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 3.2; }
-.logo-gfg path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3.2; }
-.logo-codeforces rect,
-.logo-codeforces .logo-blue,
-.logo-codeforces .logo-yellow { fill: currentColor; }
+.logo-leetcode { transform: scale(1.06); }
+.logo-leetcode .logo-lc-accent { stroke: #a1a1a6; }
+.logo-leetcode .logo-lc-muted { stroke: #6e6e73; stroke-width: 7; }
+.logo-hackerrank .logo-hr-shell { fill: currentColor; }
+.logo-hackerrank .logo-hr-cutout { fill: #0a0d12; }
+.logo-gfg .logo-gfg-mark {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 8.5;
+}
+.logo-gfg { transform: scale(1.1); }
+.logo-codeforces .logo-part { fill: currentColor; }
 
 .taxonomy-platforms > article > strong {
   color: #f5f5f7;
@@ -2300,19 +2349,27 @@ h2 {
 .slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(3) { animation-delay: 580ms; }
 .slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(4) { animation-delay: 750ms; }
 
-.taxonomy-platforms article:nth-child(1) { --logo-brand: #ffa116; }
-.taxonomy-platforms article:nth-child(2) { --logo-brand: #00ea64; }
-.taxonomy-platforms article:nth-child(3) { --logo-brand: #2f8d46; }
-.taxonomy-platforms article:nth-child(4) { --logo-brand: #2997ff; }
+.taxonomy-platforms article:nth-child(1) { --logo-delay: 240ms; }
+.taxonomy-platforms article:nth-child(2) { --logo-delay: 410ms; }
+.taxonomy-platforms article:nth-child(3) { --logo-delay: 580ms; }
+.taxonomy-platforms article:nth-child(4) { --logo-delay: 750ms; }
 
-.slide-taxonomy-graph.is-active .taxonomy-platform-logo {
-  animation: taxonomy-logo-settle 900ms ease-out both;
+.slide-taxonomy-graph.is-active .taxonomy-platform-logo .logo-part {
+  animation-delay: var(--logo-delay);
+  animation-duration: 900ms;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
 }
 
-.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(1) .taxonomy-platform-logo { animation-delay: 240ms; }
-.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(2) .taxonomy-platform-logo { animation-delay: 410ms; }
-.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(3) .taxonomy-platform-logo { animation-delay: 580ms; }
-.slide-taxonomy-graph.is-active .taxonomy-platforms article:nth-child(4) .taxonomy-platform-logo { animation-delay: 750ms; }
+.slide-taxonomy-graph.is-active .logo-lc-primary { animation-name: taxonomy-logo-lc-primary; }
+.slide-taxonomy-graph.is-active .logo-lc-accent { animation-name: taxonomy-logo-lc-accent; }
+.slide-taxonomy-graph.is-active .logo-lc-muted { animation-name: taxonomy-logo-lc-muted; }
+.slide-taxonomy-graph.is-active .logo-hr-shell { animation-name: taxonomy-logo-hr-shell; }
+.slide-taxonomy-graph.is-active .logo-hr-cutout { animation-name: taxonomy-logo-hr-cutout; }
+.slide-taxonomy-graph.is-active .logo-gfg-mark { animation-name: taxonomy-logo-gfg; }
+.slide-taxonomy-graph.is-active .logo-cf-yellow { animation-name: taxonomy-logo-cf-yellow; }
+.slide-taxonomy-graph.is-active .logo-cf-blue { animation-name: taxonomy-logo-cf-blue; }
+.slide-taxonomy-graph.is-active .logo-cf-red { animation-name: taxonomy-logo-cf-red; }
 
 .slide-taxonomy-graph.is-active .taxonomy-links-platforms path {
   animation: taxonomy-input-edge-in 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
@@ -2369,6 +2426,10 @@ h2 {
   color: #d1d1d6;
 }
 
+.slide-taxonomy-graph.is-settled .taxonomy-platform-logo .logo-part {
+  animation: none;
+}
+
 @keyframes taxonomy-platform-in {
   to { opacity: 1; transform: translateX(0); }
 }
@@ -2387,10 +2448,15 @@ h2 {
   to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes taxonomy-logo-settle {
-  0%, 35% { color: var(--logo-brand); }
-  100% { color: #d1d1d6; }
-}
+@keyframes taxonomy-logo-lc-primary { 0%, 35% { stroke: #f5f5f7; } 100% { stroke: #d1d1d6; } }
+@keyframes taxonomy-logo-lc-accent { 0%, 35% { stroke: #ffa116; } 100% { stroke: #a1a1a6; } }
+@keyframes taxonomy-logo-lc-muted { 0%, 35% { stroke: #a1a1a6; } 100% { stroke: #6e6e73; } }
+@keyframes taxonomy-logo-hr-shell { 0%, 35% { fill: #1fba55; } 100% { fill: #d1d1d6; } }
+@keyframes taxonomy-logo-hr-cutout { 0%, 35% { fill: #fff; } 100% { fill: #0a0d12; } }
+@keyframes taxonomy-logo-gfg { 0%, 35% { stroke: #008f6b; } 100% { stroke: #d1d1d6; } }
+@keyframes taxonomy-logo-cf-yellow { 0%, 35% { fill: #f7c844; } 100% { fill: #d1d1d6; } }
+@keyframes taxonomy-logo-cf-blue { 0%, 35% { fill: #2196ca; } 100% { fill: #d1d1d6; } }
+@keyframes taxonomy-logo-cf-red { 0%, 35% { fill: #c31829; } 100% { fill: #d1d1d6; } }
 
 @keyframes taxonomy-total-in {
   from { opacity: 0; transform: translateY(10px); }
@@ -2632,29 +2698,10 @@ h2 {
   top: 0 !important;
   right: auto !important;
   left: 0 !important;
-  transform-origin: 0 0;
+  transform-origin: 50% 50%;
   transform-style: preserve-3d;
   backface-visibility: hidden;
   transition: opacity 520ms ease, filter 1100ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.product-ui-card::before {
-  position: absolute;
-  top: 5px;
-  bottom: 5px;
-  left: -13px;
-  z-index: -1;
-  width: 14px;
-  border: 1px solid rgba(93, 151, 222, 0.22);
-  border-right: 0;
-  border-radius: 10px 0 0 10px;
-  background: linear-gradient(90deg, rgba(19, 35, 54, 0.92), rgba(7, 12, 20, 0.28));
-  box-shadow: -10px 5px 24px rgba(0, 0, 0, 0.42);
-  content: "";
-  opacity: 0;
-  transform: translateX(8px) scaleX(0.25);
-  transform-origin: right center;
-  transition: opacity 900ms ease, transform 1450ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .product-ui-stage--agent .product-ui-card,
@@ -2687,11 +2734,6 @@ h2 {
   left: 0 !important;
 }
 
-.is-product-focus .product-ui-card::before {
-  opacity: 1;
-  transform: translateX(0) scaleX(1);
-}
-
 .is-product-focus .product-ui-stage--agent .product-ui-card,
 .is-product-focus .product-ui-stage--stages .product-ui-card {
   top: 140px;
@@ -2706,9 +2748,8 @@ h2 {
 .product-ui-glint {
   position: absolute;
   z-index: 20;
-  inset: -3px;
+  inset: 0;
   overflow: hidden;
-  border: 1px solid rgba(121, 192, 255, 0.12);
   border-radius: 15px;
   opacity: 0;
   pointer-events: none;
