@@ -10,6 +10,7 @@
   const priceBackdrop = document.getElementById("priceBackdrop");
   const priceCounter = document.getElementById("priceCounter");
   const priceCounterValue = document.getElementById("priceCounterValue");
+  const blackout = document.getElementById("blackout");
   const planetWipe = document.getElementById("planetWipe");
   const planetWipeBody = document.getElementById("planetWipeBody");
   const marketCounter = document.getElementById("marketCounter");
@@ -319,6 +320,10 @@
   let planetTransitionRunning = false;
   let priceTransitionRunning = false;
   let productCopyTransitionRunning = false;
+  let blackoutTransitionRunning = false;
+  const BLACKOUT_DURATION = 1250;
+  let crossFadeTransitionRunning = false;
+  const CROSS_FADE_DURATION = 780;
   const PRICE_TRANSITION_DURATION = 1400;
   let planetFrame = null;
   const PLANET_FLIGHT_DURATION = 1500;
@@ -728,16 +733,22 @@
       const target = Number.parseInt(element.dataset.taxonomyCount || "0", 10);
       element.textContent = reduceMotion ? formatValue(target) : "0";
     });
+    const isTaxonomy = slide.classList.contains("slide-taxonomy-graph");
+
     if (reduceMotion) {
-      slide.classList.add("is-settled");
+      if (isTaxonomy) slide.classList.add("is-settled");
       return;
     }
 
-    taxonomySettleTimer = window.setTimeout(() => {
-      if (slides[currentSlide] === slide) slide.classList.add("is-settled");
-    }, 3800);
+    if (isTaxonomy) {
+      // is-settled глушит анимации и выставляет конечные состояния, поэтому
+      // должен сработать позже последнего такта (узлы подпаттернов, ~7090мс).
+      taxonomySettleTimer = window.setTimeout(() => {
+        if (slides[currentSlide] === slide) slide.classList.add("is-settled");
+      }, 7400);
+    }
 
-    taxonomyCountTimer = window.setTimeout(() => {
+    const begin = () => {
       if (slides[currentSlide] !== slide) return;
       const startedAt = performance.now();
       const frame = (now) => {
@@ -754,7 +765,22 @@
         taxonomyCountFrame = null;
       };
       taxonomyCountFrame = window.requestAnimationFrame(frame);
-    }, 820);
+    };
+
+    const startDelay = Number.parseInt(slide.dataset.countDelay || "820", 10);
+
+    // Слайды, которые въезжают через morph-surface, ждут конца перехода:
+    // пока на экране снимок, а не живой элемент, счёт под ним не виден.
+    const transition = activeViewTransition;
+    if (slide.hasAttribute("data-count-after-transition") && transition?.finished) {
+      transition.finished.catch(() => {}).finally(() => {
+        if (slides[currentSlide] !== slide) return;
+        taxonomyCountTimer = window.setTimeout(begin, startDelay);
+      });
+      return;
+    }
+
+    taxonomyCountTimer = window.setTimeout(begin, startDelay);
   }
 
   function startCountUpFrames(targets) {
@@ -930,6 +956,92 @@
     });
 
     return animations;
+  }
+
+  // Метка ставится на слайд, ПОСЛЕ которого нужно затухание.
+  function isCrossFadeTransition(previousIndex, nextIndex) {
+    if (Math.abs(nextIndex - previousIndex) !== 1) return false;
+    const lower = Math.min(previousIndex, nextIndex);
+    return Boolean(slides[lower]?.hasAttribute("data-fade-next"));
+  }
+
+  // Простое затухание без magic move: новый слайд проявляется поверх
+  // старого. Оба тёмные и непрозрачные, поэтому перекрытие читается как
+  // перетекание, а морфинг .macbook-3d-slot в .memory-cards, растягивавший
+  // снимок между разными габаритами, здесь не участвует.
+  async function runCrossFadeTransition(nextIndex, previousIndex, options) {
+    if (crossFadeTransitionRunning) return;
+    const nextSlideElement = slides[nextIndex];
+    if (!nextSlideElement || typeof Element.prototype.animate !== "function") {
+      commitSlide(nextIndex, previousIndex, options);
+      return;
+    }
+
+    crossFadeTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+    nextSlideElement.classList.add("is-fade-next");
+
+    const fade = nextSlideElement.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: CROSS_FADE_DURATION, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both" },
+    );
+
+    try {
+      await fade.finished.catch(() => {});
+      commitSlide(nextIndex, previousIndex, options);
+    } finally {
+      fade.cancel();
+      nextSlideElement.classList.remove("is-fade-next");
+      crossFadeTransitionRunning = false;
+    }
+  }
+
+  // Метка ставится на слайд, ПОСЛЕ которого нужен провал в чёрный,
+  // поэтому переход работает одинаково в обе стороны.
+  function isBlackoutTransition(previousIndex, nextIndex) {
+    if (Math.abs(nextIndex - previousIndex) !== 1) return false;
+    const lower = Math.min(previousIndex, nextIndex);
+    return Boolean(slides[lower]?.hasAttribute("data-blackout-next"));
+  }
+
+  async function runBlackoutTransition(nextIndex, previousIndex, options) {
+    if (blackoutTransitionRunning) return;
+    blackoutTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+
+    blackout.style.opacity = "0";
+    blackout.classList.add("is-running");
+
+    let committed = false;
+    try {
+      await animateProgress(BLACKOUT_DURATION, (progress) => {
+        // 0–38%: гаснем, 38–52%: держим полностью чёрный кадр, 52–100%: проявляемся.
+        let opacity;
+        if (progress < 0.38) {
+          opacity = easeInOutCubic(progress / 0.38);
+        } else if (progress < 0.52) {
+          opacity = 1;
+        } else {
+          opacity = 1 - easeInOutCubic((progress - 0.52) / 0.48);
+        }
+        blackout.style.opacity = opacity.toFixed(3);
+
+        // Слайд подменяем в середине чёрной паузы — самой подмены не видно.
+        if (!committed && progress >= 0.45) {
+          committed = true;
+          commitSlide(nextIndex, previousIndex, options);
+        }
+      });
+    } finally {
+      if (!committed) commitSlide(nextIndex, previousIndex, options);
+      window.cancelAnimationFrame(planetFrame);
+      planetFrame = null;
+      blackout.classList.remove("is-running");
+      blackout.style.opacity = "0";
+      blackoutTransitionRunning = false;
+    }
   }
 
   function isProductCopyTransition(previousIndex, nextIndex) {
@@ -1295,6 +1407,28 @@
 
     const nextSlide = Math.max(0, Math.min(index, slides.length - 1));
     const previousSlide = currentSlide;
+
+    // Явная метка перехода имеет приоритет над остальными сценариями.
+    const canBlackout = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isBlackoutTransition(previousSlide, nextSlide);
+
+    if (canBlackout) {
+      runBlackoutTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
+    const canCrossFade = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isCrossFadeTransition(previousSlide, nextSlide);
+
+    if (canCrossFade) {
+      runCrossFadeTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
     const canFlyPlanet = nextSlide !== previousSlide
       && !reduceMotion
       && !options.instant

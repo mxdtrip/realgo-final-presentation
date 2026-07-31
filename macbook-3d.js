@@ -853,13 +853,16 @@ if (stage && slots.length) {
       targetY: 0,
       fov: 22.5,
     });
+    // The card-training shot is taller than the shared 10–12 story frame.
+    // Keep the colleague's wider, lower composition for this later mode.
     configureScreenShot("stages", {
       distance: 2.52,
       cameraX: -1.08,
       cameraY: 0.21,
       targetX: 0.48,
       targetY: -0.05,
-      fov: 22,
+      frameYFraction: -0.198,
+      fov: 25.4,
     });
     configureScreenShot("rating", {
       distance: 2.38,
