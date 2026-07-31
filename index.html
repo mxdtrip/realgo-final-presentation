@@ -271,7 +271,7 @@
           <aside class="speaker-notes"><strong>01:15–01:30</strong><p>ReAlgo приглушает информационный шум и выделяет только те элементы, которые ведут кандидата к его цели.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="8" data-order="13" data-theme="dark">
+        <section class="slide theme-dark" data-slide="8" data-order="13" data-theme="dark" data-blackout-next>
           <div class="cycle-keynote reveal">
             <p class="kicker">Повторение</p>
             <h2>Маршрут адаптируется.</h2>
@@ -357,7 +357,7 @@
           <aside class="speaker-notes"><strong>03:05–03:20</strong><p>Решённая задача превращается в три проверки: распознать паттерн, объяснить механику и вспомнить крайние случаи. Мы повторяем способ мышления, а не готовый код.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-company-targets" data-slide="15" data-order="8" data-theme="dark">
+        <section class="slide theme-dark slide-company-targets" data-slide="15" data-order="8" data-theme="dark" data-count-after-transition data-count-delay="300">
           <div class="company-target-keynote reveal">
             <div class="company-target-copy">
               <p class="kicker">Company overlay</p>
@@ -365,10 +365,10 @@
               <p>Задачи интервью связываются с паттернами и превращаются в персональный маршрут.</p>
             </div>
             <div class="company-target-list" aria-label="Компании и количество связанных задач">
-              <article><span class="company-target-logo company-logo-amazon" aria-hidden="true">a<i></i></span><strong>Amazon</strong><span class="company-target-count"><b>2 676</b><small>задач</small></span></article>
-              <article><span class="company-target-logo company-logo-google" aria-hidden="true">G</span><strong>Google</strong><span class="company-target-count"><b>2 529</b><small>задач</small></span></article>
-              <article><span class="company-target-logo company-logo-microsoft" aria-hidden="true"><i></i><i></i><i></i><i></i></span><strong>Microsoft</strong><span class="company-target-count"><b>1 863</b><small>задачи</small></span></article>
-              <article><svg class="company-target-logo company-logo-meta" viewBox="0 0 52 34" aria-hidden="true"><path d="M4 27C8 9 14 5 19 5c8 0 12 22 18 22 5 0 8-8 11-20M4 27c3 0 8-14 15-14 8 0 11 14 18 14"/></svg><strong>Meta</strong><span class="company-target-count"><b>1 450</b><small>задач</small></span></article>
+              <article><span class="company-target-logo company-logo-amazon" aria-hidden="true">a<i></i></span><strong>Amazon</strong><span class="company-target-count"><b data-taxonomy-count="2676">2 676</b><small>задач</small></span></article>
+              <article><span class="company-target-logo company-logo-google" aria-hidden="true">G</span><strong>Google</strong><span class="company-target-count"><b data-taxonomy-count="2529">2 529</b><small>задач</small></span></article>
+              <article><span class="company-target-logo company-logo-microsoft" aria-hidden="true"><i></i><i></i><i></i><i></i></span><strong>Microsoft</strong><span class="company-target-count"><b data-taxonomy-count="1863">1 863</b><small>задачи</small></span></article>
+              <article><svg class="company-target-logo company-logo-meta" viewBox="0 0 52 34" aria-hidden="true"><path d="M4 27C8 9 14 5 19 5c8 0 12 22 18 22 5 0 8-8 11-20M4 27c3 0 8-14 15-14 8 0 11 14 18 14"/></svg><strong>Meta</strong><span class="company-target-count"><b data-taxonomy-count="1450">1 450</b><small>задач</small></span></article>
             </div>
           </div>
           <aside class="speaker-notes"><strong>01:54–02:05</strong><p>ReAlgo накладывает данные интервью конкретной компании на карту паттернов. Пользователь получает не общий список, а практику под выбранную карьерную цель.</p></aside>
@@ -423,6 +423,7 @@
         </section>
       </div>
 
+      <div id="blackout" class="blackout" aria-hidden="true"></div>
       <div id="priceBackdrop" class="price-backdrop" aria-hidden="true"></div>
       <div id="priceCounter" class="price price-counter" aria-hidden="true"><span class="price-currency">$</span><span id="priceCounterValue" class="price-value"></span></div>
 

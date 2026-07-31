@@ -1110,6 +1110,17 @@ h2 {
   pointer-events: none;
 }
 
+/* Линия шла на 36px ниже центра иконок. Причина — не в самих путях:
+   viewBox 1400×440 вписывается в бокс 1580×560 по правилу xMidYMid meet,
+   то есть по ширине (масштаб 1.1286), а по вертикали остаётся поле 31.7px.
+   Из-за этого y=220 попадает на 280px — точную середину сцены, тогда как
+   центр иконки лежит на 244px (top 185 + половина бокса 118).
+   Сдвиг задаём здесь, а не пересчётом двух десятков path: так одинаково
+   правится и прямая, и путаница, и маршрут на всех слайдах journey. */
+.slide-journey .journey-lines {
+  transform: translateY(-36px);
+}
+
 .journey-lines path {
   vector-effect: non-scaling-stroke;
   transition: opacity 700ms ease, stroke 700ms ease, stroke-width 700ms ease;
@@ -1454,6 +1465,18 @@ h2 {
   box-shadow: none;
   filter: grayscale(1) blur(0.35px);
 }
+
+/* Подсвеченные плашки садятся центром на синий маршрут.
+   Позиции только для .journey-route: на остальных journey-слайдах эти же
+   плашки — часть облака шума, там линии нет и двигать их незачем.
+   Значения посчитаны из пути маршрута с учётом того, что viewBox 1400×440
+   вписан в бокс 1580×560 по ширине (масштаб 1.1286, поле сверху 31.7px)
+   и слой линий поднят на 36px. Высота плашки — 37px: строка 14.5px
+   (JetBrains Mono 11px, line-height normal = 1.32em) плюс padding и рамка. */
+.journey-route .journey-materials span:nth-child(15) { top: 13.6%; }
+.journey-route .journey-materials span:nth-child(16) { top: 13.6%; }
+.journey-route .journey-materials span:nth-child(17) { top: 57%; }
+.journey-route .journey-materials span:nth-child(18) { top: 13.7%; }
 
 .journey-route .journey-materials span.is-route {
   z-index: 8;
@@ -2371,36 +2394,45 @@ h2 {
 .slide-taxonomy-graph.is-active .logo-cf-blue { animation-name: taxonomy-logo-cf-blue; }
 .slide-taxonomy-graph.is-active .logo-cf-red { animation-name: taxonomy-logo-cf-red; }
 
+/* Хореография слайда — три такта с паузами в секунду между ними.
+   Такт 1 (0–2160):    карточки платформ -> счёт их цифр (JS, 820–1500)
+                       -> «14 810 задач всего»
+   пауза 1000
+   Такт 2 (3160–4680): линии платформы -> паттерны, следом узлы,
+                       затем «22 паттерна»
+   пауза 1000
+   Такт 3 (5680–7090): линии паттерны -> подпаттерны вместе с
+                       «111 подпаттернов», следом узлы */
+.slide-taxonomy-graph.is-active .taxonomy-platform-column footer {
+  animation: taxonomy-total-in 560ms ease-out 1600ms both;
+}
+
 .slide-taxonomy-graph.is-active .taxonomy-links-platforms path {
   animation: taxonomy-input-edge-in 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: calc(1000ms + var(--edge-index) * 3ms);
+  animation-delay: calc(3160ms + var(--edge-index) * 3ms);
 }
 
 .slide-taxonomy-graph.is-active .taxonomy-pattern-shell .taxonomy-node-field i {
   animation: taxonomy-node-in 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(1600ms + var(--node-index) * 20ms);
+  animation-delay: calc(3620ms + var(--node-index) * 20ms);
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-pattern-column footer {
+  animation: taxonomy-total-in 480ms ease-out 4200ms both;
 }
 
 .slide-taxonomy-graph.is-active .taxonomy-links-patterns path {
   animation: taxonomy-main-edge-in 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: calc(2020ms + var(--edge-index) * 4ms);
+  animation-delay: calc(5680ms + var(--edge-index) * 4ms);
+}
+
+.slide-taxonomy-graph.is-active .taxonomy-subpattern-column footer {
+  animation: taxonomy-total-in 480ms ease-out 6100ms both;
 }
 
 .slide-taxonomy-graph.is-active .taxonomy-subpattern-shell .taxonomy-node-field i {
   animation: taxonomy-node-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(2360ms + var(--node-index) * 6ms);
-}
-
-.slide-taxonomy-graph.is-active .taxonomy-pattern-column footer {
-  animation: taxonomy-total-in 480ms ease-out 1950ms both;
-}
-
-.slide-taxonomy-graph.is-active .taxonomy-subpattern-column footer {
-  animation: taxonomy-total-in 480ms ease-out 3150ms both;
-}
-
-.slide-taxonomy-graph.is-active .taxonomy-platform-column footer {
-  animation: taxonomy-total-in 560ms ease-out 3200ms both;
+  animation-delay: calc(6040ms + var(--node-index) * 6ms);
 }
 
 .slide-taxonomy-graph.is-settled .taxonomy-links-platforms path {
@@ -3701,6 +3733,23 @@ h2 {
 /* Фон перехода 17 → 18: цвет интерполируется на отдельном слое под слайдами,
    а сами слайды на это время становятся прозрачными. Так фон именно
    перекрашивается, а не кросс-фейдится через серую середину. */
+/* Провал в чёрный между слайдами. Слой выше слайдов и хрома деки, но ниже
+   заметок докладчика и панели помощи — чтобы гасился именно кадр, а не
+   служебные оверлеи. */
+.blackout {
+  position: absolute;
+  inset: 0;
+  z-index: 48;
+  display: none;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.blackout.is-running {
+  display: block;
+}
+
 .price-backdrop {
   position: absolute;
   inset: 0;
