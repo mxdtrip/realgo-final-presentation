@@ -90,6 +90,88 @@
     });
   }
 
+  // The journey scene is taller than its original SVG viewBox. Hard-coded
+  // coordinates therefore placed the connectors below the optical center of
+  // the cards. Build every visible path from the real element bounds instead:
+  // the direct line meets both cards at mid-height, while the ReAlgo route
+  // enters each selected node through its left edge and exits through its right.
+  function layoutJourneyPaths() {
+    document.querySelectorAll(".slide-journey .journey-stage").forEach((journeyStage) => {
+      const svg = journeyStage.querySelector(".journey-lines");
+      const direct = svg?.querySelector(".journey-direct");
+      const candidate = journeyStage.querySelector(".journey-candidate svg");
+      const vacancy = journeyStage.querySelector(".journey-vacancy svg");
+      if (!svg || !direct || !candidate || !vacancy) return;
+
+      const stageRect = journeyStage.getBoundingClientRect();
+      if (!stageRect.width || !stageRect.height) return;
+      svg.setAttribute("viewBox", `0 0 ${stageRect.width} ${stageRect.height}`);
+      svg.setAttribute("preserveAspectRatio", "none");
+
+      const pointFor = (element, edge) => {
+        const rect = element.getBoundingClientRect();
+        const x = edge === "left" ? rect.left : edge === "right" ? rect.right : rect.left + rect.width / 2;
+        return {
+          x: x - stageRect.left,
+          y: rect.top + rect.height / 2 - stageRect.top,
+        };
+      };
+
+      const connector = (from, to) => {
+        const bend = Math.max(28, Math.abs(to.x - from.x) * 0.38);
+        return `C ${(from.x + bend).toFixed(2)} ${from.y.toFixed(2)}, ${(to.x - bend).toFixed(2)} ${to.y.toFixed(2)}, ${to.x.toFixed(2)} ${to.y.toFixed(2)}`;
+      };
+
+      const candidateEdge = pointFor(candidate, "right");
+      const vacancyEdge = pointFor(vacancy, "left");
+      direct.setAttribute("d", `M ${candidateEdge.x.toFixed(2)} ${candidateEdge.y.toFixed(2)} ${connector(candidateEdge, vacancyEdge)}`);
+
+      if (!journeyStage.closest(".journey-route")) return;
+      const routeLine = svg.querySelector(".journey-route-line");
+      const routeDraw = svg.querySelector(".journey-route-draw");
+      const routeNodes = Array.from(journeyStage.querySelectorAll(".journey-materials .is-route"));
+      if (!routeLine || !routeDraw || !routeNodes.length) return;
+
+      let routePath = `M ${candidateEdge.x.toFixed(2)} ${candidateEdge.y.toFixed(2)}`;
+      let current = candidateEdge;
+      const activationPoints = [];
+      routeNodes.forEach((node) => {
+        const nodeLeft = pointFor(node, "left");
+        const nodeRight = pointFor(node, "right");
+        routePath += ` ${connector(current, nodeLeft)} L ${nodeRight.x.toFixed(2)} ${nodeRight.y.toFixed(2)}`;
+        current = nodeRight;
+        activationPoints.push(nodeLeft);
+      });
+      routePath += ` ${connector(current, vacancyEdge)}`;
+      routeLine.setAttribute("d", routePath);
+      routeDraw.setAttribute("d", routePath);
+
+      const routeLength = Math.ceil(routeDraw.getTotalLength());
+      routeDraw.style.setProperty("--journey-route-length", String(routeLength));
+
+      // Synchronize each node with the light front instead of relying on
+      // arbitrary nth-child delays. Search progressively along the path so a
+      // nearby later bend cannot accidentally activate an earlier node.
+      let searchStart = 0;
+      activationPoints.forEach((activationPoint, index) => {
+        let nearestDistance = searchStart;
+        let nearestDelta = Number.POSITIVE_INFINITY;
+        for (let distance = searchStart; distance <= routeLength; distance += 2) {
+          const pathPoint = routeDraw.getPointAtLength(distance);
+          const delta = Math.hypot(pathPoint.x - activationPoint.x, pathPoint.y - activationPoint.y);
+          if (delta < nearestDelta) {
+            nearestDelta = delta;
+            nearestDistance = distance;
+          }
+          if (nearestDelta < 1) break;
+        }
+        searchStart = nearestDistance + 2;
+        const delay = 0.28 + 3.2 * nearestDistance / routeLength - 0.08;
+        routeNodes[index].style.setProperty("--route-delay", `${Math.max(0.28, delay).toFixed(2)}s`);
+      });
+    });
+  }
+
   function buildTaxonomyGraphFields() {
     document.querySelectorAll("[data-taxonomy-nodes]").forEach((container) => {
       const nodeCount = Number.parseInt(container.dataset.taxonomyNodes || "0", 10);
@@ -1435,6 +1517,7 @@
 
   window.addEventListener("resize", () => {
     resizeStage();
+    requestAnimationFrame(layoutJourneyPaths);
     requestAnimationFrame(buildTaxonomyConnections);
   });
   window.addEventListener("hashchange", () => {
@@ -1443,6 +1526,7 @@
   });
 
   buildPreparationFields();
+  layoutJourneyPaths();
   buildTaxonomyGraphFields();
   buildDots();
   calibrateCounterMetrics();
@@ -1455,10 +1539,12 @@
       countUpTargets.forEach((element) => {
         if (element.style.minWidth) reserveCountUpWidth(element);
       });
+      requestAnimationFrame(layoutJourneyPaths);
       requestAnimationFrame(buildTaxonomyConnections);
     });
   }
   resizeStage();
+  requestAnimationFrame(layoutJourneyPaths);
   requestAnimationFrame(buildTaxonomyConnections);
   showSlide(currentSlide, { skipHash: true });
   if (slides[currentSlide] === teamSlide) {

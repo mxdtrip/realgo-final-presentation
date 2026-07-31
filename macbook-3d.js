@@ -9,6 +9,7 @@ const KEYBOARD_ENGRAVING_MATERIAL = "sIfSZcqgDlKMJPf";
 const SCREEN_WIDTH = 1600;
 const SCREEN_HEIGHT = 1000;
 const CAMERA_MOVE_MS = 3800;
+const FIRST_SHOT_HOLD_MS = 1800;
 const stage = document.getElementById("stage");
 const slots = Array.from(document.querySelectorAll(".macbook-3d-slot"));
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -158,6 +159,8 @@ if (stage && slots.length) {
   let activeSlot = null;
   let activeMode = "extension";
   let sceneActive = false;
+  let screenStoryStartedAt = performance.now();
+  let lastScreenStoryKey = "";
   let contactShadow = null;
   let contactBaseY = 0;
   let revealStartedAt = performance.now();
@@ -211,7 +214,7 @@ if (stage && slots.length) {
     context.fillText(text, x, y);
   }
 
-  function drawExtensionScreen() {
+  function drawExtensionScreen(mode = activeMode, elapsed = 0) {
     const context = screenContext;
     context.fillStyle = "#0f1115";
     context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -251,31 +254,73 @@ if (stage && slots.length) {
     context.fillStyle = "#292d34";
     context.fillRect(642, 139, 958, 2);
 
-    const code = [
+    const isSolved = mode === "rating" || (mode === "agent" && elapsed >= 5600);
+    const typingProgress = mode === "rating"
+      ? 1
+      : mode === "agent"
+        ? THREE.MathUtils.clamp((elapsed - 1500) / 3600, 0, 1)
+        : 0;
+    const fixedCode = [
       ["class Solution {", "#ff7b72", 710],
       ["public:", "#ff7b72", 742],
       ["int lengthOfLongestSubstring(string s) {", "#c9d1d9", 742],
+    ];
+    fixedCode.forEach(([line, color, x], index) => drawText(context, line, x, 202 + index * 42, 18, color, 500, "JetBrains Mono"));
+
+    const solutionBody = [
       ["unordered_map<char, int> last;", "#c9d1d9", 782],
       ["int left = 0, answer = 0;", "#79c0ff", 782],
       ["for (int right = 0; right < s.size(); right++) {", "#c9d1d9", 782],
-      ["// move left when a character repeats", "#8b949e", 822],
-      ["left = max(left, last[s[right]] + 1);", "#79c0ff", 822],
+      ["if (last.count(s[right]))", "#c9d1d9", 822],
+      ["left = max(left, last[s[right]] + 1);", "#79c0ff", 862],
       ["last[s[right]] = right;", "#c9d1d9", 822],
       ["answer = max(answer, right - left + 1);", "#c9d1d9", 822],
       ["}", "#c9d1d9", 782],
       ["return answer;", "#ff7b72", 782],
-      ["}", "#c9d1d9", 742],
-      ["};", "#c9d1d9", 710],
     ];
-    code.forEach(([line, color, x], index) => drawText(context, line, x, 202 + index * 42, 18, color, 500, "JetBrains Mono"));
+    const totalCharacters = solutionBody.reduce((sum, [line]) => sum + line.length, 0);
+    let visibleCharacters = Math.floor(totalCharacters * typingProgress);
+    let cursor = null;
+    solutionBody.forEach(([line, color, x], index) => {
+      const visibleLine = line.slice(0, Math.max(0, visibleCharacters));
+      if (visibleLine) drawText(context, visibleLine, x, 328 + index * 42, 18, color, 500, "JetBrains Mono");
+      if (visibleCharacters >= 0 && visibleCharacters < line.length && cursor === null) {
+        cursor = { x: x + context.measureText(visibleLine).width + 3, y: 308 + index * 42 };
+      }
+      visibleCharacters -= line.length;
+    });
 
-    fillRoundedRect(context, 690, 835, 850, 92, 13, "#0f1c14");
-    context.strokeStyle = "#1f7139";
-    context.lineWidth = 2;
-    roundedRect(context, 690, 835, 850, 92, 13);
-    context.stroke();
-    drawText(context, "✓  ACCEPTED", 722, 891, 23, "#3fb950", 700, "JetBrains Mono");
-    drawText(context, "Runtime 3 ms", 1260, 890, 16, "#7d8590", 500, "JetBrains Mono");
+    if (typingProgress === 0) {
+      drawText(context, "// Write your solution here", 782, 342, 18, "#59616c", 500, "JetBrains Mono");
+      cursor = { x: 782, y: 360 };
+    }
+    drawText(context, "}", 742, 748, 18, "#c9d1d9", 500, "JetBrains Mono");
+    drawText(context, "};", 710, 790, 18, "#c9d1d9", 500, "JetBrains Mono");
+    if (!isSolved && cursor && Math.floor(elapsed / 420) % 2 === 0) {
+      context.fillStyle = "#58a6ff";
+      context.fillRect(cursor.x, cursor.y, 2, 23);
+    }
+
+    if (isSolved) {
+      fillRoundedRect(context, 690, 835, 850, 92, 13, "#0f1c14");
+      context.strokeStyle = "#1f7139";
+      context.lineWidth = 2;
+      roundedRect(context, 690, 835, 850, 92, 13);
+      context.stroke();
+      drawText(context, "✓  ACCEPTED", 722, 891, 23, "#3fb950", 700, "JetBrains Mono");
+      drawText(context, "Runtime 3 ms", 1260, 890, 16, "#7d8590", 500, "JetBrains Mono");
+    } else {
+      fillRoundedRect(context, 690, 835, 850, 92, 13, "#11151b");
+      context.strokeStyle = "#292f38";
+      context.lineWidth = 2;
+      roundedRect(context, 690, 835, 850, 92, 13);
+      context.stroke();
+      drawText(context, typingProgress > 0 ? "Editing solution…" : "Testcase", 722, 891, 16, "#7d8590", 500, "JetBrains Mono");
+      fillRoundedRect(context, 1285, 855, 104, 48, 9, "#262b33");
+      drawText(context, "Run", 1318, 886, 15, "#d7dce2", 650, "JetBrains Mono");
+      fillRoundedRect(context, 1403, 855, 113, 48, 9, "#1f6f3d");
+      drawText(context, "Submit", 1421, 886, 15, "#effff4", 650, "JetBrains Mono");
+    }
   }
 
   function commitScreenTexture() {
@@ -306,7 +351,22 @@ if (stage && slots.length) {
 
   function drawScreen(mode, restartVideo = false) {
     activeMode = Object.hasOwn(shotPoses, mode) ? mode : "extension";
-    drawExtensionScreen();
+    screenStoryStartedAt = performance.now();
+    lastScreenStoryKey = "";
+    drawExtensionScreen(activeMode, 0);
+    commitScreenTexture();
+  }
+
+  function updateScreenStory(now) {
+    const elapsed = Math.max(0, now - screenStoryStartedAt);
+    const progress = activeMode === "agent"
+      ? THREE.MathUtils.clamp((elapsed - 1500) / 3600, 0, 1)
+      : activeMode === "rating" ? 1 : 0;
+    const solved = activeMode === "rating" || (activeMode === "agent" && elapsed >= 5600);
+    const storyKey = `${activeMode}:${Math.floor(progress * 260)}:${solved}:${Math.floor(elapsed / 420) % 2}`;
+    if (storyKey === lastScreenStoryKey) return;
+    lastScreenStoryKey = storyKey;
+    drawExtensionScreen(activeMode, elapsed);
     commitScreenTexture();
   }
 
@@ -351,7 +411,7 @@ if (stage && slots.length) {
     const lift = averageUp.multiplyScalar(Math.min(0.16, 0.07 + travelDistance * 0.035));
     shotControlA.copy(shotFrom.camera).addScaledVector(travel, 0.3).add(lift).add(side);
     shotControlB.copy(shotFrom.camera).addScaledVector(travel, 0.72).add(lift).add(side);
-    shotStartedAt = performance.now();
+    shotStartedAt = performance.now() + (enterFromWide && mode === "extension" ? FIRST_SHOT_HOLD_MS : 0);
     if (immediate || reduceMotion) copyPose(currentPose, shotTo);
   }
 
@@ -489,20 +549,16 @@ if (stage && slots.length) {
       : 0;
     const progress = 1 - Math.pow(1 - rawProgress, 4);
     const tallPanel = panelHeight > 450;
-    const extensionPanel = activeMode === "extension";
-    const widthFraction = extensionPanel
-      ? 0.31
-      : activeMode === "rating"
-        ? 0.35
-        : tallPanel
-          ? 0.27
-          : 0.35;
+    const storyPanel = activeMode === "extension" || activeMode === "agent" || activeMode === "rating";
+    const widthFraction = storyPanel ? 0.28 : tallPanel ? 0.27 : 0.35;
     const worldWidth = screenPlaneWidth * widthFraction;
-    const margin = screenPlaneWidth * 0.045;
-    const centerX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5;
-    const centerY = extensionPanel
-      ? -screenPlaneHeight * 0.15
-      : -screenPlaneHeight * 0.065;
+    const worldHeight = worldWidth * panelHeight / panelWidth;
+    const margin = screenPlaneWidth * 0.025;
+    const lateralLift = storyPanel ? 0.095 : 0.105;
+    const centerX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5
+      + screenPlaneWidth * lateralLift * progress;
+    const storyTopY = -screenPlaneHeight * 0.195 + worldWidth * (520 / 400) * 0.5;
+    const centerY = storyPanel ? storyTopY - worldHeight * 0.5 : -screenPlaneHeight * 0.065;
     planeCenter.copy(screenCenter)
       .addScaledVector(screenRight, centerX)
       .addScaledVector(screenUp, centerY)
@@ -517,7 +573,6 @@ if (stage && slots.length) {
     // directly on the display so the lifted window leaves a real projected
     // shadow on the monitor instead of carrying a fake duplicate outline.
     const screenShadow = ensureProductScreenShadow();
-    const worldHeight = worldWidth * panelHeight / panelWidth;
     shadowCenter.copy(screenCenter)
       .addScaledVector(screenRight, centerX - screenPlaneWidth * 0.045 * progress)
       .addScaledVector(screenUp, centerY - screenPlaneHeight * 0.018 * progress)
@@ -531,9 +586,11 @@ if (stage && slots.length) {
   function renderNow() {
     if (!model || !activeSlot) return;
     resizeRenderer();
-    updateCameraMove(performance.now());
+    const now = performance.now();
+    updateCameraMove(now);
+    updateScreenStory(now);
     modelPivot.updateMatrixWorld(true);
-    updateProductObject(performance.now());
+    updateProductObject(now);
     renderer.render(scene, camera);
     cssRenderer.render(scene, camera);
   }
@@ -579,8 +636,8 @@ if (stage && slots.length) {
   }
 
   window.addEventListener("realgo:slidechange", syncActiveSlot);
-  window.addEventListener("realgo:productfocus", () => {
-    uiFocusStartedAt = performance.now();
+  window.addEventListener("realgo:productfocus", (event) => {
+    uiFocusStartedAt = performance.now() - (event.detail?.immediate ? 1450 : 0);
   });
   window.addEventListener("resize", resizeRenderer);
 
@@ -780,13 +837,13 @@ if (stage && slots.length) {
     }
 
     configureScreenShot("extension", {
-      distance: 2.76,
-      cameraX: -1.46,
-      cameraY: 0.34,
-      targetX: 0.38,
-      targetY: 0.02,
-      frameYFraction: -0.15,
-      fov: 23,
+      distance: 3.08,
+      cameraX: -1.36,
+      cameraY: 0.3,
+      targetX: 0.28,
+      targetY: 0,
+      frameYFraction: -0.08,
+      fov: 24,
     });
     configureScreenShot("agent", {
       distance: 2.62,
@@ -805,13 +862,18 @@ if (stage && slots.length) {
       fov: 22,
     });
     configureScreenShot("rating", {
-      distance: 2.44,
-      cameraX: -0.94,
-      cameraY: 0.17,
-      targetX: 0.5,
+      distance: 2.38,
+      cameraX: -0.84,
+      cameraY: 0.15,
+      targetX: 0.58,
       targetY: -0.08,
       fov: 21.5,
     });
+    // The keynote move finishes on slide 10. Slides 11–12 retain the exact
+    // camera/model pose so the detached window behaves as one continuous
+    // object while only its content and intrinsic height change.
+    copyPose(shotPoses.agent, shotPoses.extension);
+    copyPose(shotPoses.rating, shotPoses.extension);
 
     const engravingCenter = new THREE.Box3()
       .setFromObject(keyboardEngraving)
@@ -871,6 +933,7 @@ if (stage && slots.length) {
       topLight.intensity = 0.72 * lightReveal;
       renderer.toneMappingExposure = 0.48 + 0.31 * lightReveal;
       updateCameraMove(now);
+      updateScreenStory(now);
       modelPivot.updateMatrixWorld(true);
       updateProductObject(now);
       renderer.render(scene, camera);

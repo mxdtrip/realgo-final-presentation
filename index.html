@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=56" />
+    <link rel="stylesheet" href="apple.css?v=65" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -260,6 +260,7 @@
                 <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
                 <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
                 <path class="journey-route-line" d="M150 220 C220 220 280 120 338 120 S500 120 579 120 C680 120 720 319 829 319 C920 319 970 120 1040 120 S1180 220 1250 220" />
+                <path class="journey-route-draw" />
               </svg>
               <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
               <div class="journey-materials" aria-hidden="true">
@@ -287,18 +288,18 @@
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-extension" data-slide="9" data-order="9" data-theme="dark">
-          <div class="product-heading product-overlay reveal"><p class="kicker">Расширение поверх задачи</p><h2>Никакой смены<br />контекста.</h2><p>ReAlgo появляется там, где пользователь уже решает.</p></div>
-          <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension" aria-label="Трёхмерная модель MacBook с расширением ReAlgo на экране"></div>
+          <div class="product-heading product-overlay reveal"><p class="kicker">Задача открыта</p><h2>Сначала —<br />только задача.</h2><p>Пустой редактор и привычный интерфейс платформы.</p></div>
+          <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension" aria-label="MacBook с открытой задачей и пустым редактором; затем появляется AI-агент ReAlgo"></div>
           <div class="platforms">LeetCode · HackerRank · GeeksforGeeks · Codeforces</div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:05–02:25</strong><p>Пользователь продолжает решать задачи на привычной платформе. Расширение распознаёт задачу и сопровождает практику без смены контекста.</p></aside>
+          <aside class="speaker-notes"><strong>02:05–02:25</strong><p>Пользователь открывает привычную задачу и видит пустой редактор. ReAlgo распознаёт контекст и только затем выводит AI-агента справа — без перехода в другой сервис.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-agent" data-slide="10" data-order="10" data-theme="dark">
-          <div class="ai-copy product-overlay reveal"><p class="kicker">AI-агент</p><h2>Не ответ.<br /><span class="accent-blue">Следующий шаг.</span></h2><p>AI видит задачу и дозирует помощь, не раскрывая решение раньше времени.</p></div>
-          <div class="macbook-3d-slot macbook-3d-agent" data-macbook-mode="agent" aria-label="Трёхмерная модель MacBook с AI-агентом ReAlgo на экране"></div>
+          <div class="ai-copy product-overlay reveal"><p class="kicker">AI-агент</p><h2>Подсказка.<br /><span class="accent-blue">Затем решение.</span></h2><p>AI возвращает мышление в нужное русло, пользователь дописывает код сам.</p></div>
+          <div class="macbook-3d-slot macbook-3d-agent" data-macbook-mode="agent" aria-label="MacBook: AI-агент даёт подсказку, пользователь заполняет код и получает Accepted"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:25–02:45</strong><p>Если пользователь застрял, AI не пишет код за него. Он указывает на ограничение, напоминает о паттерне и задаёт наводящий вопрос — возвращает мышление в нужное русло.</p></aside>
+          <aside class="speaker-notes"><strong>02:25–02:45</strong><p>AI не пишет решение за пользователя: даёт один направляющий намёк и вопрос об инварианте. Пользователь продолжает ввод, запускает код и получает Accepted.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-taxonomy-graph" data-slide="11" data-order="7" data-theme="dark">
@@ -438,8 +439,8 @@
       <nav id="dots" class="slide-dots" aria-label="Навигация по слайдам"></nav>
       <div id="help" class="help-panel" aria-hidden="true"><strong>Управление</strong><span><kbd>←</kbd><kbd>→</kbd> слайды</span><span><kbd>Space</kbd> дальше</span><span><kbd>N</kbd> заметки</span><span><kbd>F</kbd> полный экран</span><span><kbd>?</kbd> закрыть</span></div>
     </main>
-    <script type="module" src="assets/product-ui.js?v=35"></script>
-    <script type="module" src="macbook-3d.js?v=43"></script>
-    <script src="deck.js?v=31"></script>
+    <script type="module" src="assets/product-ui.js?v=40"></script>
+    <script type="module" src="macbook-3d.js?v=50"></script>
+    <script src="deck.js?v=33"></script>
   </body>
 </html>

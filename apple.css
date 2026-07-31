@@ -1133,6 +1133,16 @@ h2 {
   opacity: 0;
 }
 
+.journey-route-draw {
+  stroke: #64d2ff;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: var(--journey-route-length, 2000);
+  stroke-dashoffset: var(--journey-route-length, 2000);
+  opacity: 0;
+  filter: drop-shadow(0 0 9px rgba(41, 151, 255, 0.82));
+}
+
 .journey-person {
   position: absolute;
   top: 145px;
@@ -1457,19 +1467,29 @@ h2 {
 
 .journey-route .journey-materials span.is-route {
   z-index: 8;
-  border-color: rgba(41, 151, 255, 0.8);
-  background: rgba(16, 64, 114, 0.82);
-  color: white;
-  box-shadow: 0 0 0 1px rgba(104, 190, 255, 0.24), 0 0 34px rgba(41, 151, 255, 0.52);
-  filter: none;
-  opacity: 1;
-  animation: journey-route-node 1.8s ease-in-out infinite alternate;
 }
 
 .journey-route .journey-route-line {
-  opacity: 1;
-  animation: journey-route-flow 1.8s linear infinite;
+  opacity: 0;
   filter: drop-shadow(0 0 7px rgba(41, 151, 255, 0.72));
+}
+
+.journey-route.is-active .journey-route-draw {
+  animation:
+    journey-route-draw 3.2s 280ms linear both,
+    journey-route-draw-fade 320ms 3.48s ease-out forwards;
+}
+
+.journey-route.is-active .journey-route-line {
+  animation:
+    journey-route-base-in 320ms 3.48s ease-out both,
+    journey-route-flow 1.8s 3.48s linear infinite;
+}
+
+.journey-route.is-active .journey-materials span.is-route {
+  animation:
+    journey-route-activate 520ms var(--route-delay, 720ms) cubic-bezier(0.16, 1, 0.3, 1) both,
+    journey-route-node 1.8s calc(var(--route-delay, 720ms) + 520ms) ease-in-out infinite alternate;
 }
 
 .journey-route .journey-person {
@@ -1479,6 +1499,42 @@ h2 {
 
 @keyframes journey-route-flow {
   to { stroke-dashoffset: -42; }
+}
+
+@keyframes journey-route-draw {
+  0% { opacity: 0; stroke-dashoffset: var(--journey-route-length, 2000); }
+  7%, 100% { opacity: 1; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes journey-route-draw-fade {
+  to { opacity: 0; }
+}
+
+@keyframes journey-route-base-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes journey-route-activate {
+  from {
+    border-color: rgba(150, 156, 168, 0.1);
+    background: rgba(80, 84, 92, 0.08);
+    color: rgba(170, 175, 184, 0.25);
+    box-shadow: none;
+    filter: grayscale(1) blur(0.35px);
+    opacity: 0.35;
+    transform: scale(0.94);
+  }
+  to {
+    border-color: rgba(41, 151, 255, 0.8);
+    background: rgba(16, 64, 114, 0.82);
+    color: white;
+    box-shadow: 0 0 0 1px rgba(104, 190, 255, 0.24), 0 0 34px rgba(41, 151, 255, 0.52);
+    filter: none;
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes journey-route-node {
@@ -2092,6 +2148,7 @@ h2 {
   column-gap: 90px;
   justify-content: center;
   height: 100%;
+  transform: translateX(105px);
 }
 
 .taxonomy-links {
@@ -2195,22 +2252,24 @@ h2 {
 
 .taxonomy-platforms article {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) auto;
-  gap: 18px;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 20px;
   align-items: center;
-  min-height: 84px;
-  padding: 14px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  min-height: 100px;
+  padding: 18px 36px 18px 28px;
+  border: 1px solid rgba(149, 171, 206, 0.16);
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.035);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+  background: linear-gradient(105deg, rgba(15, 20, 29, 0.96), rgba(8, 11, 17, 0.9));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.018),
+    0 18px 38px rgba(0, 0, 0, 0.24);
   opacity: 0;
   transform: translateX(-18px);
 }
 
 .taxonomy-platform-logo {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   color: #d1d1d6;
   overflow: visible;
 }
@@ -2241,7 +2300,7 @@ h2 {
 .taxonomy-platforms > article > strong {
   color: #f5f5f7;
   font-family: "Manrope", sans-serif;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 620;
 }
 
@@ -2256,7 +2315,7 @@ h2 {
 .taxonomy-platform-count b {
   color: #f5f5f7;
   font-family: "Manrope", sans-serif;
-  font-size: 23px;
+  font-size: 27px;
   font-weight: 650;
   letter-spacing: -0.05em;
 }
@@ -2666,11 +2725,15 @@ h2 {
   position: absolute;
   inset: 0;
   opacity: 0;
-  background:
-    radial-gradient(circle at 72% 43%, rgba(2, 5, 10, 0.08), rgba(0, 0, 0, 0.42) 56%, rgba(0, 0, 0, 0.56)),
-    rgba(0, 0, 0, 0.16);
-  backdrop-filter: saturate(0.78) blur(0.7px);
-  transition: opacity 1100ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 48%,
+    rgba(0, 0, 0, 0.08) 60%,
+    rgba(0, 0, 0, 0.34) 76%,
+    rgba(0, 0, 0, 0.74) 100%
+  );
+  transition: opacity 1000ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .product-ui-card {
@@ -2704,6 +2767,15 @@ h2 {
   transition: opacity 520ms ease, filter 1100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.product-ui-card.is-height-transitioning {
+  overflow: hidden;
+  transition:
+    height 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 520ms ease,
+    filter 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-ui-stage--extension .product-ui-card,
 .product-ui-stage--agent .product-ui-card,
 .product-ui-stage--stages .product-ui-card {
   --product-final-scale: 1.4;
@@ -2734,6 +2806,7 @@ h2 {
   left: 0 !important;
 }
 
+.is-product-focus .product-ui-stage--extension .product-ui-card,
 .is-product-focus .product-ui-stage--agent .product-ui-card,
 .is-product-focus .product-ui-stage--stages .product-ui-card {
   top: 140px;
@@ -3814,6 +3887,27 @@ h2 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .journey-route .journey-route-draw {
+    display: none;
+    animation: none !important;
+  }
+
+  .journey-route .journey-route-line {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .journey-route .journey-materials span.is-route {
+    border-color: rgba(41, 151, 255, 0.8);
+    background: rgba(16, 64, 114, 0.82);
+    color: white;
+    box-shadow: 0 0 0 1px rgba(104, 190, 255, 0.24), 0 0 34px rgba(41, 151, 255, 0.52);
+    filter: none;
+    opacity: 1;
+    transform: scale(1);
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {
