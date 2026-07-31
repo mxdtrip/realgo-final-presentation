@@ -164,6 +164,11 @@ if (stage && slots.length) {
   let uiFocusStartedAt = Number.POSITIVE_INFINITY;
   let screenPlaneWidth = 0;
   let screenPlaneHeight = 0;
+  // Геометрия эталонной панели extension, по верхней границе которой
+  // выравниваются окна остальных режимов.
+  const EXTENSION_WIDTH_FRACTION = 0.31;
+  const EXTENSION_CENTER_FRACTION = -0.15;
+  let referencePanelHeight = 372;
   let screenCenter = null;
   let screenNormal = null;
   let screenUp = null;
@@ -498,11 +503,27 @@ if (stage && slots.length) {
           ? 0.27
           : 0.35;
     const worldWidth = screenPlaneWidth * widthFraction;
+    const worldHeight = worldWidth * panelHeight / panelWidth;
     const margin = screenPlaneWidth * 0.045;
     const centerX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5;
+
+    // Панель extension — эталон: её верхняя граница задаёт уровень для всех
+    // режимов. Раньше centerY задавал ЦЕНТР панели (-0.15 у extension против
+    // -0.065 у остальных), а панели разной высоты — поэтому верхние границы
+    // расходились: у agent верх стоял на +0.206H против +0.073H у extension.
+    // Теперь позиция считается от верхнего края вниз.
+    //
+    // extension и rating рисует один и тот же компонент, значит на слайде
+    // rating panelHeight равен высоте эталонной панели — кэшируем её, чтобы
+    // agent и stages выравнивались по тому же уровню, а не по константе.
+    if (extensionPanel || activeMode === "rating") referencePanelHeight = panelHeight;
+    const referenceHeight = screenPlaneWidth * EXTENSION_WIDTH_FRACTION
+      * referencePanelHeight / panelWidth;
+    const topEdge = screenPlaneHeight * EXTENSION_CENTER_FRACTION + referenceHeight * 0.5;
     const centerY = extensionPanel
-      ? -screenPlaneHeight * 0.15
-      : -screenPlaneHeight * 0.065;
+      ? screenPlaneHeight * EXTENSION_CENTER_FRACTION
+      : topEdge - worldHeight * 0.5;
+
     planeCenter.copy(screenCenter)
       .addScaledVector(screenRight, centerX)
       .addScaledVector(screenUp, centerY)
@@ -517,7 +538,6 @@ if (stage && slots.length) {
     // directly on the display so the lifted window leaves a real projected
     // shadow on the monitor instead of carrying a fake duplicate outline.
     const screenShadow = ensureProductScreenShadow();
-    const worldHeight = worldWidth * panelHeight / panelWidth;
     shadowCenter.copy(screenCenter)
       .addScaledVector(screenRight, centerX - screenPlaneWidth * 0.045 * progress)
       .addScaledVector(screenUp, centerY - screenPlaneHeight * 0.018 * progress)
@@ -788,13 +808,20 @@ if (stage && slots.length) {
       frameYFraction: -0.15,
       fov: 23,
     });
+    // frameYFraction — чистая вертикальная панорама кадра: смещает и камеру,
+    // и точку взгляда вдоль экрана. У extension она была -0.15, у остальных
+    // отсутствовала, поэтому кадр стоял по центру дисплея, а окно — заметно
+    // выше. Теперь у каждого режима она равна доле центра его панели, как у
+    // extension. fov расширен: при прежних 22.5 и 21.5 окно занимало 85 и 93%
+    // высоты кадра и после выравнивания вылезало бы низом.
     configureScreenShot("agent", {
       distance: 2.62,
       cameraX: -1.26,
       cameraY: 0.28,
       targetX: 0.44,
       targetY: 0,
-      fov: 22.5,
+      frameYFraction: -0.198,
+      fov: 25.4,
     });
     configureScreenShot("stages", {
       distance: 2.52,
@@ -802,7 +829,8 @@ if (stage && slots.length) {
       cameraY: 0.21,
       targetX: 0.48,
       targetY: -0.05,
-      fov: 22,
+      frameYFraction: -0.198,
+      fov: 25.4,
     });
     configureScreenShot("rating", {
       distance: 2.44,
@@ -810,7 +838,8 @@ if (stage && slots.length) {
       cameraY: 0.17,
       targetX: 0.5,
       targetY: -0.08,
-      fov: 21.5,
+      frameYFraction: -0.179,
+      fov: 28.7,
     });
 
     const engravingCenter = new THREE.Box3()

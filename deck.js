@@ -240,6 +240,8 @@
   let productCopyTransitionRunning = false;
   let blackoutTransitionRunning = false;
   const BLACKOUT_DURATION = 1250;
+  let crossFadeTransitionRunning = false;
+  const CROSS_FADE_DURATION = 780;
   const PRICE_TRANSITION_DURATION = 1400;
   let planetFrame = null;
   const PLANET_FLIGHT_DURATION = 1500;
@@ -874,6 +876,45 @@
     return animations;
   }
 
+  // Метка ставится на слайд, ПОСЛЕ которого нужно затухание.
+  function isCrossFadeTransition(previousIndex, nextIndex) {
+    if (Math.abs(nextIndex - previousIndex) !== 1) return false;
+    const lower = Math.min(previousIndex, nextIndex);
+    return Boolean(slides[lower]?.hasAttribute("data-fade-next"));
+  }
+
+  // Простое затухание без magic move: новый слайд проявляется поверх
+  // старого. Оба тёмные и непрозрачные, поэтому перекрытие читается как
+  // перетекание, а морфинг .macbook-3d-slot в .memory-cards, растягивавший
+  // снимок между разными габаритами, здесь не участвует.
+  async function runCrossFadeTransition(nextIndex, previousIndex, options) {
+    if (crossFadeTransitionRunning) return;
+    const nextSlideElement = slides[nextIndex];
+    if (!nextSlideElement || typeof Element.prototype.animate !== "function") {
+      commitSlide(nextIndex, previousIndex, options);
+      return;
+    }
+
+    crossFadeTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+    nextSlideElement.classList.add("is-fade-next");
+
+    const fade = nextSlideElement.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: CROSS_FADE_DURATION, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "both" },
+    );
+
+    try {
+      await fade.finished.catch(() => {});
+      commitSlide(nextIndex, previousIndex, options);
+    } finally {
+      fade.cancel();
+      nextSlideElement.classList.remove("is-fade-next");
+      crossFadeTransitionRunning = false;
+    }
+  }
+
   // Метка ставится на слайд, ПОСЛЕ которого нужен провал в чёрный,
   // поэтому переход работает одинаково в обе стороны.
   function isBlackoutTransition(previousIndex, nextIndex) {
@@ -1293,6 +1334,16 @@
 
     if (canBlackout) {
       runBlackoutTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
+    const canCrossFade = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isCrossFadeTransition(previousSlide, nextSlide);
+
+    if (canCrossFade) {
+      runCrossFadeTransition(nextSlide, previousSlide, options);
       return;
     }
 
