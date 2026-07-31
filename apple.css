@@ -57,6 +57,11 @@
   --line-dark: rgba(255, 255, 255, 0.16);
   --line-light: rgba(0, 0, 0, 0.14);
   --gold: #e8d094;
+  /* Градиент больших цифр на светлых слайдах. Собран из токенов, которые
+     уже есть в деке: --blue-dark и индиго #5e5ce6 из градиента taxonomyMainFlow.
+     Прежний #00fff0 → #0083fe уходил в неоновый циан, которого больше нигде
+     нет, и на бумажном фоне выбивался из общего тона. */
+  --stat-number-gradient: linear-gradient(96deg, #0071e3 0%, #5e5ce6 100%);
   --stage-scale: 1;
 }
 
@@ -794,7 +799,7 @@ h2 {
   letter-spacing: normal;
   white-space: nowrap;
   color: transparent;
-  background: linear-gradient(90deg, #00fff0 0%, #0083fe 100%);
+  background: var(--stat-number-gradient);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -863,7 +868,7 @@ h2 {
   z-index: 12;
   display: block;
   width: 100%;
-  color: #0083fe;
+  color: var(--blue-dark);
   font-family: "Manrope", sans-serif;
   font-size: 310px;
   font-weight: 650;
@@ -893,7 +898,7 @@ h2 {
 #marketCounterDecimal,
 #marketCounterPercent {
   color: transparent;
-  background: linear-gradient(90deg, #00fff0 0%, #0083fe 100%);
+  background: var(--stat-number-gradient);
   background-repeat: no-repeat;
   background-size: var(--market-gradient-width, 100%) 100%;
   background-position: calc(-1 * var(--market-gradient-offset, 0em)) 0;
