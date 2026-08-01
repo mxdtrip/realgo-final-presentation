@@ -10,10 +10,14 @@ import type {
 } from "@realgo-extension/lib/types";
 import { PopupApp } from "@realgo-extension/popup/PopupApp";
 
-type DemoMode = "extension" | "agent" | "stages" | "rating";
+type DemoMode = "extension-intro" | "extension" | "agent" | "stages" | "rating";
 const CAMERA_APPROACH_MS = 3800;
 const FIRST_SHOT_HOLD_MS = 1800;
-const PRODUCT_FOCUS_DELAY_MS = FIRST_SHOT_HOLD_MS + CAMERA_APPROACH_MS + 180;
+const CAMERA_SETTLED_MS = FIRST_SHOT_HOLD_MS + CAMERA_APPROACH_MS;
+const COPY_REVEAL_DELAY_MS = CAMERA_SETTLED_MS + 120;
+const EXTENSION_SCREEN_DELAY_MS = COPY_REVEAL_DELAY_MS + 900;
+const PRODUCT_FOCUS_DELAY_MS = EXTENSION_SCREEN_DELAY_MS + 620;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (duration: number) => new Promise((resolve) => window.setTimeout(resolve, duration));
 const storage = new Map<string, unknown>();
 const storageListeners = new Set<(changes: Record<string, unknown>, area: string) => void>();
@@ -124,92 +128,154 @@ function ProductDemo({ mode }: { mode: DemoMode }) {
 
 let currentRoot: Root | null = null;
 let currentSlide: HTMLElement | null = null;
+let currentMode: DemoMode | null = null;
 let currentCard: HTMLElement | null = null;
-let previousCardHeight: number | null = null;
+let currentLayer: HTMLElement | null = null;
 let timers: number[] = [];
 let pendingReadyHandler: (() => void) | null = null;
 
-function clearDemo() {
+function clearTimeline() {
   timers.forEach((timer) => window.clearTimeout(timer)); timers = [];
   if (pendingReadyHandler) {
     window.removeEventListener("realgo:macbookready", pendingReadyHandler);
     pendingReadyHandler = null;
   }
-  if (currentCard?.offsetHeight) previousCardHeight = currentCard.offsetHeight;
-  currentCard = null;
-  currentSlide?.classList.remove("is-product-mounted", "is-product-screen", "is-product-focus");
-  if (currentSlide) delete currentSlide.dataset.productTimelineStarted;
-  currentRoot?.unmount(); currentRoot = null;
-  currentSlide?.querySelector(".product-ui-stage")?.remove(); currentSlide = null;
 }
 
-function activateDemo() {
+function clearDemo() {
+  clearTimeline();
+  currentSlide?.classList.remove("is-product-mounted", "is-product-screen", "is-product-focus", "is-camera-settled");
+  if (currentSlide) delete currentSlide.dataset.productTimelineStarted;
+  currentRoot?.unmount(); currentRoot = null;
+  currentCard?.remove(); currentCard = null;
+  currentLayer?.remove(); currentLayer = null;
+  currentSlide = null;
+  currentMode = null;
+}
+
+function activateDemo(event?: Event) {
   const slide = document.querySelector<HTMLElement>(".slide.is-active.slide-macbook");
   if (!slide) { clearDemo(); return; }
-  if (slide === currentSlide) return;
-  clearDemo();
-  const mode = (slide.querySelector<HTMLElement>(".macbook-3d-slot")?.dataset.macbookMode ?? "extension") as DemoMode;
-  if (mode === "stages") storage.set(assistantStorageKey, storedStagesState()); else storage.delete(assistantStorageKey);
-  const layer = document.createElement("div");
-  layer.className = `product-ui-stage product-ui-stage--${mode}`;
-  layer.setAttribute("aria-label", "Интерактивная демонстрация интерфейса расширения ReAlgo");
-  layer.innerHTML = '<div class="product-focus-dim" aria-hidden="true"></div><div class="product-ui-card"><div class="product-ui-glint" aria-hidden="true"></div><div class="product-ui-root"></div></div>';
-  const card = layer.querySelector<HTMLElement>(".product-ui-card")!;
-  currentCard = card;
-  slide.appendChild(layer);
-  currentSlide = slide;
-  currentRoot = createRoot(layer.querySelector(".product-ui-root")!);
-  currentRoot.render(<ProductDemo mode={mode} />);
-  slide.classList.add("is-product-mounted");
+  const eventDetail = (event as CustomEvent<{ logicalSlide?: HTMLElement }> | undefined)?.detail;
+  const logicalSlide = eventDetail?.logicalSlide instanceof HTMLElement ? eventDetail.logicalSlide : null;
+  const requestedMode = logicalSlide?.querySelector<HTMLElement>(".macbook-3d-slot")?.dataset.macbookMode
+    ?? document.getElementById("stage")?.dataset.productMode
+    ?? slide.querySelector<HTMLElement>(".macbook-3d-slot")?.dataset.macbookMode
+    ?? "extension";
+  const mode = requestedMode as DemoMode;
+  if (slide === currentSlide && mode === currentMode) return;
+  clearTimeline();
+  const continuesProductSequence = Boolean(currentSlide && currentCard && currentLayer && currentRoot);
+  const reusesCurrentSlide = slide === currentSlide;
+  const previousMode = currentMode ?? undefined;
+  const previousHeight = currentCard?.offsetHeight ?? null;
+  currentSlide?.classList.remove("is-product-screen", "is-product-focus");
+  if (!reusesCurrentSlide) currentSlide?.classList.remove("is-product-mounted", "is-camera-settled");
+  if (currentSlide) delete currentSlide.dataset.productTimelineStarted;
 
-  if (previousCardHeight && mode !== "extension") {
-    card.classList.add("is-height-transitioning");
-    card.style.height = `${previousCardHeight}px`;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (card !== currentCard) return;
-      const targetHeight = card.querySelector<HTMLElement>(".product-ui-root")?.scrollHeight;
-      if (!targetHeight) return;
-      card.style.height = `${targetHeight}px`;
-      timers.push(window.setTimeout(() => {
-        if (card !== currentCard) return;
-        card.classList.remove("is-height-transitioning");
-        card.style.removeProperty("height");
-      }, 920));
-    }));
+  if (mode === "stages") storage.set(assistantStorageKey, storedStagesState()); else storage.delete(assistantStorageKey);
+
+  if (!continuesProductSequence) {
+    currentLayer = document.createElement("div");
+    currentLayer.setAttribute("aria-label", "Интерактивная демонстрация интерфейса расширения ReAlgo");
+    currentLayer.innerHTML = '<div class="product-focus-dim" aria-hidden="true"></div><div class="product-ui-card"><div class="product-ui-glint" aria-hidden="true"></div><div class="product-ui-root"></div></div>';
+    currentCard = currentLayer.querySelector<HTMLElement>(".product-ui-card")!;
+    currentRoot = createRoot(currentLayer.querySelector(".product-ui-root")!);
   }
 
-  // Slides after the opening extension shot continue the same physical
-  // window. Mount them directly in the already detached state so changing
-  // the content never replays the lift from the MacBook display.
-  if (mode !== "extension") {
-    slide.classList.add("is-product-focus");
-    window.dispatchEvent(new CustomEvent("realgo:productfocus", {
-      detail: { slide, immediate: true },
-    }));
-    // Keep the replacement hidden for the single frame in which
-    // CSS3DRenderer reparents it from the slide layer into the 3D scene.
-    // This prevents a large flat-DOM flash before the settled matrix applies.
+  const layer = currentLayer!;
+  const card = currentCard!;
+  layer.className = `product-ui-stage product-ui-stage--${mode}`;
+  slide.appendChild(layer);
+  currentSlide = slide;
+  currentMode = mode;
+  currentRoot!.render(<ProductDemo mode={mode} />);
+  slide.classList.add("is-product-mounted");
+
+  if (continuesProductSequence && previousHeight) {
+    card.classList.add("is-height-transitioning");
+    card.style.height = `${previousHeight}px`;
+    // createRoot commits concurrently. Give React one paint to replace the
+    // inner state, then measure its intrinsic height and animate the existing
+    // outer shell to it. A nested rAF could still observe the previous tree.
     requestAnimationFrame(() => {
-      if (slide === currentSlide) slide.classList.add("is-product-screen");
+      timers.push(window.setTimeout(() => {
+        if (card !== currentCard) return;
+        const targetHeight = card.querySelector<HTMLElement>(".product-ui-root")?.scrollHeight;
+        if (!targetHeight) {
+          card.classList.remove("is-height-transitioning");
+          card.style.removeProperty("height");
+          return;
+        }
+        card.style.height = `${targetHeight}px`;
+        timers.push(window.setTimeout(() => {
+          if (card !== currentCard) return;
+          card.classList.remove("is-height-transitioning");
+          card.style.removeProperty("height");
+        }, 920));
+      }, 50));
     });
+  }
+
+  // Once the window has detached from the display, keep that exact DOM node
+  // and CSS3D object alive for every adjacent product slide. Only React state
+  // and intrinsic height change; opacity and the lift animation never reset.
+  if (continuesProductSequence) {
+    slide.classList.add("is-camera-settled");
+    if (mode !== "extension-intro" && !(mode === "extension" && previousMode === "extension-intro")) {
+      slide.classList.add("is-product-focus");
+      slide.classList.add("is-product-screen");
+      window.dispatchEvent(new CustomEvent("realgo:productfocus", {
+        detail: { slide, immediate: true },
+      }));
+    }
   }
 
   function startTimeline() {
     if (slide !== currentSlide || slide.dataset.productTimelineStarted === "true") return;
     slide.dataset.productTimelineStarted = "true";
-    if (mode === "extension") {
-      timers.push(window.setTimeout(() => slide.classList.add("is-product-screen"), FIRST_SHOT_HOLD_MS));
+    if (mode === "extension-intro") {
+      if (reduceMotion) slide.classList.add("is-camera-settled");
+      else timers.push(window.setTimeout(() => slide.classList.add("is-camera-settled"), COPY_REVEAL_DELAY_MS));
+    } else if (mode === "extension" && continuesProductSequence && previousMode === "extension-intro") {
+      const revealPanel = () => {
+        slide.classList.add("is-product-screen");
+        timers.push(window.setTimeout(() => {
+          slide.classList.add("is-product-focus");
+          window.dispatchEvent(new CustomEvent("realgo:productfocus", { detail: { slide, immediate: reduceMotion } }));
+        }, reduceMotion ? 0 : 620));
+      };
+      if (reduceMotion) revealPanel();
+      else timers.push(window.setTimeout(revealPanel, 180));
+    } else if (mode === "extension") {
+      if (reduceMotion) {
+        slide.classList.add("is-camera-settled", "is-product-screen", "is-product-focus");
+        window.dispatchEvent(new CustomEvent("realgo:productfocus", { detail: { slide, immediate: true } }));
+        return;
+      }
+      timers.push(window.setTimeout(() => slide.classList.add("is-camera-settled"), COPY_REVEAL_DELAY_MS));
+      timers.push(window.setTimeout(() => slide.classList.add("is-product-screen"), EXTENSION_SCREEN_DELAY_MS));
       timers.push(window.setTimeout(() => {
         slide.classList.add("is-product-focus");
         window.dispatchEvent(new CustomEvent("realgo:productfocus", { detail: { slide } }));
       }, PRODUCT_FOCUS_DELAY_MS));
+    } else if (!continuesProductSequence) {
+      const revealProduct = () => {
+        slide.classList.add("is-camera-settled", "is-product-screen", "is-product-focus");
+        window.dispatchEvent(new CustomEvent("realgo:productfocus", { detail: { slide, immediate: reduceMotion } }));
+      };
+      if (reduceMotion) revealProduct();
+      else timers.push(window.setTimeout(revealProduct, CAMERA_APPROACH_MS + 120));
     }
     // First complete the camera dolly with the panel rigidly attached to the
     // display. Only after the camera settles does the panel lift forward; UI
     // interactions wait until that second motion is complete as well.
     // CSS3DRenderer reparents the card into its camera layer. Keep a direct
     // reference so the timeline remains stable regardless of DOM ancestry.
-    if (mode === "agent") timers.push(window.setTimeout(() => card.querySelector<HTMLButtonElement>(".realgo-agent-btn--hint")?.click(), 980));
+    if (mode === "agent") {
+      const hintDelay = continuesProductSequence || reduceMotion ? 980 : CAMERA_APPROACH_MS + 1100;
+      timers.push(window.setTimeout(() => card.querySelector<HTMLButtonElement>(".realgo-agent-btn--hint")?.click(), hintDelay));
+    }
   }
 
   if (document.getElementById("stage")?.classList.contains("has-macbook-3d")) {

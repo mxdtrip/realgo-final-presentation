@@ -2,6 +2,16 @@
   const stage = document.getElementById("stage");
   const slides = Array.from(document.querySelectorAll(".slide:not([data-pitch-hidden])"))
     .sort((firstSlide, secondSlide) => Number(firstSlide.dataset.order) - Number(secondSlide.dataset.order));
+  const extensionIntroSlideIndex = slides.findIndex((slide) => (
+    slide.querySelector(".macbook-3d-slot")?.dataset.macbookMode === "extension-intro"
+  ));
+  const extensionPromptSlideIndex = slides.findIndex((slide) => (
+    slide.querySelector(".macbook-3d-slot")?.dataset.macbookMode === "extension"
+  ));
+  const visualSlideIndex = (logicalIndex) => (
+    logicalIndex === extensionPromptSlideIndex ? extensionIntroSlideIndex : logicalIndex
+  );
+  const visualSlideAt = (logicalIndex) => slides[visualSlideIndex(logicalIndex)];
   const progressBar = document.querySelector("#progress i");
   const slideCounter = document.getElementById("slideCounter");
   const dots = document.getElementById("dots");
@@ -18,6 +28,10 @@
   const marketCounterMain = document.getElementById("marketCounterMain");
   const marketCounterDecimal = document.getElementById("marketCounterDecimal");
   const marketCounterPercent = document.getElementById("marketCounterPercent");
+  const coverTransition = document.getElementById("coverTransition");
+  const coverTransitionVideo = document.getElementById("coverTransitionVideo");
+  const coverTransitionForeground = document.getElementById("coverTransitionForeground");
+  const coverTransitionWhite = document.getElementById("coverTransitionWhite");
   const roadmapList = document.querySelector(".roadmap-list");
   const roadmapItems = roadmapList ? Array.from(roadmapList.children) : [];
   const roadmapSlide = roadmapList?.closest(".slide") || null;
@@ -85,6 +99,7 @@
         field.style.left = `${horizontal}%`;
         field.style.top = `${vertical}%`;
         field.style.setProperty("--field-delay", `${(0.95 + ((index * 7) % 58) * 0.055).toFixed(3)}s`);
+        field.style.setProperty("--field-reveal-delay", `${(1.85 + ((index * 7) % 58) * 0.025).toFixed(3)}s`);
       });
 
       container.dataset.fieldCount = String(container.children.length);
@@ -128,49 +143,159 @@
       direct.setAttribute("d", `M ${candidateEdge.x.toFixed(2)} ${candidateEdge.y.toFixed(2)} ${connector(candidateEdge, vacancyEdge)}`);
 
       if (!journeyStage.closest(".journey-route")) return;
-      const routeLine = svg.querySelector(".journey-route-line");
-      const routeDraw = svg.querySelector(".journey-route-draw");
+      const routeGroup = svg.querySelector(".journey-route-segments");
+      const routeMask = svg.querySelector("#journeyRouteUncover");
+      const maskBase = svg.querySelector(".journey-route-mask-base");
+      const maskCover = svg.querySelector(".journey-route-mask-cover");
+      const maskFeather = svg.querySelector(".journey-route-mask-feather");
+      const maskBody = svg.querySelector(".journey-route-mask-body");
+      const maskGradient = svg.querySelector("#journeyRouteMaskFeather");
       const routeNodes = Array.from(journeyStage.querySelectorAll(".journey-materials .is-route"));
-      if (!routeLine || !routeDraw || !routeNodes.length) return;
+      if (!routeGroup || !routeMask || !maskBase || !maskCover || !maskFeather || !maskBody || !maskGradient || !routeNodes.length) return;
 
-      let routePath = `M ${candidateEdge.x.toFixed(2)} ${candidateEdge.y.toFixed(2)}`;
+      // Build the five visual connectors with clean gaps around labels, but
+      // reveal the complete group through one rectangular cover mask. The mask
+      // moves as one surface; individual paths never own animation timelines.
+      const segmentPaths = [];
       let current = candidateEdge;
-      const activationPoints = [];
       routeNodes.forEach((node) => {
-        const nodeLeft = pointFor(node, "left");
-        const nodeRight = pointFor(node, "right");
-        routePath += ` ${connector(current, nodeLeft)} L ${nodeRight.x.toFixed(2)} ${nodeRight.y.toFixed(2)}`;
+        const rawLeft = pointFor(node, "left");
+        const rawRight = pointFor(node, "right");
+        const nodeLeft = { x: rawLeft.x - 18, y: rawLeft.y };
+        const nodeRight = { x: rawRight.x + 18, y: rawRight.y };
+        segmentPaths.push(`M ${current.x.toFixed(2)} ${current.y.toFixed(2)} ${connector(current, nodeLeft)}`);
         current = nodeRight;
-        activationPoints.push(nodeLeft);
+        node.dataset.routeRevealX = ((rawLeft.x + rawRight.x) / 2).toFixed(2);
       });
-      routePath += ` ${connector(current, vacancyEdge)}`;
-      routeLine.setAttribute("d", routePath);
-      routeDraw.setAttribute("d", routePath);
+      segmentPaths.push(`M ${current.x.toFixed(2)} ${current.y.toFixed(2)} ${connector(current, vacancyEdge)}`);
 
-      const routeLength = Math.ceil(routeDraw.getTotalLength());
-      routeDraw.style.setProperty("--journey-route-length", String(routeLength));
+      while (routeGroup.children.length < segmentPaths.length) {
+        const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        segment.classList.add("journey-route-segment");
+        routeGroup.appendChild(segment);
+      }
+      while (routeGroup.children.length > segmentPaths.length) routeGroup.lastElementChild.remove();
 
-      // Synchronize each node with the light front instead of relying on
-      // arbitrary nth-child delays. Search progressively along the path so a
-      // nearby later bend cannot accidentally activate an earlier node.
-      let searchStart = 0;
-      activationPoints.forEach((activationPoint, index) => {
-        let nearestDistance = searchStart;
-        let nearestDelta = Number.POSITIVE_INFINITY;
-        for (let distance = searchStart; distance <= routeLength; distance += 2) {
-          const pathPoint = routeDraw.getPointAtLength(distance);
-          const delta = Math.hypot(pathPoint.x - activationPoint.x, pathPoint.y - activationPoint.y);
-          if (delta < nearestDelta) {
-            nearestDelta = delta;
-            nearestDistance = distance;
-          }
-          if (nearestDelta < 1) break;
-        }
-        searchStart = nearestDistance + 2;
-        const delay = 0.28 + 3.2 * nearestDistance / routeLength - 0.08;
-        routeNodes[index].style.setProperty("--route-delay", `${Math.max(0.28, delay).toFixed(2)}s`);
+      Array.from(routeGroup.children).forEach((segment, index) => {
+        segment.setAttribute("d", segmentPaths[index]);
       });
+
+      const featherWidth = 92;
+      const maskStart = candidateEdge.x;
+      const maskEnd = vacancyEdge.x + 4;
+      const maskTravel = maskEnd - maskStart + featherWidth;
+      routeMask.setAttribute("x", "0");
+      routeMask.setAttribute("y", "0");
+      routeMask.setAttribute("width", stageRect.width.toFixed(2));
+      routeMask.setAttribute("height", stageRect.height.toFixed(2));
+      maskBase.setAttribute("x", "0");
+      maskBase.setAttribute("y", "0");
+      maskBase.setAttribute("width", stageRect.width.toFixed(2));
+      maskBase.setAttribute("height", stageRect.height.toFixed(2));
+      maskFeather.setAttribute("x", (maskStart - featherWidth).toFixed(2));
+      maskFeather.setAttribute("y", "0");
+      maskFeather.setAttribute("width", String(featherWidth));
+      maskFeather.setAttribute("height", stageRect.height.toFixed(2));
+      maskBody.setAttribute("x", maskStart.toFixed(2));
+      maskBody.setAttribute("y", "0");
+      maskBody.setAttribute("width", Math.max(1, maskEnd - maskStart).toFixed(2));
+      maskBody.setAttribute("height", stageRect.height.toFixed(2));
+      maskGradient.setAttribute("x1", (maskStart - featherWidth).toFixed(2));
+      maskGradient.setAttribute("x2", maskStart.toFixed(2));
+      maskGradient.setAttribute("y1", "0");
+      maskGradient.setAttribute("y2", "0");
+      maskCover.dataset.routeStart = maskStart.toFixed(2);
+      maskCover.dataset.routeTravel = maskTravel.toFixed(2);
+
+      const routeSlide = journeyStage.closest(".journey-route");
+      if (routeSlide?.classList.contains("is-route-complete")) {
+        maskCover.style.transform = "translateX(100%)";
+      }
     });
+  }
+
+  function stopJourneyRouteAnimation() {
+    journeyRouteRun += 1;
+    journeyRouteAnimations.forEach((animation) => animation.cancel());
+    journeyRouteAnimations = [];
+    if (journeyRouteMaskFrame !== null) window.cancelAnimationFrame(journeyRouteMaskFrame);
+    journeyRouteMaskFrame = null;
+
+    document.querySelectorAll(".journey-route").forEach((slide) => {
+      slide.classList.add("is-route-resetting");
+      slide.classList.remove("is-route-complete");
+      const maskCover = slide.querySelector(".journey-route-mask-cover");
+      if (maskCover) maskCover.style.transform = "translateX(0%)";
+      slide.querySelectorAll(".journey-materials .is-route").forEach((node) => {
+        node.classList.remove("is-route-active");
+      });
+      // Flush the reset while transitions are disabled. A replay therefore
+      // starts from a genuinely clean frame instead of fading backwards from
+      // the previous completed state.
+      void slide.offsetWidth;
+      slide.classList.remove("is-route-resetting");
+    });
+  }
+
+  function startJourneyRouteAnimation(slide) {
+    stopJourneyRouteAnimation();
+    if (!slide?.classList.contains("journey-route")) return;
+
+    const maskCover = slide.querySelector(".journey-route-mask-cover");
+    const routeNodes = Array.from(slide.querySelectorAll(".journey-materials .is-route"));
+    if (!maskCover || !routeNodes.length) return;
+    const run = journeyRouteRun;
+
+    const finishImmediately = () => {
+      if (run !== journeyRouteRun || !slide.classList.contains("is-active")) return;
+      journeyRouteAnimations.forEach((animation) => animation.cancel());
+      journeyRouteAnimations = [];
+      if (journeyRouteMaskFrame !== null) window.cancelAnimationFrame(journeyRouteMaskFrame);
+      journeyRouteMaskFrame = null;
+      maskCover.style.transform = "translateX(100%)";
+      slide.classList.add("is-route-complete");
+      routeNodes.forEach((node) => node.classList.add("is-route-active"));
+    };
+    if (reduceMotion || typeof Element.prototype.animate !== "function") {
+      finishImmediately();
+      return;
+    }
+
+    const transitionHold = document.documentElement.classList.contains("is-slide-transitioning")
+      ? JOURNEY_ROUTE_TRANSITION_HOLD
+      : 0;
+    maskCover.style.transform = "translateX(0%)";
+    const animation = maskCover.animate(
+      [
+        { transform: "translateX(0%)" },
+        { transform: "translateX(100%)" },
+      ],
+      {
+        duration: JOURNEY_ROUTE_DURATION,
+        delay: transitionHold + JOURNEY_ROUTE_DELAY,
+        easing: "cubic-bezier(0.37, 0, 0.63, 1)",
+        fill: "both",
+      },
+    );
+    journeyRouteAnimations = [animation];
+
+    const routeStart = Number.parseFloat(maskCover.dataset.routeStart || "0");
+    const routeTravel = Math.max(1, Number.parseFloat(maskCover.dataset.routeTravel || "1"));
+    const syncNodesToMask = () => {
+      if (run !== journeyRouteRun || !slide.classList.contains("is-active")) return;
+      const progress = animation.effect?.getComputedTiming().progress ?? 0;
+      const revealEdge = routeStart + routeTravel * progress;
+      routeNodes.forEach((node) => {
+        const revealX = Number.parseFloat(node.dataset.routeRevealX || "0");
+        node.classList.toggle("is-route-active", revealEdge >= revealX);
+      });
+      if (animation.playState !== "finished") {
+        journeyRouteMaskFrame = window.requestAnimationFrame(syncNodesToMask);
+      }
+    };
+    journeyRouteMaskFrame = window.requestAnimationFrame(syncNodesToMask);
+
+    animation.finished.then(finishImmediately).catch(() => {});
   }
 
   function buildTaxonomyGraphFields() {
@@ -253,7 +378,7 @@
       [".source-line", ".source-line", "morph-market-source"],
     ],
     [
-      [".giant-number", ".journey-candidate", "morph-card-a"],
+      [".giant-number", ".journey-materials span:first-child", "morph-primary"],
     ],
     [
       [".journey-candidate", ".journey-candidate", "morph-card-a"],
@@ -264,15 +389,7 @@
       [".journey-vacancy", ".journey-vacancy", "morph-card-b"],
       [".journey-materials", ".journey-materials", "morph-surface"],
     ],
-    [
-      [".journey-stage", ".taxonomy-flow", "morph-surface"],
-    ],
-    [
-      [".taxonomy-flow", ".company-target-list", "morph-surface"],
-    ],
-    [
-      [".roadmap-list", ".macbook-3d-slot", "morph-surface"],
-    ],
+    [], // Journey route → product demo
     [
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
     ],
@@ -280,23 +397,15 @@
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
     ],
     [
-      [".macbook-3d-slot", ".memory-cards", "morph-surface"],
+      [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
     ],
+    [], // Rating → roadmap: cross-fade
+    [], // Roadmap → taxonomy: blackout
+    [], // Taxonomy → team
+    [], // Team → Free: planet transition
+    [], // Free → Pro: price transition
     [
-      [".memory-cards", ".cycle", "morph-surface"],
-      [".cards-copy h2", ".cycle-keynote h2", "morph-primary"],
-    ],
-    [
-      [".cycle", ".solar", "morph-surface"],
-      [".cycle-keynote h2", ".team-copy h2", "morph-primary"],
-    ],
-    [
-      [".team-copy", ".monetization-keynote", "morph-primary"],
-      [".solar", ".plan-flow", "morph-surface"],
-    ],
-    [
-      [".monetization-keynote h2", ".closing-keynote h2", "morph-primary"],
-      [".plan-flow", ".final-line", "morph-secondary"],
+      [".price-keynote h2", ".closing-keynote h2", "morph-primary"],
     ],
   ];
 
@@ -310,6 +419,12 @@
   let roadmapTimer = null;
   let roadmapStartTimer = null;
   const ROADMAP_STEP = 2200;
+  const JOURNEY_ROUTE_DELAY = 180;
+  const JOURNEY_ROUTE_DURATION = 5400;
+  const JOURNEY_ROUTE_TRANSITION_HOLD = 1240;
+  let journeyRouteAnimations = [];
+  let journeyRouteMaskFrame = null;
+  let journeyRouteRun = 0;
   let teamOrbitFrame = null;
   let teamOrbitElapsed = 0;
   let teamOrbitStartedAt = 0;
@@ -320,6 +435,11 @@
   let planetTransitionRunning = false;
   let priceTransitionRunning = false;
   let productCopyTransitionRunning = false;
+  let coverVideoTransitionRunning = false;
+  let coverTransitionFrame = null;
+  let coverTransitionObjects = [];
+  const COVER_WHITE_FADE_DURATION = 0.4;
+  const COVER_ARRIVAL_FADE_DURATION = 1360;
   let blackoutTransitionRunning = false;
   const BLACKOUT_DURATION = 1250;
   let crossFadeTransitionRunning = false;
@@ -965,10 +1085,239 @@
     return Boolean(slides[lower]?.hasAttribute("data-fade-next"));
   }
 
+  function isCoverVideoTransition(previousIndex, nextIndex) {
+    return previousIndex === 0 && nextIndex === 1;
+  }
+
+  function prepareCoverTransitionForeground() {
+    if (!coverTransitionForeground) return;
+    coverTransitionForeground.replaceChildren();
+    coverTransitionObjects = [];
+
+    const deckChrome = document.querySelector(".deck-chrome");
+    const sources = [
+      { source: slides[0]?.querySelector(".centered"), depth: 0.96, name: "hero" },
+      { source: slides[0]?.querySelector(".awards"), depth: 0.78, name: "awards" },
+      {
+        source: deckChrome,
+        depth: 0.86,
+        name: "brand",
+        prepare(clone) {
+          clone.querySelector(".deck-meta")?.remove();
+        },
+      },
+      {
+        source: deckChrome,
+        depth: 1.18,
+        name: "meta",
+        prepare(clone) {
+          clone.querySelector(".brand")?.remove();
+          clone.style.justifyContent = "flex-end";
+        },
+      },
+    ].filter(({ source }) => Boolean(source));
+
+    sources.forEach(({ source, depth, name, prepare }) => {
+      const clone = source.cloneNode(true);
+      prepare?.(clone);
+      [clone, ...clone.querySelectorAll("[id]")].forEach((element) => element.removeAttribute("id"));
+      clone.querySelectorAll("a, button").forEach((element) => element.setAttribute("tabindex", "-1"));
+      const object = document.createElement("div");
+      object.className = `cover-transition-object cover-transition-object--${name}`;
+      object.dataset.depth = String(depth);
+      object.appendChild(clone);
+      coverTransitionForeground.appendChild(object);
+      coverTransitionObjects.push({ element: object, depth });
+    });
+    if (coverTransitionWhite) coverTransitionWhite.style.opacity = "0";
+  }
+
+  function coverReferenceScaleAtTime(currentTime) {
+    const time = Math.max(0, currentTime);
+    // Least-squares fit по SIFT-трекингу 205 опорных точек Blender-рендера.
+    // Ошибка масштаба на надёжном интервале 0–1.125 с: около 0.0032x.
+    return Math.exp(-0.0496956 * time + 1.08506902 * time * time - 0.18118389 * time * time * time);
+  }
+
+  function coverCameraPoseAtTime(currentTime) {
+    const time = Math.max(0, currentTime);
+    const trackedTime = Math.min(time, 1.125);
+    const trackedTime2 = trackedTime * trackedTime;
+    const trackedTime3 = trackedTime2 * trackedTime;
+
+    // Точка пролёта и roll восстановлены из накопленных межкадровых affine
+    // transforms, затем переведены из 2560×1440 в координаты сцены 1920×1080.
+    let focusX = 1830 + 141.99439214 * trackedTime - 582.82697947 * trackedTime2 + 257.1590266 * trackedTime3;
+    let focusY = 465 + 29.27110665 * trackedTime - 1.00879765 * trackedTime2 - 7.0578793 * trackedTime3;
+    let roll = -0.28344155 * trackedTime + 7.49935484 * trackedTime2 - 1.42773199 * trackedTime3;
+
+    // После 1.125 с объект занимает почти весь кадр и feature tracking теряет
+    // устойчивость. Продолжаем позу по касательной последнего надёжного кадра;
+    // масштаб всё ещё задаётся непрерывной fit-кривой выше.
+    if (time > 1.125) {
+      const tail = time - 1.125;
+      focusX -= 193 * tail;
+      focusY += 0.2 * tail;
+      roll += 11.17 * tail;
+    }
+
+    const referenceScale = coverReferenceScaleAtTime(time);
+    return {
+      focusX,
+      focusY,
+      roll,
+      travel: 1 - 1 / referenceScale,
+    };
+  }
+
+  function renderCoverObjectInCamera(object, pose) {
+    const remainingDepth = object.depth - pose.travel;
+    if (remainingDepth <= 0.035) {
+      object.element.style.visibility = "hidden";
+      return;
+    }
+
+    object.element.style.visibility = "visible";
+    const projectedScale = object.depth / remainingDepth;
+    const perspective = 1450;
+    const translateZ = perspective * (1 - 1 / projectedScale);
+    object.element.style.transform = [
+      `translate3d(${pose.focusX.toFixed(3)}px, ${pose.focusY.toFixed(3)}px, 0)`,
+      `rotateZ(${pose.roll.toFixed(4)}deg)`,
+      `perspective(${perspective}px)`,
+      `translateZ(${translateZ.toFixed(3)}px)`,
+      `translate3d(${-pose.focusX.toFixed(3)}px, ${-pose.focusY.toFixed(3)}px, 0)`,
+    ].join(" ");
+  }
+
+  function startCoverForegroundCamera() {
+    window.cancelAnimationFrame(coverTransitionFrame);
+
+    const render = () => {
+      if (!coverVideoTransitionRunning || !coverTransitionForeground || !coverTransitionVideo) return;
+      const pose = coverCameraPoseAtTime(coverTransitionVideo.currentTime);
+      coverTransitionObjects.forEach((object) => renderCoverObjectInCamera(object, pose));
+      if (coverTransitionWhite) {
+        const duration = Number.isFinite(coverTransitionVideo.duration) ? coverTransitionVideo.duration : 2;
+        const fadeStart = Math.max(0, duration - COVER_WHITE_FADE_DURATION);
+        const whiteOpacity = clamp01((coverTransitionVideo.currentTime - fadeStart) / COVER_WHITE_FADE_DURATION);
+        coverTransitionWhite.style.opacity = whiteOpacity.toFixed(4);
+      }
+      coverTransitionFrame = window.requestAnimationFrame(render);
+    };
+
+    coverTransitionFrame = window.requestAnimationFrame(render);
+  }
+
+  function waitForVideoEvent(video, eventName, timeoutMs) {
+    return new Promise((resolve, reject) => {
+      const cleanup = () => {
+        window.clearTimeout(timeout);
+        video.removeEventListener(eventName, handleSuccess);
+        video.removeEventListener("error", handleError);
+      };
+      const handleSuccess = () => {
+        cleanup();
+        resolve();
+      };
+      const handleError = () => {
+        cleanup();
+        reject(video.error || new Error("Не удалось воспроизвести видео перехода"));
+      };
+      const timeout = window.setTimeout(() => {
+        cleanup();
+        reject(new Error("Истекло время ожидания видео перехода"));
+      }, timeoutMs);
+
+      video.addEventListener(eventName, handleSuccess, { once: true });
+      video.addEventListener("error", handleError, { once: true });
+    });
+  }
+
+  function prepareCoverArrival(slide) {
+    const slideElements = Array.from(slide?.children || [])
+      .filter((element) => !element.classList.contains("speaker-notes"));
+    const chromeElements = [
+      document.querySelector(".deck-chrome"),
+      document.querySelector(".deck-controls"),
+      document.querySelector(".slide-dots"),
+    ].filter(Boolean);
+    const elements = [...slideElements, ...chromeElements];
+    elements.forEach((element) => {
+      element.style.opacity = "0";
+    });
+    return elements;
+  }
+
+  async function runCoverArrivalFade(elements) {
+    if (typeof Element.prototype.animate !== "function") {
+      elements.forEach((element) => element.style.removeProperty("opacity"));
+      return;
+    }
+
+    const animations = elements.map((element) => element.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      {
+        duration: COVER_ARRIVAL_FADE_DURATION,
+        easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+        fill: "both",
+      },
+    ));
+
+    await Promise.all(animations.map((animation) => animation.finished.catch(() => {})));
+    animations.forEach((animation) => animation.cancel());
+    elements.forEach((element) => element.style.removeProperty("opacity"));
+  }
+
+  async function runCoverVideoTransition(nextIndex, previousIndex, options) {
+    if (coverVideoTransitionRunning) return;
+    if (!coverTransition || !coverTransitionVideo) {
+      commitSlide(nextIndex, previousIndex, options);
+      return;
+    }
+
+    coverVideoTransitionRunning = true;
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+    coverTransitionVideo.pause();
+    coverTransitionVideo.currentTime = 0;
+    prepareCoverTransitionForeground();
+
+    let committed = false;
+    try {
+      if (coverTransitionVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+        coverTransitionVideo.load();
+        await waitForVideoEvent(coverTransitionVideo, "loadeddata", 3000);
+      }
+      coverTransition.classList.add("is-running");
+      await coverTransitionVideo.play();
+      startCoverForegroundCamera();
+      await waitForVideoEvent(coverTransitionVideo, "ended", 6000);
+      if (coverTransitionWhite) coverTransitionWhite.style.opacity = "1";
+      await new Promise((resolve) => window.requestAnimationFrame(resolve));
+      const arrivalElements = prepareCoverArrival(slides[nextIndex]);
+      commitSlide(nextIndex, previousIndex, options);
+      committed = true;
+      coverTransition.classList.remove("is-running");
+      await runCoverArrivalFade(arrivalElements);
+    } catch (error) {
+      console.warn("Video transition skipped:", error);
+    } finally {
+      if (!committed) commitSlide(nextIndex, previousIndex, options);
+      window.cancelAnimationFrame(coverTransitionFrame);
+      coverTransitionFrame = null;
+      coverTransitionVideo.pause();
+      coverTransition.classList.remove("is-running");
+      coverTransitionForeground?.replaceChildren();
+      coverTransitionObjects = [];
+      if (coverTransitionWhite) coverTransitionWhite.style.opacity = "0";
+      coverVideoTransitionRunning = false;
+    }
+  }
+
   // Простое затухание без magic move: новый слайд проявляется поверх
   // старого. Оба тёмные и непрозрачные, поэтому перекрытие читается как
-  // перетекание, а морфинг .macbook-3d-slot в .memory-cards, растягивавший
-  // снимок между разными габаритами, здесь не участвует.
+  // перетекание без растягивания снимков между разногабаритными сценами.
   async function runCrossFadeTransition(nextIndex, previousIndex, options) {
     if (crossFadeTransitionRunning) return;
     const nextSlideElement = slides[nextIndex];
@@ -1050,6 +1399,30 @@
       && Boolean(slides[nextIndex]?.querySelector(".macbook-3d-slot"));
   }
 
+  function isExtensionRevealTransition(previousIndex, nextIndex) {
+    if (Math.abs(nextIndex - previousIndex) !== 1) return false;
+    const previousMode = slides[previousIndex]?.querySelector(".macbook-3d-slot")?.dataset.macbookMode;
+    const nextMode = slides[nextIndex]?.querySelector(".macbook-3d-slot")?.dataset.macbookMode;
+    return (previousMode === "extension-intro" && nextMode === "extension")
+      || (previousMode === "extension" && nextMode === "extension-intro");
+  }
+
+  function runExtensionRevealTransition(nextIndex, previousIndex, options) {
+    activeViewTransition?.skipTransition();
+    clearMagicMoveElements();
+    commitSlide(nextIndex, previousIndex, options);
+  }
+
+  function isJourneyRouteTransition(previousIndex, nextIndex) {
+    if (Math.abs(nextIndex - previousIndex) !== 1) return false;
+    const previousSlide = slides[previousIndex];
+    const nextSlide = slides[nextIndex];
+    return Boolean(
+      (previousSlide?.classList.contains("journey-reveal") && nextSlide?.classList.contains("journey-route"))
+      || (previousSlide?.classList.contains("journey-route") && nextSlide?.classList.contains("journey-reveal"))
+    );
+  }
+
   // Переход между слайдами с MacBook идёт БЕЗ view transition.
   // View transition подменяет страницу статичными снимками, а 3D-сцена в это
   // время живёт: движение камеры длится 3800мс. Снимок замораживал ракурс на
@@ -1059,8 +1432,8 @@
   // в новый слот сразу, а подписи старого слайда доигрывают затухание поверх.
   async function runProductCopyTransition(nextIndex, previousIndex, options) {
     if (productCopyTransitionRunning) return;
-    const previousSlide = slides[previousIndex];
-    const nextSlide = slides[nextIndex];
+    const previousSlide = visualSlideAt(previousIndex);
+    const nextSlide = visualSlideAt(nextIndex);
     if (!previousSlide || !nextSlide || typeof Element.prototype.animate !== "function") {
       commitSlide(nextIndex, previousIndex, options);
       return;
@@ -1361,24 +1734,41 @@
 
   function commitSlide(nextSlide, previousSlide, options = {}) {
     currentSlide = nextSlide;
-    stage.dataset.theme = slides[currentSlide].dataset.theme || "dark";
+    const logicalSlideElement = slides[currentSlide];
+    const currentSlideElement = visualSlideAt(currentSlide);
+    const previousSlideElement = visualSlideAt(previousSlide);
+    const logicalProductMode = logicalSlideElement.querySelector(".macbook-3d-slot")?.dataset.macbookMode;
+    stage.dataset.theme = logicalSlideElement.dataset.theme || "dark";
+    stage.dataset.extensionStep = currentSlide === extensionPromptSlideIndex
+      ? "prompt"
+      : currentSlide === extensionIntroSlideIndex ? "intro" : "";
+    if (logicalProductMode) stage.dataset.productMode = logicalProductMode;
+    else delete stage.dataset.productMode;
 
     slides.forEach((slide, slideIndex) => {
-      slide.classList.toggle("is-active", slideIndex === currentSlide);
-      slide.classList.toggle("is-before", slideIndex < currentSlide);
-      slide.classList.toggle("is-after", slideIndex > currentSlide);
-      slide.setAttribute("aria-hidden", slideIndex === currentSlide ? "false" : "true");
+      const isVisualSlide = slide === currentSlideElement;
+      slide.classList.toggle("is-active", isVisualSlide);
+      slide.classList.toggle("is-before", !isVisualSlide && slideIndex < currentSlide);
+      slide.classList.toggle("is-after", !isVisualSlide && slideIndex > currentSlide);
+      slide.setAttribute("aria-hidden", isVisualSlide ? "false" : "true");
     });
 
+    currentSlideElement.querySelectorAll("[data-extension-note]").forEach((note) => {
+      note.hidden = note.dataset.extensionNote !== stage.dataset.extensionStep;
+    });
+
+    if (currentSlideElement.classList.contains("journey-route")) {
+      startJourneyRouteAnimation(currentSlideElement);
+    } else {
+      stopJourneyRouteAnimation();
+    }
+
     window.dispatchEvent(new CustomEvent("realgo:slidechange", {
-      detail: { index: currentSlide, slide: slides[currentSlide] },
+      detail: { index: currentSlide, slide: currentSlideElement, logicalSlide: logicalSlideElement },
     }));
 
-    runCountUp(slides[currentSlide]);
-    runTaxonomyCountUp(slides[currentSlide]);
-
-    const previousSlideElement = slides[previousSlide];
-    const currentSlideElement = slides[currentSlide];
+    runCountUp(currentSlideElement);
+    runTaxonomyCountUp(currentSlideElement);
 
     if (previousSlideElement === teamSlide && currentSlideElement !== teamSlide) {
       stopTeamRotation();
@@ -1388,7 +1778,7 @@
     }
 
     if (roadmapSlide) {
-      if (slides[currentSlide] === roadmapSlide) startRoadmapCycle();
+      if (currentSlideElement === roadmapSlide) startRoadmapCycle();
       else stopRoadmapCycle();
     }
 
@@ -1403,10 +1793,32 @@
   }
 
   function showSlide(index, options = {}) {
-    if (activeViewTransition && !options.instant) return;
+    if ((activeViewTransition || coverVideoTransitionRunning) && !options.instant) return;
 
     const nextSlide = Math.max(0, Math.min(index, slides.length - 1));
     const previousSlide = currentSlide;
+
+    const canPlayCoverTransition = nextSlide !== previousSlide
+      && !reduceMotion
+      && !options.instant
+      && isCoverVideoTransition(previousSlide, nextSlide);
+
+    if (canPlayCoverTransition) {
+      runCoverVideoTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
+    // Slides 6 and 7 share identical geometry. Switch the static scene
+    // directly so the single moving SVG cover mask is the only transition
+    // surface; a View Transition snapshot would hide or retime that wipe.
+    if (nextSlide !== previousSlide
+      && !options.instant
+      && isJourneyRouteTransition(previousSlide, nextSlide)) {
+      activeViewTransition?.skipTransition();
+      clearMagicMoveElements();
+      commitSlide(nextSlide, previousSlide, options);
+      return;
+    }
 
     // Явная метка перехода имеет приоритет над остальными сценариями.
     const canBlackout = nextSlide !== previousSlide
@@ -1446,6 +1858,19 @@
 
     if (canCountPrice) {
       runPriceTransition(nextSlide, previousSlide, options);
+      return;
+    }
+
+    // Slides 8 → 9 retain identical shade and copy. A copy cross-fade would
+    // briefly expose two gradients and drive the headline near zero opacity.
+    // Swap the slide root in one paint and leave motion exclusively to the
+    // persistent extension card mounted by product-ui-source.tsx.
+    const canRevealExtension = nextSlide !== previousSlide
+      && !options.instant
+      && isExtensionRevealTransition(previousSlide, nextSlide);
+
+    if (canRevealExtension) {
+      runExtensionRevealTransition(nextSlide, previousSlide, options);
       return;
     }
 

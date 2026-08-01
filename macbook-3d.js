@@ -543,7 +543,15 @@ if (stage && slots.length) {
     const object = ensureProductObject();
     if (!object) return;
     const panelWidth = trackedPanelWidth;
-    const panelHeight = trackedPanelHeight;
+    // During agent -> rating React has already mounted the new, shorter UI,
+    // while the outer card is still interpolating from its previous height.
+    // Following the inner ResizeObserver made the CSS3D plane snap to the new
+    // geometry before the visible card finished resizing. For that brief
+    // interval read the animated outer height, keeping the top edge locked and
+    // letting only the bottom edge travel smoothly.
+    const panelHeight = object.element.classList.contains("is-height-transitioning")
+      ? object.element.offsetHeight || trackedPanelHeight
+      : trackedPanelHeight;
     const rawProgress = Number.isFinite(uiFocusStartedAt)
       ? THREE.MathUtils.clamp((now - uiFocusStartedAt) / 1450, 0, 1)
       : 0;
@@ -601,7 +609,13 @@ if (stage && slots.length) {
     const enterFromWide = isVisible && !sceneActive;
     sceneActive = isVisible;
     if (activeSlot !== slot) {
-      detachProductObject();
+      // Slides 10–12 share one live extension card. Preserve its CSS3DObject
+      // while the WebGL/CSS renderers move to the next slot; recreating it
+      // caused a one-frame disappearance followed by the lift animation.
+      const continuesProductSequence = Boolean(
+        productUiObject && slot.closest(".slide")?.classList.contains("slide-macbook")
+      );
+      if (!continuesProductSequence) detachProductObject();
       activeSlot?.classList.remove("is-ready");
       activeSlot = slot;
       activeSlot.appendChild(renderer.domElement);
