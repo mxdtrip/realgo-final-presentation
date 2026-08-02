@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=128" />
+    <link rel="stylesheet" href="apple.css?v=131" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -53,7 +53,7 @@
           <img src="assets/realgo-mark.svg" alt="" />
           <span>ReAlgo</span>
         </a>
-        <div class="deck-meta"><span id="timer">00:00</span><span id="slideCounter">01 / 18</span></div>
+        <div class="deck-meta"><span id="timer">00:00</span><span id="slideCounter">01 / 19</span></div>
       </div>
 
       <div class="slides">
@@ -361,6 +361,103 @@
             </section>
           </div>
           <aside class="speaker-notes"><strong>03:20–03:40</strong><p>Roadmap — тот самый путь среди хаоса. Сначала выбираем одну из четырёх поддерживаемых площадок. Затем — компанию: объединённая база ReAlgo содержит 428 уникальных компаний с привязанными задачами. Последний ввод — точный срок до собеседования с шагом в один день, под который будет рассчитан темп roadmap.</p></aside>
+        </section>
+
+        <section class="slide theme-dark slide-stack" data-slide="stack" data-order="14.5" data-theme="dark">
+          <div class="stack-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="stack-keynote">
+            <header class="stack-heading">
+              <p class="kicker">Архитектура ReAlgo</p>
+              <h2>Как данные проходят<br /><strong>через ReAlgo.</strong></h2>
+              <p>Клиенты, API, хранилища и AI связаны одним типизированным контрактом.</p>
+            </header>
+
+            <div class="architecture-map" aria-label="Схема архитектуры ReAlgo">
+              <svg class="architecture-links" viewBox="0 0 1660 620" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <marker id="architectureArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                  </marker>
+                </defs>
+                <path class="arch-link arch-link--client" d="M340 100 C378 100 370 265 404 265" />
+                <path class="arch-link arch-link--client" d="M340 330 C375 330 375 285 404 285" />
+                <path class="arch-link arch-link--main" d="M554 275 H620" />
+                <path class="arch-link arch-link--data" d="M1100 137 H1170" />
+                <path class="arch-link arch-link--data" d="M1100 260 H1170" />
+                <path class="arch-link arch-link--ai" d="M1100 447 H1170" />
+              </svg>
+
+              <section class="architecture-zone architecture-zone--clients" aria-label="Клиентские приложения">
+                <header><span>01</span><strong>Browser</strong><small>TypeScript</small></header>
+                <article class="architecture-node architecture-node--web">
+                  <span class="architecture-node__icon">W</span>
+                  <div><small>Личный кабинет · PWA</small><h3>Next.js 16 · React 19</h3><p>Roadmap, Pattern Atlas, повторения и аналитика.</p></div>
+                </article>
+                <article class="architecture-node architecture-node--extension">
+                  <span class="architecture-node__icon">Ext</span>
+                  <div><small>Прямо на странице задачи</small><h3>Plasmo · Manifest V3</h3><p>Считывает условие и код, ловит submit.</p></div>
+                  <footer><span>LeetCode</span><span>HackerRank</span><span>GFG</span><span>Codeforces</span></footer>
+                </article>
+              </section>
+
+              <section class="architecture-gateway" aria-label="Входной шлюз">
+                <small>Edge</small><strong>Caddy</strong><span>HTTPS</span><span>/api/*</span>
+              </section>
+
+              <section class="architecture-zone architecture-zone--core" aria-label="Backend ReAlgo">
+                <header><span>02</span><strong>Go API</strong><small>Go 1.25 · chi</small></header>
+                <div class="architecture-core-main">
+                  <div class="architecture-domain-grid">
+                    <span>Auth</span><span>Problems</span><span>Cards</span>
+                    <span>Pattern Atlas</span><span>Roadmap</span><span>Practice</span>
+                  </div>
+                  <article class="architecture-service">
+                    <small>Интервальные повторения</small><strong>FSRS Scheduler</strong><p>Оценка → новый интервал → очередь практики</p>
+                  </article>
+                  <article class="architecture-service architecture-service--ai">
+                    <small>Встроенный модуль оркестрации</small><strong>AI Orchestrator</strong><p>Контекст, prompt versioning, streaming, validation</p>
+                  </article>
+                </div>
+                <footer><span>pgx</span><span>sqlc</span><span>REST + SSE</span><span>typed contracts</span></footer>
+              </section>
+
+              <section class="architecture-zone architecture-zone--services" aria-label="Хранилища и AI-провайдер">
+                <header><span>03</span><strong>State + AI</strong><small>Docker network</small></header>
+                <div class="architecture-stores">
+                  <article class="architecture-store architecture-store--postgres">
+                    <span>DB</span><div><small>Источник истины</small><h3>PostgreSQL 16</h3><p>Пользователи, задачи, roadmap, карточки</p></div>
+                  </article>
+                  <article class="architecture-store architecture-store--redis">
+                    <span>R</span><div><small>Быстрый контур</small><h3>Redis 7</h3><p>Кэш, locks, rate limits, дедупликация</p></div>
+                  </article>
+                </div>
+
+                <article class="architecture-ai-module">
+                  <header>
+                    <span class="architecture-ai-orb">AI</span>
+                    <div><small>OpenAI-compatible provider adapter</small><h3>Gemini 2.5 Flash</h3></div>
+                  </header>
+                  <div class="architecture-ai-pipeline">
+                    <span>условие + код + паттерны</span><b>→</b><span>prompt v1</span><b>→</b><span>strict JSON</span>
+                  </div>
+                  <footer>
+                    <div><strong>SSE-подсказки</strong><small>3 уровня · кулдаун 30 сек.</small></div>
+                    <div><strong>AI-карточки</strong><small>3 карточки → Postgres</small></div>
+                  </footer>
+                </article>
+              </section>
+
+              <span class="architecture-label architecture-label--rest">REST / JSON</span>
+              <span class="architecture-label architecture-label--sql">SQL</span>
+              <span class="architecture-label architecture-label--cache">cache / locks</span>
+              <span class="architecture-label architecture-label--provider">provider call</span>
+
+              <footer class="architecture-infra">
+                <strong>Delivery</strong><span>Docker Compose</span><span>Caddy</span><span>golang-migrate</span><span>GitHub Actions</span>
+              </footer>
+            </div>
+          </div>
+          <aside class="speaker-notes"><strong>03:40–04:05</strong><p>Слева два клиента: кабинет на Next.js и расширение на Plasmo. Оба приходят по HTTPS через Caddy в модульный Go API. API хранит постоянное состояние в PostgreSQL, а Redis использует для кэша, блокировок и лимитов. FSRS внутри API рассчитывает повторения. Отдельный AI Orchestrator собирает условие, текущий код и паттерны, вызывает Gemini 2.5 Flash через provider adapter и строго валидирует JSON. Подсказки возвращаются в расширение потоком SSE, а три сгенерированные карточки дедуплицируются и сохраняются в PostgreSQL.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-extension-intro" data-slide="9-intro" data-order="9" data-theme="dark">
