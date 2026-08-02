@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=106" />
+    <link rel="stylesheet" href="apple.css?v=128" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -53,7 +53,7 @@
           <img src="assets/realgo-mark.svg" alt="" />
           <span>ReAlgo</span>
         </a>
-        <div class="deck-meta"><span id="timer">00:00</span><span id="slideCounter">01 / 19</span></div>
+        <div class="deck-meta"><span id="timer">00:00</span><span id="slideCounter">01 / 18</span></div>
       </div>
 
       <div class="slides">
@@ -112,11 +112,11 @@
           <aside class="speaker-notes"><strong>00:17–00:26</strong><p>Для начинающих открыта лишь небольшая часть IT-вакансий — конкуренция особенно заметна в начале карьеры.</p></aside>
         </section>
 
-        <section class="slide theme-light" data-slide="3" data-order="3" data-theme="light">
+        <section class="slide theme-light" data-slide="3" data-order="3" data-theme="light" data-blackout-next>
           <div class="stat-keynote reveal">
             <div class="giant-number" data-value="63" data-decimals="0" data-percent="true">63%</div>
             <div class="stat-copy">
-              <h2>работодателей сначала смотрят на навыки.</h2>
+              <h2>работодателей сначала<br />смотрят на навыки.</h2>
               <p>Не на обещания. Не на список технологий. На способность показать результат.</p>
             </div>
           </div>
@@ -300,7 +300,7 @@
         <section class="slide theme-light slide-roadmap-builder" data-slide="8" data-order="13" data-theme="light" data-blackout-next>
           <div class="roadmap-story" aria-label="Последовательная настройка персонального roadmap">
             <div class="roadmap-story__intro">
-              <h2>Roadmap. Тот самый путь среди хаоса</h2>
+              <h2>Roadmap.<br />Тот самый путь посреди хаоса.</h2>
             </div>
 
             <section class="roadmap-story__step roadmap-story__step--platform">
@@ -333,9 +333,7 @@
 
             <section class="roadmap-story__step roadmap-story__step--deadline">
               <div class="roadmap-metric roadmap-metric--deadline">
-                <small>До собеседования</small>
-                <div><strong>45</strong><em>дней</em></div>
-                <p>Темп подготовки будет рассчитан под выбранный срок.</p>
+                <h3>срок для подготовки</h3>
               </div>
               <div class="roadmap-choice-result"><small>Срок зафиксирован</small><strong>45 дней</strong><b aria-hidden="true">✓</b></div>
               <div class="roadmap-word-wheel roadmap-word-wheel--deadline" aria-label="До собеседования выбрано 45 дней">
@@ -366,25 +364,60 @@
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-extension-intro" data-slide="9-intro" data-order="9" data-theme="dark">
-          <div class="product-heading product-overlay reveal"><h2>Задача зашла<br />в тупик?<br /><span class="accent-blue">Запроси подсказку</span></h2></div>
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--context" data-product-copy="extension-intro extension">
+              <h2>Помощь появляется<br /><strong>там, где возник вопрос.</strong></h2>
+              <p class="product-story__lead">ReAlgo распознаёт открытую задачу и разворачивает подсказку поверх страницы — без вкладок, копипаста и потери контекста.</p>
+            </article>
+            <article class="product-story product-story--ai" data-product-copy="agent">
+              <h2>ИИ ведёт к ответу.<br /><strong>Не подменяет мышление.</strong></h2>
+              <p class="product-story__lead">Модель читает условие, ограничения и текущий код. Между уровнями действует кулдаун 30 секунд: сначала пользователь пробует применить подсказку сам, а не прокликивает путь к готовому решению.</p>
+              <div class="product-story__levels" aria-label="Три уровня AI-подсказок">
+                <div><b>01</b><span><strong>Направление</strong><small>идея и подходящий паттерн</small></span></div>
+                <div><b>02</b><span><strong>Инвариант</strong><small>ключевой вопрос к решению</small></span></div>
+                <div><b>03</b><span><strong>Конкретика</strong><small>формула следующего шага</small></span></div>
+              </div>
+            </article>
+            <article class="product-story product-story--memory" data-product-copy="rating">
+              <h2>Решение превращается<br /><strong>в долгую память.</strong></h2>
+              <p class="product-story__lead">Оценка сложности задаёт интервал повторения. Если карточек к задаче ещё нет в базе, ИИ разбирает решение и генерирует их автоматически.</p>
+            </article>
+          </div>
           <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension-intro" aria-label="MacBook с нерешённой задачей; интерфейс затемняется и появляется предложение запросить подсказку"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes" data-extension-note="intro"><strong>02:05–02:15</strong><p>Когда решение заходит в тупик, ReAlgo распознаёт открытую задачу. Сначала мы фиксируем внимание на проблеме: интерфейс приглушается, появляется простой следующий шаг — запросить подсказку.</p></aside>
-          <aside class="speaker-notes" data-extension-note="prompt" hidden><strong>02:15–02:25</strong><p>Следующим шагом окно расширения плавно появляется прямо поверх сайта. Оно предлагает мягкую подсказку без готового решения.</p></aside>
+          <aside class="speaker-notes" data-product-note="extension-intro"><strong>02:05–02:15</strong><p>Когда решение заходит в тупик, ReAlgo распознаёт открытую задачу. Сначала мы фиксируем внимание на проблеме: интерфейс приглушается, появляется простой следующий шаг — запросить подсказку.</p></aside>
+          <aside class="speaker-notes" data-product-note="extension" hidden><strong>02:15–02:25</strong><p>Расширение распознаёт открытую задачу и появляется поверх платформы. Пользователю не нужно переносить условие в другой чат: весь контекст уже здесь.</p></aside>
+          <aside class="speaker-notes" data-product-note="agent" hidden><strong>02:25–02:45</strong><p>ИИ анализирует условие, ограничения и текущий код. Три уровня помощи раскрываются постепенно: направление и паттерн, вопрос об инварианте, затем конкретная формула следующего шага. Между уровнями действует кулдаун 30 секунд — пользователь должен сначала попробовать применить идею, а не прокликать подсказки в поиске готового решения.</p></aside>
+          <aside class="speaker-notes" data-product-note="rating" hidden><strong>02:45–03:05</strong><p>После Accepted оценка сложности влияет на интервал повторения. Если готовых карточек для задачи нет в базе, ИИ разбирает решение и автоматически генерирует три карточки для закрепления паттерна.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-extension" data-slide="9" data-order="9.5" data-theme="dark">
-          <div class="product-heading product-overlay reveal"><h2>Задача зашла<br />в тупик?<br /><span class="accent-blue">Запроси подсказку</span></h2></div>
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--context">
+              <h2>Помощь появляется<br /><strong>там, где возник вопрос.</strong></h2>
+              <p class="product-story__lead">ReAlgo распознаёт открытую задачу и разворачивает подсказку поверх страницы — без вкладок, копипаста и потери контекста.</p>
+            </article>
+          </div>
           <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension" aria-label="MacBook с нерешённой задачей; затем открывается расширение ReAlgo с предложением получить первую подсказку"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:15–02:25</strong><p>Следующим шагом окно расширения плавно появляется прямо поверх сайта. Оно предлагает мягкую подсказку без готового решения.</p></aside>
+          <aside class="speaker-notes"><strong>02:15–02:25</strong><p>Расширение распознаёт открытую задачу и появляется поверх платформы. Пользователю не нужно переносить условие в другой чат: весь контекст уже здесь.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-agent" data-slide="10" data-order="10" data-theme="dark">
-          <div class="product-heading product-overlay reveal"><h2>Подсказка.<br /><span class="accent-blue">Затем решение.</span></h2></div>
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--ai">
+              <h2>ИИ ведёт к ответу.<br /><strong>Не подменяет мышление.</strong></h2>
+              <p class="product-story__lead">Модель читает условие, ограничения и текущий код. Между уровнями действует кулдаун 30 секунд: сначала пользователь пробует применить подсказку сам, а не прокликивает путь к готовому решению.</p>
+              <div class="product-story__levels" aria-label="Три уровня AI-подсказок">
+                <div><b>01</b><span><strong>Направление</strong><small>идея и подходящий паттерн</small></span></div>
+                <div><b>02</b><span><strong>Инвариант</strong><small>ключевой вопрос к решению</small></span></div>
+                <div><b>03</b><span><strong>Конкретика</strong><small>формула следующего шага</small></span></div>
+              </div>
+            </article>
+          </div>
           <div class="macbook-3d-slot macbook-3d-agent" data-macbook-mode="agent" aria-label="MacBook: AI-агент даёт подсказку, пользователь заполняет код и получает Accepted"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:25–02:45</strong><p>AI не пишет решение за пользователя: даёт один направляющий намёк и вопрос об инварианте. Пользователь продолжает ввод, запускает код и получает Accepted.</p></aside>
+          <aside class="speaker-notes"><strong>02:25–02:45</strong><p>ИИ анализирует условие, ограничения и текущий код. Три уровня помощи раскрываются постепенно: направление и паттерн, вопрос об инварианте, затем конкретная формула следующего шага. Между уровнями действует кулдаун 30 секунд — пользователь должен сначала попробовать применить идею, а не прокликать подсказки в поиске готового решения.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-taxonomy-graph" data-slide="11" data-order="14" data-theme="dark">
@@ -428,10 +461,15 @@
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-rating" data-slide="12" data-order="11" data-theme="dark" data-fade-next>
-          <div class="product-heading product-overlay reveal"><h2>Как далась<br /><span class="accent-blue">эта задача?</span></h2></div>
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--memory">
+              <h2>Решение превращается<br /><strong>в долгую память.</strong></h2>
+              <p class="product-story__lead">Оценка сложности задаёт интервал повторения. Если карточек к задаче ещё нет в базе, ИИ разбирает решение и генерирует их автоматически.</p>
+            </article>
+          </div>
           <div class="macbook-3d-slot macbook-3d-rating" data-macbook-mode="rating" aria-label="MacBook с демонстрацией оценки сложности и постановки задачи в повторение"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:45–03:05</strong><p>После Accepted пользователь отмечает, насколько легко далась задача. Одинаковый статус может скрывать десять минут самостоятельной работы или час с подсказками — для готовности это разные результаты.</p></aside>
+          <aside class="speaker-notes"><strong>02:45–03:05</strong><p>После Accepted оценка сложности влияет на интервал повторения. Если готовых карточек для задачи нет в базе, ИИ разбирает решение и автоматически генерирует три карточки для закрепления паттерна.</p></aside>
         </section>
 
         <section class="slide theme-light slide-price slide-price-free" data-slide="16-free" data-order="16" data-theme="light">
@@ -467,6 +505,24 @@
           <div class="final-line">ReAlgo. <strong>Превращаем хаос подготовки в понятный путь к работе.</strong></div>
           <aside class="speaker-notes"><strong>04:40–05:00</strong><p>Сегодня подготовку измеряют количеством задач. Мы предлагаем другую единицу: не «я когда-то это решал», а «я умею решить это сейчас». ReAlgo превращает хаос подготовки в понятный путь к работе. Спасибо.</p></aside>
         </section>
+
+        <section class="slide theme-dark slide-gradient-poster" data-slide="19" data-order="19" data-theme="dark" aria-label="Типографический постер с градиентными фразами">
+          <div class="gradient-poster-half gradient-poster-half--light" aria-hidden="true">
+            <div class="gradient-poster-row gradient-poster-row--1">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--2">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--3">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--4">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--5">КОНТОРА ПИДОРАСОВ</div>
+          </div>
+          <div class="gradient-poster-half gradient-poster-half--dark" aria-hidden="true">
+            <div class="gradient-poster-row gradient-poster-row--1">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--2">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--3">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--4">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--5">КОНТОРА ПИДОРАСОВ</div>
+          </div>
+          <aside class="speaker-notes"><strong>Финальный постер</strong><p>Контрастная типографическая отбивка: одна фраза, пять цветовых характеров, две противоположные среды.</p></aside>
+        </section>
       </div>
 
       <div id="coverTransition" class="cover-transition" aria-hidden="true">
@@ -491,8 +547,8 @@
       <nav id="dots" class="slide-dots" aria-label="Навигация по слайдам"></nav>
       <div id="help" class="help-panel" aria-hidden="true"><strong>Управление</strong><span><kbd>←</kbd><kbd>→</kbd> слайды</span><span><kbd>Space</kbd> дальше</span><span><kbd>N</kbd> заметки</span><span><kbd>F</kbd> полный экран</span><span><kbd>?</kbd> закрыть</span></div>
     </main>
-    <script type="module" src="assets/product-ui.js?v=45"></script>
-    <script type="module" src="macbook-3d.js?v=53"></script>
-    <script src="deck.js?v=61"></script>
+    <script type="module" src="assets/product-ui.js?v=54"></script>
+    <script type="module" src="macbook-3d.js?v=67"></script>
+    <script src="deck.js?v=62"></script>
   </body>
 </html>

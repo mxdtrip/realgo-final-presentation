@@ -2,14 +2,19 @@
   const stage = document.getElementById("stage");
   const slides = Array.from(document.querySelectorAll(".slide:not([data-pitch-hidden])"))
     .sort((firstSlide, secondSlide) => Number(firstSlide.dataset.order) - Number(secondSlide.dataset.order));
-  const extensionIntroSlideIndex = slides.findIndex((slide) => (
-    slide.querySelector(".macbook-3d-slot")?.dataset.macbookMode === "extension-intro"
+  // Keep immutable logical modes because the first slot becomes the shared
+  // physical host and its dataset is updated as the story advances.
+  const logicalProductModes = slides.map((slide) => (
+    slide.querySelector(".macbook-3d-slot")?.dataset.macbookMode || ""
   ));
-  const extensionPromptSlideIndex = slides.findIndex((slide) => (
-    slide.querySelector(".macbook-3d-slot")?.dataset.macbookMode === "extension"
-  ));
+  const extensionIntroSlideIndex = logicalProductModes.indexOf("extension-intro");
+  const extensionPromptSlideIndex = logicalProductModes.indexOf("extension");
+  const productSlideIndices = new Set(slides
+    .map((slide, slideIndex) => slide.querySelector(".macbook-3d-slot") ? slideIndex : -1)
+    .filter((slideIndex) => slideIndex >= 0));
+  const sharedProductSlideIndex = Math.min(...productSlideIndices);
   const visualSlideIndex = (logicalIndex) => (
-    logicalIndex === extensionPromptSlideIndex ? extensionIntroSlideIndex : logicalIndex
+    productSlideIndices.has(logicalIndex) ? sharedProductSlideIndex : logicalIndex
   );
   const visualSlideAt = (logicalIndex) => slides[visualSlideIndex(logicalIndex)];
   const progressBar = document.querySelector("#progress i");
@@ -1401,8 +1406,8 @@
 
   function isExtensionRevealTransition(previousIndex, nextIndex) {
     if (Math.abs(nextIndex - previousIndex) !== 1) return false;
-    const previousMode = slides[previousIndex]?.querySelector(".macbook-3d-slot")?.dataset.macbookMode;
-    const nextMode = slides[nextIndex]?.querySelector(".macbook-3d-slot")?.dataset.macbookMode;
+    const previousMode = logicalProductModes[previousIndex];
+    const nextMode = logicalProductModes[nextIndex];
     return (previousMode === "extension-intro" && nextMode === "extension")
       || (previousMode === "extension" && nextMode === "extension-intro");
   }
@@ -1442,6 +1447,43 @@
     productCopyTransitionRunning = true;
     activeViewTransition?.skipTransition();
     clearMagicMoveElements();
+
+    // Every logical MacBook beat is rendered by one persistent visual slide.
+    // Fade only the changing headline around the logical mode switch; the
+    // shade, WebGL canvas, CSS3D renderer and React card stay alive throughout.
+    if (previousSlide === nextSlide) {
+      const previousMode = logicalProductModes[previousIndex];
+      const nextMode = logicalProductModes[nextIndex];
+      const previousCopy = previousSlide.querySelector(`[data-product-copy~="${previousMode}"]`);
+      const nextCopy = nextSlide.querySelector(`[data-product-copy~="${nextMode}"]`);
+      const animations = [];
+
+      try {
+        if (previousCopy && previousCopy !== nextCopy) {
+          const copyOut = previousCopy.animate(
+            [{ opacity: 1, transform: "translate3d(0, 0, 0)" }, { opacity: 0, transform: "translate3d(-14px, 0, 0)" }],
+            { duration: 220, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "both" },
+          );
+          animations.push(copyOut);
+          await copyOut.finished.catch(() => {});
+        }
+
+        commitSlide(nextIndex, previousIndex, options);
+
+        if (nextCopy && previousCopy !== nextCopy) {
+          const copyIn = nextCopy.animate(
+            [{ opacity: 0, transform: "translate3d(18px, 0, 0)" }, { opacity: 1, transform: "translate3d(0, 0, 0)" }],
+            { duration: 440, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" },
+          );
+          animations.push(copyIn);
+          await copyIn.finished.catch(() => {});
+        }
+      } finally {
+        animations.forEach((animation) => animation.cancel());
+        productCopyTransitionRunning = false;
+      }
+      return;
+    }
 
     previousSlide.classList.add("is-copy-fading");
     commitSlide(nextIndex, previousIndex, options);
@@ -1737,13 +1779,22 @@
     const logicalSlideElement = slides[currentSlide];
     const currentSlideElement = visualSlideAt(currentSlide);
     const previousSlideElement = visualSlideAt(previousSlide);
-    const logicalProductMode = logicalSlideElement.querySelector(".macbook-3d-slot")?.dataset.macbookMode;
+    const logicalProductMode = logicalProductModes[currentSlide];
     stage.dataset.theme = logicalSlideElement.dataset.theme || "dark";
     stage.dataset.extensionStep = currentSlide === extensionPromptSlideIndex
       ? "prompt"
       : currentSlide === extensionIntroSlideIndex ? "intro" : "";
     if (logicalProductMode) stage.dataset.productMode = logicalProductMode;
     else delete stage.dataset.productMode;
+
+    const persistentProductSlot = currentSlideElement.querySelector(".macbook-3d-slot");
+    const logicalProductSlot = logicalSlideElement.querySelector(".macbook-3d-slot");
+    if (persistentProductSlot && logicalProductMode) {
+      persistentProductSlot.dataset.macbookMode = logicalProductMode;
+      if (logicalProductSlot?.getAttribute("aria-label")) {
+        persistentProductSlot.setAttribute("aria-label", logicalProductSlot.getAttribute("aria-label"));
+      }
+    }
 
     slides.forEach((slide, slideIndex) => {
       const isVisualSlide = slide === currentSlideElement;
@@ -1753,8 +1804,8 @@
       slide.setAttribute("aria-hidden", isVisualSlide ? "false" : "true");
     });
 
-    currentSlideElement.querySelectorAll("[data-extension-note]").forEach((note) => {
-      note.hidden = note.dataset.extensionNote !== stage.dataset.extensionStep;
+    currentSlideElement.querySelectorAll("[data-product-note]").forEach((note) => {
+      note.hidden = note.dataset.productNote !== logicalProductMode;
     });
 
     if (currentSlideElement.classList.contains("journey-route")) {

@@ -8,6 +8,10 @@ const SCREEN_MATERIAL = "sfCQkHOWyrsLmor";
 const KEYBOARD_ENGRAVING_MATERIAL = "sIfSZcqgDlKMJPf";
 const SCREEN_WIDTH = 1600;
 const SCREEN_HEIGHT = 1000;
+// Cancel the 9.5-10.5% rightward lift and leave the settled window slightly
+// inside the display bezel. The factor is multiplied by lift progress, so the
+// original resting position remains unchanged.
+const EXTENSION_SETTLED_SHIFT_LEFT = 0.115;
 const CAMERA_MOVE_MS = 3800;
 const FIRST_SHOT_HOLD_MS = 1800;
 const stage = document.getElementById("stage");
@@ -61,6 +65,15 @@ if (stage && slots.length) {
       position: new THREE.Vector3(0.64, -0.15, 0.02),
       rotation: new THREE.Vector3(-0.058, -0.06, 0),
     },
+    extensionIntro: {
+      camera: new THREE.Vector3(0.68, 0.2, 4.5),
+      lookAt: new THREE.Vector3(0.55, 0.11, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 26,
+      arc: 1,
+      position: new THREE.Vector3(0.64, -0.15, 0.02),
+      rotation: new THREE.Vector3(-0.058, -0.06, 0),
+    },
     agent: {
       camera: new THREE.Vector3(0.98, 0.24, 3.92),
       lookAt: new THREE.Vector3(0.73, 0.14, 0),
@@ -69,6 +82,15 @@ if (stage && slots.length) {
       arc: -1,
       position: new THREE.Vector3(0.82, -0.12, 0.04),
       rotation: new THREE.Vector3(-0.052, 0.028, 0),
+    },
+    agentScreen: {
+      camera: new THREE.Vector3(0, 0.2, 4.2),
+      lookAt: new THREE.Vector3(0, 0.1, 0),
+      up: new THREE.Vector3(0, 1, 0),
+      fov: 24.5,
+      arc: -1,
+      position: new THREE.Vector3(0.66, -0.13, 0.02),
+      rotation: new THREE.Vector3(-0.045, 0, 0),
     },
     stages: {
       camera: new THREE.Vector3(1.04, 0.24, 3.35),
@@ -160,6 +182,8 @@ if (stage && slots.length) {
   let activeMode = "extension";
   let sceneActive = false;
   let screenStoryStartedAt = performance.now();
+  let agentTypingStartsAfter = Number.POSITIVE_INFINITY;
+  let agentTypingAnnounced = false;
   let lastScreenStoryKey = "";
   let contactShadow = null;
   let contactBaseY = 0;
@@ -254,11 +278,12 @@ if (stage && slots.length) {
     context.fillStyle = "#292d34";
     context.fillRect(642, 139, 958, 2);
 
-    const isSolved = mode === "rating" || (mode === "agent" && elapsed >= 5600);
+    const agentTypingElapsed = mode === "agent" ? elapsed - agentTypingStartsAfter : 0;
+    const isSolved = mode === "rating" || (mode === "agent" && agentTypingElapsed >= 4100);
     const typingProgress = mode === "rating"
       ? 1
       : mode === "agent"
-        ? THREE.MathUtils.clamp((elapsed - 1500) / 3600, 0, 1)
+        ? THREE.MathUtils.clamp(agentTypingElapsed / 3600, 0, 1)
         : 0;
     const fixedCode = [
       ["class Solution {", "#ff7b72", 710],
@@ -352,6 +377,8 @@ if (stage && slots.length) {
   function drawScreen(mode, restartVideo = false) {
     activeMode = Object.hasOwn(shotPoses, mode) ? mode : "extension";
     screenStoryStartedAt = performance.now();
+    agentTypingStartsAfter = Number.POSITIVE_INFINITY;
+    agentTypingAnnounced = false;
     lastScreenStoryKey = "";
     drawExtensionScreen(activeMode, 0);
     commitScreenTexture();
@@ -360,9 +387,13 @@ if (stage && slots.length) {
   function updateScreenStory(now) {
     const elapsed = Math.max(0, now - screenStoryStartedAt);
     const progress = activeMode === "agent"
-      ? THREE.MathUtils.clamp((elapsed - 1500) / 3600, 0, 1)
+      ? THREE.MathUtils.clamp((elapsed - agentTypingStartsAfter) / 3600, 0, 1)
       : activeMode === "rating" ? 1 : 0;
-    const solved = activeMode === "rating" || (activeMode === "agent" && elapsed >= 5600);
+    const solved = activeMode === "rating" || (activeMode === "agent" && elapsed - agentTypingStartsAfter >= 4100);
+    if (activeMode === "agent" && progress > 0 && !agentTypingAnnounced) {
+      agentTypingAnnounced = true;
+      window.dispatchEvent(new CustomEvent("realgo:codetypingstart"));
+    }
     const storyKey = `${activeMode}:${Math.floor(progress * 260)}:${solved}:${Math.floor(elapsed / 420) % 2}`;
     if (storyKey === lastScreenStoryKey) return;
     lastScreenStoryKey = storyKey;
@@ -404,6 +435,17 @@ if (stage && slots.length) {
     copyPose(shotTo, shotPoses[mode] || shotPoses.extension);
     const travel = shotTo.camera.clone().sub(shotFrom.camera);
     const travelDistance = travel.length();
+    // Adjacent close-up modes intentionally share one optical pose. Do not
+    // build a decorative Bezier arc for a zero-distance move: its synthetic
+    // lift/side controls make the supposedly fixed top edge drift by pixels.
+    if (travelDistance < 0.0001) {
+      copyPose(currentPose, shotTo);
+      copyPose(shotFrom, shotTo);
+      shotControlA.copy(shotTo.camera);
+      shotControlB.copy(shotTo.camera);
+      shotStartedAt = performance.now() - CAMERA_MOVE_MS;
+      return;
+    }
     const averageUp = shotFrom.up.clone().add(shotTo.up).normalize();
     const side = travel.clone().cross(averageUp);
     if (side.lengthSq() < 0.0001) side.set(1, 0, 0);
@@ -563,10 +605,18 @@ if (stage && slots.length) {
     const worldHeight = worldWidth * panelHeight / panelWidth;
     const margin = screenPlaneWidth * 0.025;
     const lateralLift = storyPanel ? 0.095 : 0.105;
+    // Keep every product window slightly below and to the right throughout
+    // its full entrance/lift path. Slides 9+ reuse this same CSS3D object, so
+    // one screen-relative offset keeps the whole sequence spatially stable.
+    const spawnOffsetX = screenPlaneWidth * 0.025;
+    const spawnOffsetY = screenPlaneHeight * 0.02;
     const centerX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5
-      + screenPlaneWidth * lateralLift * progress;
+      + spawnOffsetX
+      + screenPlaneWidth * lateralLift * progress
+      - screenPlaneWidth * EXTENSION_SETTLED_SHIFT_LEFT * progress;
     const storyTopY = -screenPlaneHeight * 0.195 + worldWidth * (520 / 400) * 0.5;
-    const centerY = storyPanel ? storyTopY - worldHeight * 0.5 : -screenPlaneHeight * 0.065;
+    const settledCenterY = storyPanel ? storyTopY - worldHeight * 0.5 : -screenPlaneHeight * 0.065;
+    const centerY = settledCenterY - spawnOffsetY;
     planeCenter.copy(screenCenter)
       .addScaledVector(screenRight, centerX)
       .addScaledVector(screenUp, centerY)
@@ -630,8 +680,10 @@ if (stage && slots.length) {
     uiFocusStartedAt = slot.closest(".slide")?.classList.contains("is-product-focus")
       ? performance.now() - 1450
       : Number.POSITIVE_INFINITY;
-    drawScreen(activeSlot.dataset.macbookMode, true);
-    startCameraMove(activeMode, enterFromWide, !isVisible);
+    const requestedMode = activeSlot.dataset.macbookMode;
+    drawScreen(requestedMode, true);
+    const cameraMode = requestedMode === "extension-intro" ? "extensionIntro" : activeMode;
+    startCameraMove(cameraMode, enterFromWide, !isVisible);
     if (model) {
       activeSlot.classList.add("is-ready");
       renderNow();
@@ -650,6 +702,16 @@ if (stage && slots.length) {
   }
 
   window.addEventListener("realgo:slidechange", syncActiveSlot);
+  window.addEventListener("realgo:hintready", () => {
+    if (activeMode !== "agent") return;
+    agentTypingStartsAfter = Math.max(0, performance.now() - screenStoryStartedAt) + 2000;
+    agentTypingAnnounced = false;
+    lastScreenStoryKey = "";
+  });
+  window.addEventListener("realgo:codetypingstart", () => {
+    if (activeMode !== "agent") return;
+    startCameraMove("agentScreen");
+  });
   window.addEventListener("realgo:productfocus", (event) => {
     uiFocusStartedAt = performance.now() - (event.detail?.immediate ? 1450 : 0);
   });
@@ -850,22 +912,41 @@ if (stage && slots.length) {
       pose.fov = config.fov;
     }
 
-    configureScreenShot("extension", {
-      distance: 3.08,
-      cameraX: -1.36,
-      cameraY: 0.3,
-      targetX: 0.28,
+    // The window keeps its original spawn point and only shifts left as it
+    // lifts off the display. Follow that final screen-relative position with
+    // the camera while preserving the established viewing angle.
+    const extensionCameraShiftX = screenPlaneWidth * EXTENSION_SETTLED_SHIFT_LEFT;
+
+    // Slide 8 keeps the established three-quarter angle, but pulls back far
+    // enough to retain the complete display inside the frame.
+    configureScreenShot("extensionIntro", {
+      distance: 6.05,
+      cameraX: -1.72,
+      cameraY: 0.34,
+      targetX: 0,
       targetY: 0,
-      frameYFraction: -0.08,
+      frameYFraction: -0.25,
+      fov: 25,
+    });
+    // On slide 9 the camera crosses to the right of the floating extension
+    // and aims at the extension's screen-relative centre.
+    configureScreenShot("extension", {
+      distance: 3.15,
+      cameraX: 1.38 - extensionCameraShiftX,
+      cameraY: 0.24,
+      targetX: 1.08 - extensionCameraShiftX,
+      targetY: -0.28,
+      frameYFraction: -0.04,
       fov: 24,
     });
-    configureScreenShot("agent", {
-      distance: 2.62,
-      cameraX: -1.26,
-      cameraY: 0.28,
-      targetX: 0.44,
-      targetY: 0,
-      fov: 22.5,
+    configureScreenShot("agentScreen", {
+      distance: 5.1,
+      cameraX: 0,
+      cameraY: -0.72,
+      targetX: 0,
+      targetY: -0.6,
+      frameYFraction: -0.025,
+      fov: 24.5,
     });
     // The card-training shot is taller than the shared 10–12 story frame.
     // Keep the colleague's wider, lower composition for this later mode.
@@ -879,18 +960,17 @@ if (stage && slots.length) {
       fov: 25.4,
     });
     configureScreenShot("rating", {
-      distance: 2.38,
-      cameraX: -0.84,
-      cameraY: 0.15,
-      targetX: 0.58,
-      targetY: -0.08,
-      fov: 21.5,
+      distance: 2.65,
+      cameraX: 1.28 - extensionCameraShiftX,
+      cameraY: 0.2,
+      targetX: 1.08 - extensionCameraShiftX,
+      targetY: -0.22,
+      frameYFraction: -0.06,
+      fov: 22,
     });
-    // The keynote move finishes on slide 10. Slides 11–12 retain the exact
-    // camera/model pose so the detached window behaves as one continuous
-    // object while only its content and intrinsic height change.
+    // Slide 10 starts from the exact final pose of slide 9. The move to the
+    // front-facing display is triggered only when code typing actually starts.
     copyPose(shotPoses.agent, shotPoses.extension);
-    copyPose(shotPoses.rating, shotPoses.extension);
 
     const engravingCenter = new THREE.Box3()
       .setFromObject(keyboardEngraving)

@@ -57,11 +57,11 @@
   --line-dark: rgba(255, 255, 255, 0.16);
   --line-light: rgba(0, 0, 0, 0.14);
   --gold: #e8d094;
-  /* Градиент больших цифр на светлых слайдах. Собран из токенов, которые
-     уже есть в деке: --blue-dark и индиго #5e5ce6 из градиента taxonomyMainFlow.
-     Прежний #00fff0 → #0083fe уходил в неоновый циан, которого больше нигде
-     нет, и на бумажном фоне выбивался из общего тона. */
-  --stat-number-gradient: linear-gradient(96deg, #0071e3 0%, #5e5ce6 100%);
+  /* Headings and animated market figures share one light-surface gradient so
+     the static number and the transition counter remain visually identical. */
+  --light-heading-gradient: linear-gradient(102deg, #111318 0%, #1746a2 48%, #008ee6 100%);
+  --dark-heading-gradient: linear-gradient(102deg, #e2e8f0 0%, #66d4ff 48%, #3488ff 100%);
+  --stat-number-gradient: var(--light-heading-gradient);
   --stage-scale: 1;
 }
 
@@ -687,6 +687,36 @@ h1,
 h2,
 h3 {
   font-family: "Manrope", "Inter", sans-serif;
+}
+
+.slide.theme-light h1,
+.slide.theme-light h2,
+.slide.theme-light h3 {
+  color: transparent;
+  background: var(--light-heading-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.slide.theme-dark h1,
+.slide.theme-dark h2,
+.slide.theme-dark h3 {
+  color: transparent;
+  background: var(--dark-heading-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.slide h1 .accent-blue,
+.slide h2 .accent-blue,
+.slide h3 .accent-blue,
+.slide h1 .accent-green,
+.slide h2 .accent-green,
+.slide h3 .accent-green {
+  background: none;
+  -webkit-text-fill-color: currentColor;
 }
 
 h1 {
@@ -1567,9 +1597,18 @@ h2 {
 }
 
 .journey-route .journey-materials span {
+  --route-source-color: rgba(222, 229, 241, 0.72);
   color: rgba(170, 175, 184, 0.3);
   text-shadow: none;
   filter: grayscale(1) blur(0.25px);
+}
+
+.journey-route .journey-materials span.is-chaos-field {
+  --route-source-color: rgba(201, 211, 228, 0.48);
+}
+
+.journey-route.is-active .journey-materials span {
+  animation: journey-route-secondary-dim 1800ms 250ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .journey-route .journey-materials span.is-route {
@@ -1581,6 +1620,7 @@ h2 {
   text-shadow: 0 0 18px rgba(41, 151, 255, 0.82), 0 0 34px rgba(41, 151, 255, 0.52);
   font-weight: 560;
   filter: none;
+  animation: none;
 }
 
 .journey-route.is-route-complete .journey-materials span.is-route,
@@ -1591,6 +1631,19 @@ h2 {
 .journey-route .journey-person {
   color: white;
   filter: drop-shadow(0 0 14px rgba(41, 151, 255, 0.3));
+}
+
+@keyframes journey-route-secondary-dim {
+  0% {
+    color: var(--route-source-color);
+    filter: grayscale(0) blur(0);
+    text-shadow: none;
+  }
+  100% {
+    color: rgba(170, 175, 184, 0.3);
+    filter: grayscale(1) blur(0.25px);
+    text-shadow: none;
+  }
 }
 
 /* About */
@@ -2429,6 +2482,8 @@ h2 {
 /* Roadmap story v2 — Apple-style typography and fully transparent wheels. */
 
 .slide-roadmap-builder {
+  --roadmap-accent-gradient: var(--dark-heading-gradient);
+  --roadmap-accent-rgb: 52, 136, 255;
   padding: 0;
   background:
     radial-gradient(circle at 19% 66%, rgba(77, 141, 179, 0.11), transparent 24%),
@@ -2522,15 +2577,12 @@ h2 {
   display: block;
   width: max-content;
   padding-right: 30px;
-  font-size: 196px;
+  font-size: 148px;
   font-weight: 720;
   line-height: 0.78;
   letter-spacing: -0.095em;
   color: transparent;
-  background:
-    radial-gradient(circle at 72% 76%, #5d88aa 0, #536c8d 18%, transparent 42%),
-    radial-gradient(circle at 38% 88%, #b4aa6c 0, #8a7c72 26%, transparent 56%),
-    linear-gradient(155deg, #122039 8%, #344155 55%, #765e5b 100%);
+  background: var(--roadmap-accent-gradient);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2574,6 +2626,20 @@ h2 {
   letter-spacing: -0.02em;
 }
 
+.roadmap-metric--deadline > h3 {
+  max-width: 350px;
+  margin: 0;
+  color: transparent;
+  background: var(--roadmap-accent-gradient);
+  background-clip: text;
+  font-size: 58px;
+  font-weight: 720;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .roadmap-word-wheel {
   --wheel-row: 92px;
   position: relative;
@@ -2604,6 +2670,8 @@ h2 {
 
 .roadmap-word-wheel__track > span.is-target {
   position: relative;
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .roadmap-word-wheel__track > span.is-target::after {
@@ -2700,8 +2768,24 @@ h2 {
 }
 
 @keyframes roadmap-target-lock {
-  from { color: #b8b8bd; font-weight: 590; text-shadow: none; transform: scale(1); transform-origin: left center; }
-  to { color: #111114; font-weight: 760; text-shadow: 0 0 24px rgba(0, 113, 227, 0.13); transform: scale(1.1); transform-origin: left center; }
+  from {
+    color: #b8b8bd;
+    background-image: none;
+    font-weight: 590;
+    text-shadow: none;
+    transform: scale(1);
+    transform-origin: left center;
+    -webkit-text-fill-color: currentColor;
+  }
+  to {
+    color: transparent;
+    background-image: var(--roadmap-accent-gradient);
+    font-weight: 760;
+    text-shadow: 0 0 24px rgba(var(--roadmap-accent-rgb), 0.15);
+    transform: scale(1.1);
+    transform-origin: left center;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 @keyframes roadmap-summary-in {
@@ -2769,6 +2853,13 @@ h2 {
   transform: translateY(18px);
 }
 
+.slide-roadmap-builder .roadmap-story__intro h2 {
+  background: var(--roadmap-accent-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .slide-roadmap-builder.is-active .roadmap-story__intro {
   animation: roadmap-intro-background 2600ms linear both;
 }
@@ -2783,8 +2874,8 @@ h2 {
   --wheel-left: 620px;
   --wheel-width: 600px;
   --handoff-x: 464px;
-  --handoff-y: -45px;
-  --handoff-scale: 0.69;
+  --handoff-y: -12.5px;
+  --handoff-scale: 0.706;
   display: block;
   padding: 0;
   opacity: 1;
@@ -2796,8 +2887,8 @@ h2 {
   --wheel-left: 1040px;
   --wheel-width: 610px;
   --handoff-x: 420px;
-  --handoff-y: -55px;
-  --handoff-scale: 0.6;
+  --handoff-y: -33.1px;
+  --handoff-scale: 0.615;
 }
 
 .roadmap-story__step--deadline {
@@ -2806,8 +2897,8 @@ h2 {
   --wheel-left: 1420px;
   --wheel-width: 430px;
   --handoff-x: 380px;
-  --handoff-y: -45px;
-  --handoff-scale: 0.69;
+  --handoff-y: -12.5px;
+  --handoff-scale: 0.706;
 }
 
 .roadmap-story__step .roadmap-metric,
@@ -2847,13 +2938,19 @@ h2 {
 }
 
 .roadmap-choice-result strong {
-  color: #111114;
+  color: transparent;
+  background: var(--roadmap-accent-gradient);
+  background-clip: text;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
   font-size: 62px;
   font-weight: 750;
   line-height: 0.98;
   letter-spacing: -0.055em;
   white-space: nowrap;
   opacity: 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .roadmap-choice-result b {
@@ -2862,8 +2959,8 @@ h2 {
   height: 30px;
   place-items: center;
   border-radius: 50%;
-  background: #0071e3;
-  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.2);
+  background: var(--roadmap-accent-gradient);
+  box-shadow: 0 8px 20px rgba(var(--roadmap-accent-rgb), 0.22);
   color: #fff;
   font-size: 15px;
 }
@@ -2880,106 +2977,106 @@ h2 {
 .slide-roadmap-builder.is-active .roadmap-story__step--platform .roadmap-metric {
   animation:
     roadmap-chain-element-in 560ms 2700ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-chain-element-out 220ms 4770ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    roadmap-chain-element-out 220ms 6980ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--platform .roadmap-word-wheel {
   animation:
-    roadmap-chain-wheel-in 560ms 2700ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-chain-wheel-out 350ms 5000ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    roadmap-chain-wheel-in 560ms 5260ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-wheel-out 350ms 7210ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--platform .roadmap-choice-result {
-  animation: roadmap-handoff-layer 1ms 5000ms both;
+  animation: roadmap-handoff-layer 1ms 7210ms both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--platform .roadmap-choice-result strong {
-  animation: roadmap-choice-handoff 560ms 5000ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  animation: roadmap-choice-handoff 1120ms 7210ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--platform .roadmap-choice-result small,
 .slide-roadmap-builder.is-active .roadmap-story__step--platform .roadmap-choice-result b {
-  animation: roadmap-choice-meta-in 240ms 5420ms ease-out both;
+  animation: roadmap-choice-meta-in 240ms 8190ms ease-out both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--company .roadmap-metric {
   animation:
-    roadmap-chain-element-in 560ms 5600ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-chain-element-out 220ms 8300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    roadmap-chain-element-in 560ms 8410ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-element-out 220ms 13380ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--company .roadmap-word-wheel {
   animation:
-    roadmap-chain-wheel-in 560ms 5600ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-chain-wheel-out 350ms 8530ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    roadmap-chain-wheel-in 560ms 10970ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-wheel-out 350ms 13610ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--company .roadmap-choice-result {
-  animation: roadmap-handoff-layer 1ms 8530ms both;
+  animation: roadmap-handoff-layer 1ms 13610ms both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--company .roadmap-choice-result strong {
-  animation: roadmap-choice-handoff 560ms 8530ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  animation: roadmap-choice-handoff 1120ms 13610ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--company .roadmap-choice-result small,
 .slide-roadmap-builder.is-active .roadmap-story__step--company .roadmap-choice-result b {
-  animation: roadmap-choice-meta-in 240ms 8950ms ease-out both;
+  animation: roadmap-choice-meta-in 240ms 14590ms ease-out both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--deadline .roadmap-metric {
   animation:
-    roadmap-chain-element-in 560ms 9150ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-chain-element-out 220ms 11350ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    roadmap-chain-element-in 560ms 14810ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-element-out 220ms 19280ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--deadline .roadmap-word-wheel {
   animation:
-    roadmap-chain-wheel-in 560ms 9150ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-chain-wheel-out 350ms 11580ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    roadmap-chain-wheel-in 560ms 17370ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-wheel-out 350ms 19510ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--deadline .roadmap-choice-result {
-  animation: roadmap-handoff-layer 1ms 11580ms both;
+  animation: roadmap-handoff-layer 1ms 19510ms both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--deadline .roadmap-choice-result strong {
-  animation: roadmap-choice-handoff 560ms 11580ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  animation: roadmap-choice-handoff 1120ms 19510ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--deadline .roadmap-choice-result small,
 .slide-roadmap-builder.is-active .roadmap-story__step--deadline .roadmap-choice-result b {
-  animation: roadmap-choice-meta-in 240ms 12000ms ease-out both;
+  animation: roadmap-choice-meta-in 240ms 20490ms ease-out both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--platform .roadmap-word-wheel__track {
-  animation: roadmap-wheel-platform 1740ms 3050ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: roadmap-wheel-platform 1740ms 5260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--company .roadmap-word-wheel__track {
-  animation: roadmap-wheel-company 2360ms 5890ms cubic-bezier(0.18, 0.72, 0.22, 1) both;
+  animation: roadmap-wheel-company 2360ms 10970ms cubic-bezier(0.18, 0.72, 0.22, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--deadline .roadmap-word-wheel__track {
-  animation: roadmap-wheel-deadline 1720ms 9440ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: roadmap-wheel-deadline 1720ms 17370ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--platform .is-target {
   animation:
-    roadmap-target-lock 420ms 4460ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-source-release 60ms 5000ms linear forwards;
+    roadmap-target-lock 420ms 6670ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-source-release 60ms 7210ms linear forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--company .is-target {
   animation:
-    roadmap-target-lock 420ms 7970ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-source-release 60ms 8530ms linear forwards;
+    roadmap-target-lock 420ms 13050ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-source-release 60ms 13610ms linear forwards;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--deadline .is-target {
   animation:
-    roadmap-target-lock 420ms 10750ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    roadmap-source-release 60ms 11580ms linear forwards;
+    roadmap-target-lock 420ms 18680ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-source-release 60ms 19510ms linear forwards;
 }
 
 @keyframes roadmap-intro-background {
@@ -3023,7 +3120,11 @@ h2 {
     transform: translate(var(--handoff-x), var(--handoff-y)) scale(var(--handoff-scale));
     transform-origin: left center;
   }
-  8% { opacity: 1; }
+  5%, 10% {
+    opacity: 1;
+    transform: translate(var(--handoff-x), var(--handoff-y)) scale(var(--handoff-scale));
+    transform-origin: left center;
+  }
   72% {
     opacity: 1;
     transform: translate(-8px, 0) scale(1.015);
@@ -3586,19 +3687,19 @@ h2 {
   transition: opacity 820ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* Блок стоит в левом нижнем углу, над строкой подписей
-   (.platforms / .product-demo-rail живут на bottom: 76–78px).
-   Текст не гаснет: читается в полную силу всё время показа слайда. */
+/* Editorial product story: the copy stays separate from the floating UI and
+   uses one luminous rail instead of another glass card competing with it. */
 .slide-macbook .product-overlay {
   position: absolute;
-  bottom: 128px;
+  top: 50%;
+  bottom: auto;
   left: 130px;
   z-index: 5;
-  width: 430px;
+  width: 530px;
   opacity: 0;
   pointer-events: none;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.95), 0 0 46px rgba(0, 0, 0, 0.8);
-  transform: translate3d(-24px, 0, 0);
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.92);
+  transform: translate3d(-24px, -50%, 0);
   transition:
     opacity 760ms cubic-bezier(0.22, 0.61, 0.36, 1),
     transform 920ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -3610,7 +3711,7 @@ h2 {
 }
 
 .slide-macbook.is-camera-settled .product-overlay {
-  transform: translate3d(0, 0, 0);
+  transform: translate3d(0, -50%, 0);
 }
 
 /* Slides 8 and 9 are two beats of one unchanged MacBook composition.
@@ -3628,22 +3729,139 @@ h2 {
 }
 
 .product-heading {
-  width: 430px;
-}
-
-.product-heading h2 {
-  font-size: 56px;
+  width: 530px;
 }
 
 .slide-macbook .product-heading {
-  top: calc(50% - 89px);
-  bottom: auto;
-  width: 520px;
+  width: 530px;
 }
 
 .slide-macbook .product-heading h2 {
-  font-size: 58px;
-  line-height: 1.02;
+  margin: 0;
+  color: #f5f7fb;
+  font-size: 48px;
+  font-weight: 610;
+  line-height: 1.01;
+  letter-spacing: -0.052em;
+}
+
+.product-story {
+  --story-accent: #64d2ff;
+  --story-accent-secondary: #2997ff;
+  --story-accent-rgb: 100, 210, 255;
+  position: relative;
+  max-width: 530px;
+  padding: 24px 0 24px 30px;
+}
+
+.product-story::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, transparent, var(--story-accent) 17%, var(--story-accent-secondary) 78%, transparent);
+  box-shadow: 0 0 24px rgba(var(--story-accent-rgb), 0.34);
+  content: "";
+}
+
+.product-story::after {
+  position: absolute;
+  top: -90px;
+  bottom: -90px;
+  left: -170px;
+  z-index: -1;
+  width: 700px;
+  background: radial-gradient(ellipse at 24% 50%, rgba(var(--story-accent-rgb), 0.105), transparent 66%);
+  content: "";
+  pointer-events: none;
+}
+
+.product-story--ai {
+  --story-accent: #6ee7ff;
+  --story-accent-secondary: #5e5ce6;
+  --story-accent-rgb: 110, 231, 255;
+}
+
+.product-story--memory {
+  --story-accent: #7ee787;
+  --story-accent-secondary: #30d158;
+  --story-accent-rgb: 48, 209, 88;
+}
+
+.product-story h2 strong {
+  color: transparent;
+  background: linear-gradient(100deg, var(--story-accent) 0%, var(--story-accent-secondary) 86%);
+  background-clip: text;
+  font-weight: 650;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.product-story__lead {
+  max-width: 500px;
+  margin: 22px 0 0;
+  color: rgba(226, 232, 241, 0.67);
+  font-size: 18px;
+  font-weight: 430;
+  line-height: 1.46;
+  letter-spacing: -0.018em;
+}
+
+.product-story__levels {
+  display: grid;
+  margin-top: 23px;
+  border-bottom: 1px solid rgba(var(--story-accent-rgb), 0.18);
+}
+
+.product-story__levels > div {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  min-height: 54px;
+  border-top: 1px solid rgba(var(--story-accent-rgb), 0.18);
+}
+
+.product-story__levels > div > b {
+  color: var(--story-accent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.product-story__levels span,
+.product-story__levels strong,
+.product-story__levels small {
+  display: block;
+}
+
+.product-story__levels strong {
+  color: rgba(245, 247, 251, 0.9);
+  font-size: 15px;
+  font-weight: 640;
+  letter-spacing: -0.01em;
+}
+
+.product-story__levels small {
+  margin-top: 3px;
+  color: rgba(218, 226, 238, 0.46);
+  font-size: 11px;
+  letter-spacing: 0.015em;
+}
+
+.slide-macbook .product-heading [data-product-copy] {
+  display: none;
+  margin: 0;
+}
+
+#stage[data-product-mode="extension-intro"] [data-product-copy~="extension-intro"],
+#stage[data-product-mode="extension"] [data-product-copy~="extension"],
+#stage[data-product-mode="agent"] [data-product-copy~="agent"],
+#stage[data-product-mode="rating"] [data-product-copy~="rating"] {
+  display: block;
 }
 
 .slide-macbook .product-heading > p,
@@ -3758,14 +3976,40 @@ h2 {
 .product-ui-card.is-height-transitioning {
   overflow: hidden;
   transition:
-    height 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 1300ms cubic-bezier(0.65, 0, 0.35, 1),
     opacity 520ms ease,
     filter 1100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.product-ui-card.is-height-transitioning .product-ui-root {
+  height: 100%;
+  animation: product-ui-state-in 420ms 90ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* PopupApp normally owns a fixed 372px panel. During the 10↔11 handoff the
+   outer card is deliberately taller/shorter than that intrinsic size. Make
+   the visible frame itself follow the interpolated shell so the motion moves
+   its border, background and shadow instead of clipping transparent space. */
+.product-ui-card.is-height-transitioning .product-ui-root > .realgo-popup {
+  height: 100% !important;
+}
+
+/* The production popup is 372px tall. The keynote rating beat needs a little
+   more breathing room above “Как далась задача?”, while remaining clearly
+   shorter than the 520px assistant panel. */
+.product-ui-card[data-product-ui-mode="rating"]:not(.is-height-transitioning) .realgo-popup {
+  height: 420px !important;
+}
+
+@keyframes product-ui-state-in {
+  from { opacity: 0.18; transform: translateY(8px) translateZ(0); }
+  to { opacity: 1; transform: translateY(0) translateZ(0); }
+}
+
 .product-ui-stage--extension .product-ui-card,
 .product-ui-stage--agent .product-ui-card,
-.product-ui-stage--stages .product-ui-card {
+.product-ui-stage--stages .product-ui-card,
+.product-ui-stage--rating .product-ui-card {
   --product-final-scale: 1.4;
   top: 220px;
   right: 374px;
@@ -3796,7 +4040,8 @@ h2 {
 
 .is-product-focus .product-ui-stage--extension .product-ui-card,
 .is-product-focus .product-ui-stage--agent .product-ui-card,
-.is-product-focus .product-ui-stage--stages .product-ui-card {
+.is-product-focus .product-ui-stage--stages .product-ui-card,
+.is-product-focus .product-ui-stage--rating .product-ui-card {
   top: 140px;
   right: 158px;
 }
@@ -4959,6 +5204,133 @@ h2 {
   color: white;
 }
 
+/* Final split-screen typography poster */
+
+.slide-gradient-poster {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0;
+  background: linear-gradient(90deg, #f5f5f7 0 50%, #000 50% 100%);
+}
+
+.slide-gradient-poster::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 3;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(128, 128, 128, 0.42) 18%, rgba(128, 128, 128, 0.42) 82%, transparent);
+  content: "";
+}
+
+.gradient-poster-half {
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  min-width: 0;
+  height: 1080px;
+  overflow: hidden;
+}
+
+.gradient-poster-half--light {
+  --row-enter-x: 34px;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(0, 113, 227, 0.055), transparent 32%),
+    #f5f5f7;
+}
+
+.gradient-poster-half--dark {
+  --row-enter-x: -34px;
+  background:
+    radial-gradient(circle at 92% 88%, rgba(94, 92, 230, 0.16), transparent 34%),
+    #000;
+}
+
+.gradient-poster-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 34px;
+  background: var(--poster-gradient);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 82px;
+  background-clip: text;
+  color: transparent;
+  font-family: "Manrope", "Inter", sans-serif;
+  font-size: 70px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.064em;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-poster-half--light .gradient-poster-row--1 {
+  --poster-gradient: var(--light-heading-gradient);
+}
+
+.gradient-poster-half--dark .gradient-poster-row--1 {
+  --poster-gradient: var(--dark-heading-gradient);
+}
+
+.gradient-poster-half--light .gradient-poster-row--2 {
+  --poster-gradient: linear-gradient(102deg, #72133f 0%, #d92f68 48%, #f46f1b 100%);
+}
+
+.gradient-poster-half--dark .gradient-poster-row--2 {
+  --poster-gradient: linear-gradient(102deg, #ffd08a 0%, #ff6657 48%, #ff3b8d 100%);
+}
+
+.gradient-poster-half--light .gradient-poster-row--3 {
+  --poster-gradient: linear-gradient(102deg, #005b4f 0%, #009f87 48%, #0077d9 100%);
+}
+
+.gradient-poster-half--dark .gradient-poster-row--3 {
+  --poster-gradient: linear-gradient(102deg, #9af5d0 0%, #29dfc1 48%, #39a0ff 100%);
+}
+
+.gradient-poster-half--light .gradient-poster-row--4 {
+  --poster-gradient: linear-gradient(102deg, #162a72 0%, #6345d9 48%, #c438a9 100%);
+}
+
+.gradient-poster-half--dark .gradient-poster-row--4 {
+  --poster-gradient: linear-gradient(102deg, #52a8ff 0%, #7b61ff 48%, #ef5da8 100%);
+}
+
+.gradient-poster-half--light .gradient-poster-row--5 {
+  --poster-gradient: linear-gradient(102deg, #8d2400 0%, #e84b20 48%, #d89a00 100%);
+}
+
+.gradient-poster-half--dark .gradient-poster-row--5 {
+  --poster-gradient: linear-gradient(102deg, #fff3a3 0%, #ffc83d 48%, #ff6b35 100%);
+}
+
+.slide-gradient-poster.is-active .gradient-poster-row {
+  animation: gradient-poster-row-in 780ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.slide-gradient-poster.is-active .gradient-poster-row--1 { animation-delay: 80ms; }
+.slide-gradient-poster.is-active .gradient-poster-row--2 { animation-delay: 150ms; }
+.slide-gradient-poster.is-active .gradient-poster-row--3 { animation-delay: 220ms; }
+.slide-gradient-poster.is-active .gradient-poster-row--4 { animation-delay: 290ms; }
+.slide-gradient-poster.is-active .gradient-poster-row--5 { animation-delay: 360ms; }
+
+@keyframes gradient-poster-row-in {
+  from { opacity: 0; filter: blur(8px); transform: translate3d(var(--row-enter-x), 0, 0); }
+  to { opacity: 1; filter: blur(0); transform: translate3d(0, 0, 0); }
+}
+
+.stage:has(.slide-gradient-poster.is-active) .deck-chrome,
+.stage:has(.slide-gradient-poster.is-active) .deck-controls,
+.stage:has(.slide-gradient-poster.is-active) .slide-dots {
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .slide-roadmap-builder .roadmap-picker,
   .slide-roadmap-builder .roadmap-picker > header b,
@@ -4991,6 +5363,10 @@ h2 {
     filter: none;
     opacity: 1;
     transform: scale(1);
+    animation: none !important;
+  }
+
+  .journey-route .journey-materials span:not(.is-route) {
     animation: none !important;
   }
 
