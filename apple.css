@@ -1012,6 +1012,13 @@ h2 {
   font-size: 66px;
 }
 
+/* Slides 2–4 reserve the color gradient for the headline metric only. */
+.slide.theme-light .stat-keynote h2 {
+  color: #111318;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
 .stat-copy > p {
   margin: 0;
   color: var(--gray);
@@ -1038,6 +1045,12 @@ h2 {
   border-bottom: 1px solid rgba(0, 113, 227, 0.28);
   color: rgba(0, 113, 227, 0.62);
   text-decoration: none;
+}
+
+.slide.theme-light .stat-keynote ~ .source-line a {
+  padding-bottom: 0;
+  border-bottom: 0;
+  color: var(--gray);
 }
 
 /* Transition */
