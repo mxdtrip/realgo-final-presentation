@@ -2717,6 +2717,27 @@ h2 {
   font-size: 34px;
 }
 
+.roadmap-word-wheel--strategy .roadmap-word-wheel__track > span {
+  gap: 10px;
+  padding-right: 0;
+  font-size: 30px;
+}
+
+.roadmap-word-wheel--strategy .roadmap-word-wheel__track > span em {
+  padding: 5px 7px 4px;
+  border: 1px solid rgba(66, 134, 244, 0.34);
+  border-radius: 999px;
+  background: rgba(66, 134, 244, 0.08);
+  color: #4286f4;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  -webkit-text-fill-color: #4286f4;
+}
+
 .slide-roadmap-builder.is-active .roadmap-story__step--platform {
   animation:
     roadmap-scene-in 560ms 300ms cubic-bezier(0.16, 1, 0.3, 1) both,
@@ -2899,11 +2920,11 @@ h2 {
 }
 
 .roadmap-story__step {
-  --copy-left: 156px;
-  --copy-width: 390px;
-  --wheel-left: 620px;
+  --copy-left: 130px;
+  --copy-width: 330px;
+  --wheel-left: 530px;
   --wheel-width: 600px;
-  --handoff-x: 464px;
+  --handoff-x: 400px;
   --handoff-y: -12.5px;
   --handoff-scale: 0.706;
   display: block;
@@ -2912,23 +2933,33 @@ h2 {
 }
 
 .roadmap-story__step--company {
-  --copy-left: 620px;
-  --copy-width: 350px;
-  --wheel-left: 1040px;
+  --copy-left: 530px;
+  --copy-width: 320px;
+  --wheel-left: 930px;
   --wheel-width: 610px;
-  --handoff-x: 420px;
+  --handoff-x: 400px;
   --handoff-y: -33.1px;
   --handoff-scale: 0.615;
 }
 
 .roadmap-story__step--deadline {
-  --copy-left: 1040px;
-  --copy-width: 350px;
-  --wheel-left: 1420px;
-  --wheel-width: 430px;
-  --handoff-x: 380px;
+  --copy-left: 930px;
+  --copy-width: 330px;
+  --wheel-left: 1330px;
+  --wheel-width: 500px;
+  --handoff-x: 400px;
   --handoff-y: -12.5px;
   --handoff-scale: 0.706;
+}
+
+.roadmap-story__step--strategy {
+  --copy-left: 1330px;
+  --copy-width: 300px;
+  --wheel-left: 1600px;
+  --wheel-width: 290px;
+  --handoff-x: 270px;
+  --handoff-y: -12.5px;
+  --handoff-scale: 0.66;
 }
 
 .roadmap-story__step .roadmap-metric,
@@ -3079,6 +3110,31 @@ h2 {
   animation: roadmap-choice-meta-in 240ms 20490ms ease-out both;
 }
 
+.slide-roadmap-builder.is-active .roadmap-story__step--strategy .roadmap-metric {
+  animation:
+    roadmap-chain-element-in 560ms 20710ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-element-out 220ms 25180ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.slide-roadmap-builder.is-active .roadmap-story__step--strategy .roadmap-word-wheel {
+  animation:
+    roadmap-chain-wheel-in 560ms 23270ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-chain-wheel-out 350ms 25410ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.slide-roadmap-builder.is-active .roadmap-story__step--strategy .roadmap-choice-result {
+  animation: roadmap-handoff-layer 1ms 25410ms both;
+}
+
+.slide-roadmap-builder.is-active .roadmap-story__step--strategy .roadmap-choice-result strong {
+  animation: roadmap-choice-handoff 1120ms 25410ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.slide-roadmap-builder.is-active .roadmap-story__step--strategy .roadmap-choice-result small,
+.slide-roadmap-builder.is-active .roadmap-story__step--strategy .roadmap-choice-result b {
+  animation: roadmap-choice-meta-in 240ms 26390ms ease-out both;
+}
+
 .slide-roadmap-builder.is-active .roadmap-word-wheel--platform .roadmap-word-wheel__track {
   animation: roadmap-wheel-platform 1740ms 5260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
@@ -3089,6 +3145,10 @@ h2 {
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--deadline .roadmap-word-wheel__track {
   animation: roadmap-wheel-deadline 1720ms 17370ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.slide-roadmap-builder.is-active .roadmap-word-wheel--strategy .roadmap-word-wheel__track {
+  animation: roadmap-wheel-strategy 1740ms 23270ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 .slide-roadmap-builder.is-active .roadmap-word-wheel--platform .is-target {
@@ -3107,6 +3167,40 @@ h2 {
   animation:
     roadmap-target-lock 420ms 18680ms cubic-bezier(0.16, 1, 0.3, 1) both,
     roadmap-source-release 60ms 19510ms linear forwards;
+}
+
+.slide-roadmap-builder.is-active .roadmap-word-wheel--strategy .is-target {
+  animation:
+    roadmap-target-lock-strategy 420ms 24580ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    roadmap-source-release 60ms 25410ms linear forwards;
+}
+
+@keyframes roadmap-wheel-strategy {
+  0% { transform: translateY(340px); filter: blur(2.4px); }
+  72% { transform: translateY(42px); filter: blur(0.7px); }
+  86% { transform: translateY(68px); filter: blur(0); }
+  100% { transform: translateY(58px); filter: blur(0); }
+}
+
+@keyframes roadmap-target-lock-strategy {
+  from {
+    color: #b8b8bd;
+    background-image: none;
+    font-weight: 590;
+    text-shadow: none;
+    transform: scale(1);
+    transform-origin: left center;
+    -webkit-text-fill-color: currentColor;
+  }
+  to {
+    color: transparent;
+    background-image: var(--roadmap-accent-gradient);
+    font-weight: 760;
+    text-shadow: 0 0 24px rgba(var(--roadmap-accent-rgb), 0.15);
+    transform: scale(1.04);
+    transform-origin: left center;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 @keyframes roadmap-intro-background {
@@ -3185,7 +3279,8 @@ h2 {
 
   .slide-roadmap-builder.is-active .roadmap-story__step--platform,
   .slide-roadmap-builder.is-active .roadmap-story__step--company,
-  .slide-roadmap-builder.is-active .roadmap-story__step--deadline {
+  .slide-roadmap-builder.is-active .roadmap-story__step--deadline,
+  .slide-roadmap-builder.is-active .roadmap-story__step--strategy {
     display: block;
     opacity: 1;
   }
