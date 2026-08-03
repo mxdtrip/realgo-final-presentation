@@ -30,7 +30,7 @@ if (stage && slots.length) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.54;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.setClearColor(0x000000, 0);
   renderer.domElement.className = "macbook-3d-canvas";
   renderer.domElement.setAttribute("aria-hidden", "true");

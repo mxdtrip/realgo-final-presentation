@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=131" />
+    <link rel="stylesheet" href="apple.css?v=146" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -45,6 +45,19 @@
           <feBlend in="glass-red-shift" in2="glass-green" mode="screen" result="glass-rg" />
           <feBlend in="glass-rg" in2="glass-blue-shift" mode="screen" />
         </filter>
+        <symbol id="stackIconBrowser" viewBox="0 0 32 32"><rect x="4" y="5" width="24" height="22" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 11h24M9 8h.1M13 8h.1M17 8h.1M9 16h7v6H9zM19 16h5M19 20h5M19 24h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconGlobe" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 16h24M16 4c4 4 6 8 6 12s-2 8-6 12c-4-4-6-8-6-12s2-8 6-12Z" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+        <symbol id="stackIconCode" viewBox="0 0 32 32"><path d="m12 9-7 7 7 7M20 9l7 7-7 7M18 6l-4 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="stackIconDatabase" viewBox="0 0 32 32"><ellipse cx="16" cy="7" rx="10" ry="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 7v9c0 2.2 4.5 4 10 4s10-1.8 10-4V7M6 16v9c0 2.2 4.5 4 10 4s10-1.8 10-4v-9" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="stackIconNext" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M9.5 22V10l13 12V10M18.5 10 25 22" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="stackIconPuzzle" viewBox="0 0 32 32"><path d="M4 5h8a4 4 0 1 1 8 0h8v8h-3a4 4 0 1 0 0 8h3v7h-8v-3a4 4 0 1 0-8 0v3H4v-8h3a4 4 0 1 0 0-8H4V5Z" fill="currentColor"/></symbol>
+        <symbol id="stackIconCaddy" viewBox="0 0 32 32"><path d="M23.8 9.1A10 10 0 1 0 24 22.7" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="m20.5 19.5 4 3.2 3.5-4.1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="stackIconCalendar" viewBox="0 0 32 32"><rect x="5" y="7" width="22" height="20" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 4v6M22 4v6M5 13h22M10 18h4v4h-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconSpark" viewBox="0 0 32 32"><path d="M16 2c1.5 8.5 5.5 12.5 14 14-8.5 1.5-12.5 5.5-14 14C14.5 21.5 10.5 17.5 2 16 10.5 14.5 14.5 10.5 16 2Z" fill="currentColor"/><path d="M26 3c.5 2.8 1.8 4.1 4.6 4.6-2.8.5-4.1 1.8-4.6 4.6-.5-2.8-1.8-4.1-4.6-4.6C24.2 7.1 25.5 5.8 26 3Z" fill="currentColor" opacity=".72"/></symbol>
+        <symbol id="stackIconPostgres" viewBox="0 0 32 32"><path d="M8 7.5c2.7-3.2 12.8-3.6 16.4-.5 3 2.6 1.5 10.2-.2 14.2-.7 1.7-2.7 1.5-3.1-.3l-.8-3.5c-1.4 1-2.8 1.2-4.3.7l-.3 7.4c-.1 2.5-3.6 2.9-4.3.5l-1.7-6.1C6.2 17.2 5.2 10.8 8 7.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M11 8c1 2.7 1 6.4-1.3 11.9M21 8c-1 2.4-.9 6.4-.7 9.4M14 11.5c1.5-1.3 3.5-1.3 5 0M18 15.5c2.3 1.3 4.6.7 6.4-.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconRedis" viewBox="0 0 32 32"><path d="m16 4 13 6-13 6L3 10l13-6Z" fill="currentColor"/><path d="m3 15 13 6 13-6v5l-13 6L3 20v-5Z" fill="currentColor" opacity=".8"/><path d="m3 22 13 6 13-6v4l-13 6-13-6v-4Z" fill="currentColor" opacity=".58"/></symbol>
+        <symbol id="stackIconChat" viewBox="0 0 32 32"><path d="M6 6h20v15H15l-6 5v-5H6V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11 13h2M16 13h2M21 13h2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconCard" viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 12h24M9 17h8M9 21h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       </defs>
     </svg>
     <main id="stage" class="stage" data-theme="dark" aria-label="Презентация ReAlgo">
@@ -373,84 +386,89 @@
             </header>
 
             <div class="architecture-map" aria-label="Схема архитектуры ReAlgo">
-              <svg class="architecture-links" viewBox="0 0 1660 620" preserveAspectRatio="none" aria-hidden="true">
+              <svg class="architecture-links" viewBox="0 0 1660 570" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
                   <marker id="architectureArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                     <path d="M 0 0 L 10 5 L 0 10 z" />
                   </marker>
                 </defs>
-                <path class="arch-link arch-link--client" d="M340 100 C378 100 370 265 404 265" />
-                <path class="arch-link arch-link--client" d="M340 330 C375 330 375 285 404 285" />
-                <path class="arch-link arch-link--main" d="M554 275 H620" />
-                <path class="arch-link arch-link--data" d="M1100 137 H1170" />
-                <path class="arch-link arch-link--data" d="M1100 260 H1170" />
-                <path class="arch-link arch-link--ai" d="M1100 447 H1170" />
+                <path class="arch-link arch-link--client" d="M340 140 H404" />
+                <path class="arch-link arch-link--client" d="M340 350 H404" />
+                <path class="arch-link arch-link--main" d="M554 265 H620" />
+                <path class="arch-link arch-link--data" d="M1100 118 H1170" />
+                <path class="arch-link arch-link--data" d="M1100 202 H1170" />
+                <path class="arch-link arch-link--ai" d="M1100 360 H1170" />
+              </svg>
+              <svg class="architecture-return-links" viewBox="0 0 1660 570" preserveAspectRatio="none" aria-hidden="true">
+                <path class="arch-link arch-link--return" d="M636 425 H620 C580 425 600 536 540 536 H385 C350 536 365 397 340 397" />
               </svg>
 
               <section class="architecture-zone architecture-zone--clients" aria-label="Клиентские приложения">
-                <header><span>01</span><strong>Browser</strong><small>TypeScript</small></header>
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconBrowser" /></svg></span><strong>Browser / Client</strong><small>TypeScript</small></header>
                 <article class="architecture-node architecture-node--web">
-                  <span class="architecture-node__icon">W</span>
-                  <div><small>Личный кабинет · PWA</small><h3>Next.js 16 · React 19</h3><p>Roadmap, Pattern Atlas, повторения и аналитика.</p></div>
+                  <span class="architecture-node__icon architecture-node__icon--next"><img src="assets/nextjs-logo.svg" alt="" aria-hidden="true" /></span>
+                  <div><small>Личный кабинет · PWA</small><h3>Next.js<span class="architecture-version">16</span><br />React<span class="architecture-version">19</span></h3><p>Roadmap, Pattern Atlas, повторения и аналитика.</p></div>
                 </article>
                 <article class="architecture-node architecture-node--extension">
-                  <span class="architecture-node__icon">Ext</span>
+                  <span class="architecture-node__icon architecture-node__icon--plasmo"><img src="assets/plasmo-logo.svg?v=2" alt="" aria-hidden="true" /></span>
                   <div><small>Прямо на странице задачи</small><h3>Plasmo · Manifest V3</h3><p>Считывает условие и код, ловит submit.</p></div>
                   <footer><span>LeetCode</span><span>HackerRank</span><span>GFG</span><span>Codeforces</span></footer>
                 </article>
               </section>
 
               <section class="architecture-gateway" aria-label="Входной шлюз">
-                <small>Edge</small><strong>Caddy</strong><span>HTTPS</span><span>/api/*</span>
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconGlobe" /></svg></span><strong>Edge</strong></header>
+                <b><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCaddy" /></svg></b><strong>Caddy</strong><span>HTTPS</span>
               </section>
 
               <section class="architecture-zone architecture-zone--core" aria-label="Backend ReAlgo">
-                <header><span>02</span><strong>Go API</strong><small>Go 1.25 · chi</small></header>
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCode" /></svg></span><strong>Go API</strong><small>Go 1.25 · chi</small></header>
                 <div class="architecture-core-main">
                   <div class="architecture-domain-grid">
                     <span>Auth</span><span>Problems</span><span>Cards</span>
                     <span>Pattern Atlas</span><span>Roadmap</span><span>Practice</span>
                   </div>
-                  <article class="architecture-service">
+                  <article class="architecture-service architecture-service--scheduler">
+                    <svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCalendar" /></svg>
                     <small>Интервальные повторения</small><strong>FSRS Scheduler</strong><p>Оценка → новый интервал → очередь практики</p>
                   </article>
                   <article class="architecture-service architecture-service--ai">
+                    <svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconSpark" /></svg>
                     <small>Встроенный модуль оркестрации</small><strong>AI Orchestrator</strong><p>Контекст, prompt versioning, streaming, validation</p>
                   </article>
+                  <div class="architecture-orchestrator-results" aria-label="Результаты AI Orchestrator">
+                    <span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconChat" /></svg><strong>3 уровня подсказок<br />кулдаун 30 секунд</strong></span>
+                    <span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCard" /></svg><strong>3 AI-карточки<br />→ PostgreSQL</strong></span>
+                  </div>
                 </div>
                 <footer><span>pgx</span><span>sqlc</span><span>REST + SSE</span><span>typed contracts</span></footer>
               </section>
 
               <section class="architecture-zone architecture-zone--services" aria-label="Хранилища и AI-провайдер">
-                <header><span>03</span><strong>State + AI</strong><small>Docker network</small></header>
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconDatabase" /></svg></span><strong>Data</strong></header>
                 <div class="architecture-stores">
                   <article class="architecture-store architecture-store--postgres">
-                    <span>DB</span><div><small>Источник истины</small><h3>PostgreSQL 16</h3><p>Пользователи, задачи, roadmap, карточки</p></div>
+                    <span class="architecture-store__icon architecture-store__icon--postgres"><img src="assets/postgresql-logo.svg" alt="" aria-hidden="true" /></span><div><small>Источник истины</small><h3>PostgreSQL<span class="architecture-version">16</span></h3><p>Пользователи, задачи, roadmap, карточки</p></div>
                   </article>
                   <article class="architecture-store architecture-store--redis">
-                    <span>R</span><div><small>Быстрый контур</small><h3>Redis 7</h3><p>Кэш, locks, rate limits, дедупликация</p></div>
+                    <span class="architecture-store__icon architecture-store__icon--redis"><img src="assets/redis-logo.svg" alt="" aria-hidden="true" /></span><div><small>Быстрый контур</small><h3>Redis 7</h3><p>Кэш, locks, rate limits, дедупликация</p></div>
                   </article>
                 </div>
 
                 <article class="architecture-ai-module">
                   <header>
-                    <span class="architecture-ai-orb">AI</span>
-                    <div><small>OpenAI-compatible provider adapter</small><h3>Gemini 2.5 Flash</h3></div>
+                    <span class="architecture-ai-orb"><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconSpark" /></svg></span>
+                    <div><small>Внешний AI Provider</small><h3>Gemini<span class="architecture-version">2.5 Flash</span></h3></div>
                   </header>
-                  <div class="architecture-ai-pipeline">
-                    <span>условие + код + паттерны</span><b>→</b><span>prompt v1</span><b>→</b><span>strict JSON</span>
-                  </div>
-                  <footer>
-                    <div><strong>SSE-подсказки</strong><small>3 уровня · кулдаун 30 сек.</small></div>
-                    <div><strong>AI-карточки</strong><small>3 карточки → Postgres</small></div>
-                  </footer>
+                  <p>Получает контекст задачи и кода.<br />Возвращает структурированный JSON.</p>
                 </article>
               </section>
 
-              <span class="architecture-label architecture-label--rest">REST / JSON</span>
+              <span class="architecture-label architecture-label--rest">REST</span>
               <span class="architecture-label architecture-label--sql">SQL</span>
-              <span class="architecture-label architecture-label--cache">cache / locks</span>
-              <span class="architecture-label architecture-label--provider">provider call</span>
+              <span class="architecture-label architecture-label--cache">cache</span>
+              <span class="architecture-label architecture-label--provider">AI API</span>
+              <span class="architecture-label architecture-label--sse">SSE → Extension</span>
 
               <footer class="architecture-infra">
                 <strong>Delivery</strong><span>Docker Compose</span><span>Caddy</span><span>golang-migrate</span><span>GitHub Actions</span>
@@ -645,7 +663,7 @@
       <div id="help" class="help-panel" aria-hidden="true"><strong>Управление</strong><span><kbd>←</kbd><kbd>→</kbd> слайды</span><span><kbd>Space</kbd> дальше</span><span><kbd>N</kbd> заметки</span><span><kbd>F</kbd> полный экран</span><span><kbd>?</kbd> закрыть</span></div>
     </main>
     <script type="module" src="assets/product-ui.js?v=54"></script>
-    <script type="module" src="macbook-3d.js?v=67"></script>
+    <script type="module" src="macbook-3d.js?v=68"></script>
     <script src="deck.js?v=62"></script>
   </body>
 </html>
