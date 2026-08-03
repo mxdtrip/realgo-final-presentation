@@ -3289,8 +3289,94 @@ h2 {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  min-height: 79px;
   padding: 0 2px 24px;
   border-bottom: 1px solid rgba(31, 42, 58, 0.1);
+}
+
+.roadmap-final-plan__build {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  align-content: center;
+  padding: 58px 62px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.roadmap-final-plan__build > small {
+  margin-bottom: 36px;
+  color: #77777d;
+  font-size: 12px;
+  font-weight: 720;
+  letter-spacing: 0.11em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.roadmap-final-plan__build ol {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roadmap-final-plan__build ol::before {
+  position: absolute;
+  top: 28px;
+  right: 9%;
+  left: 9%;
+  height: 2px;
+  background: rgba(66, 134, 244, 0.12);
+  content: "";
+}
+
+.roadmap-final-plan__build li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 19px;
+  opacity: 0;
+  text-align: center;
+  transform: translateY(14px);
+}
+
+.roadmap-final-plan__build li > b {
+  z-index: 1;
+  display: grid;
+  width: 56px;
+  height: 56px;
+  border: 1px solid rgba(66, 134, 244, 0.24);
+  border-radius: 18px;
+  background: #fff;
+  color: #4286f4;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  place-items: center;
+  box-shadow: 0 12px 28px rgba(44, 61, 84, 0.08);
+}
+
+.roadmap-final-plan__build li > span,
+.roadmap-final-plan__build li small {
+  display: block;
+}
+
+.roadmap-final-plan__build li > span {
+  color: #292b31;
+  font-size: 16px;
+  font-weight: 720;
+}
+
+.roadmap-final-plan__build li small {
+  margin-top: 8px;
+  color: #77777d;
+  font-size: 10px;
+  font-weight: 520;
+  line-height: 1.35;
 }
 
 .roadmap-final-plan > header > div:first-child > small {
@@ -3646,6 +3732,10 @@ h2 {
 .slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-story__step .roadmap-choice-result small,
 .slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-story__step .roadmap-choice-result b,
 .slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan,
+.slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan__build,
+.slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan__build li,
+.slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan > header,
+.slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan__track,
 .slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan__track i,
 .slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan__stages article,
 .slide-roadmap-builder.is-active[data-roadmap-stage] .roadmap-final-plan__summary {
@@ -3779,21 +3869,59 @@ h2 {
   animation: roadmap-final-plan-in 720ms 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build {
+  animation: roadmap-final-build-shell 3300ms 760ms ease both;
+}
+
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build li {
+  animation: roadmap-final-build-step 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build li:nth-child(1) { animation-delay: 1000ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build li:nth-child(2) { animation-delay: 1340ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build li:nth-child(3) { animation-delay: 1680ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build li:nth-child(4) { animation-delay: 2020ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__build li:nth-child(5) { animation-delay: 2360ms; }
+
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan > header {
+  animation: roadmap-final-stage-in 520ms 3900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__track i {
-  animation: roadmap-final-track-in 1100ms 1050ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: roadmap-final-track-in 1100ms 4200ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__track {
+  animation: roadmap-final-track-shell-in 180ms 4150ms ease-out both;
 }
 
 .slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article {
   animation: roadmap-final-stage-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(1) { animation-delay: 1200ms; }
-.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(2) { animation-delay: 1440ms; }
-.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(3) { animation-delay: 1680ms; }
-.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(4) { animation-delay: 1920ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(1) { animation-delay: 4380ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(2) { animation-delay: 4620ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(3) { animation-delay: 4860ms; }
+.slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__stages article:nth-child(4) { animation-delay: 5100ms; }
 
 .slide-roadmap-builder.is-active[data-roadmap-stage="5"] .roadmap-final-plan__summary {
-  animation: roadmap-final-stage-in 520ms 2240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: roadmap-final-stage-in 520ms 5420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes roadmap-final-build-shell {
+  0% { opacity: 0; transform: translateY(12px); }
+  10%, 78% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+
+@keyframes roadmap-final-build-step {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes roadmap-final-track-shell-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes roadmap-click-intro-out {
