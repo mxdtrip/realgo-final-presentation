@@ -2718,24 +2718,8 @@ h2 {
 }
 
 .roadmap-word-wheel--strategy .roadmap-word-wheel__track > span {
-  gap: 10px;
   padding-right: 0;
   font-size: 30px;
-}
-
-.roadmap-word-wheel--strategy .roadmap-word-wheel__track > span em {
-  padding: 5px 7px 4px;
-  border: 1px solid rgba(66, 134, 244, 0.34);
-  border-radius: 999px;
-  background: rgba(66, 134, 244, 0.08);
-  color: #4286f4;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 8px;
-  font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.035em;
-  text-transform: uppercase;
-  -webkit-text-fill-color: #4286f4;
 }
 
 .slide-roadmap-builder.is-active .roadmap-story__step--platform {
