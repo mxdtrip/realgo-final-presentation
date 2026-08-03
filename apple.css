@@ -5837,6 +5837,14 @@ h2 {
   height: 420px !important;
 }
 
+/* Keep the extension's own rating prompt styling: the deck-wide dark heading
+   gradient must not leak into “Как далась задача?”. */
+.slide.theme-dark .product-ui-card[data-product-ui-mode="rating"] .realgo-section__title {
+  color: var(--text);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
 @keyframes product-ui-state-in {
   from { opacity: 0.18; transform: translateY(8px) translateZ(0); }
   to { opacity: 1; transform: translateY(0) translateZ(0); }
