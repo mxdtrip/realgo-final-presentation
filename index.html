@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark light" />
     <title>ReAlgo — финал хакатона</title>
     <link rel="icon" href="assets/realgo-logo.png" />
-    <link rel="stylesheet" href="apple.css?v=56" />
+    <link rel="stylesheet" href="apple.css?v=146" />
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}
     </script>
@@ -45,6 +45,19 @@
           <feBlend in="glass-red-shift" in2="glass-green" mode="screen" result="glass-rg" />
           <feBlend in="glass-rg" in2="glass-blue-shift" mode="screen" />
         </filter>
+        <symbol id="stackIconBrowser" viewBox="0 0 32 32"><rect x="4" y="5" width="24" height="22" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 11h24M9 8h.1M13 8h.1M17 8h.1M9 16h7v6H9zM19 16h5M19 20h5M19 24h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconGlobe" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 16h24M16 4c4 4 6 8 6 12s-2 8-6 12c-4-4-6-8-6-12s2-8 6-12Z" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+        <symbol id="stackIconCode" viewBox="0 0 32 32"><path d="m12 9-7 7 7 7M20 9l7 7-7 7M18 6l-4 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="stackIconDatabase" viewBox="0 0 32 32"><ellipse cx="16" cy="7" rx="10" ry="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 7v9c0 2.2 4.5 4 10 4s10-1.8 10-4V7M6 16v9c0 2.2 4.5 4 10 4s10-1.8 10-4v-9" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="stackIconNext" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M9.5 22V10l13 12V10M18.5 10 25 22" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="stackIconPuzzle" viewBox="0 0 32 32"><path d="M4 5h8a4 4 0 1 1 8 0h8v8h-3a4 4 0 1 0 0 8h3v7h-8v-3a4 4 0 1 0-8 0v3H4v-8h3a4 4 0 1 0 0-8H4V5Z" fill="currentColor"/></symbol>
+        <symbol id="stackIconCaddy" viewBox="0 0 32 32"><path d="M23.8 9.1A10 10 0 1 0 24 22.7" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="m20.5 19.5 4 3.2 3.5-4.1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="stackIconCalendar" viewBox="0 0 32 32"><rect x="5" y="7" width="22" height="20" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 4v6M22 4v6M5 13h22M10 18h4v4h-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconSpark" viewBox="0 0 32 32"><path d="M16 2c1.5 8.5 5.5 12.5 14 14-8.5 1.5-12.5 5.5-14 14C14.5 21.5 10.5 17.5 2 16 10.5 14.5 14.5 10.5 16 2Z" fill="currentColor"/><path d="M26 3c.5 2.8 1.8 4.1 4.6 4.6-2.8.5-4.1 1.8-4.6 4.6-.5-2.8-1.8-4.1-4.6-4.6C24.2 7.1 25.5 5.8 26 3Z" fill="currentColor" opacity=".72"/></symbol>
+        <symbol id="stackIconPostgres" viewBox="0 0 32 32"><path d="M8 7.5c2.7-3.2 12.8-3.6 16.4-.5 3 2.6 1.5 10.2-.2 14.2-.7 1.7-2.7 1.5-3.1-.3l-.8-3.5c-1.4 1-2.8 1.2-4.3.7l-.3 7.4c-.1 2.5-3.6 2.9-4.3.5l-1.7-6.1C6.2 17.2 5.2 10.8 8 7.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M11 8c1 2.7 1 6.4-1.3 11.9M21 8c-1 2.4-.9 6.4-.7 9.4M14 11.5c1.5-1.3 3.5-1.3 5 0M18 15.5c2.3 1.3 4.6.7 6.4-.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconRedis" viewBox="0 0 32 32"><path d="m16 4 13 6-13 6L3 10l13-6Z" fill="currentColor"/><path d="m3 15 13 6 13-6v5l-13 6L3 20v-5Z" fill="currentColor" opacity=".8"/><path d="m3 22 13 6 13-6v4l-13 6-13-6v-4Z" fill="currentColor" opacity=".58"/></symbol>
+        <symbol id="stackIconChat" viewBox="0 0 32 32"><path d="M6 6h20v15H15l-6 5v-5H6V6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11 13h2M16 13h2M21 13h2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+        <symbol id="stackIconCard" viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 12h24M9 17h8M9 21h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       </defs>
     </svg>
     <main id="stage" class="stage" data-theme="dark" aria-label="Презентация ReAlgo">
@@ -58,7 +71,7 @@
 
       <div class="slides">
         <section class="slide theme-dark slide-cover is-active" data-slide="0" data-order="0" data-theme="dark">
-          <img class="hero-backdrop" src="assets/hero-background.jpg" alt="" aria-hidden="true" />
+          <img class="hero-backdrop" src="assets/hero-background-start.png" alt="" aria-hidden="true" />
           <div class="centered hero reveal">
             <h1>ReAlgo</h1>
             <p class="subhead">Подготовка, которая запоминает<br />ваш прогресс.</p>
@@ -90,7 +103,6 @@
 
         <section class="slide theme-light" data-slide="1" data-order="1" data-theme="light">
           <div class="stat-keynote reveal">
-            <p class="kicker dark-kicker">Рынок труда · апрель 2026</p>
             <div class="giant-number" data-value="22" data-decimals="0" data-percent="false">22</div>
             <div class="stat-copy">
               <h2>резюме на одну вакансию.</h2>
@@ -103,7 +115,6 @@
 
         <section class="slide theme-light" data-slide="2" data-order="2" data-theme="light">
           <div class="stat-keynote reveal">
-            <p class="kicker dark-kicker">Начало карьеры · IT</p>
             <div class="giant-number" data-value="13" data-decimals="0" data-percent="true">13%</div>
             <div class="stat-copy">
               <h2>IT-вакансий доступны начинающим.</h2>
@@ -114,12 +125,11 @@
           <aside class="speaker-notes"><strong>00:17–00:26</strong><p>Для начинающих открыта лишь небольшая часть IT-вакансий — конкуренция особенно заметна в начале карьеры.</p></aside>
         </section>
 
-        <section class="slide theme-light" data-slide="3" data-order="3" data-theme="light">
+        <section class="slide theme-light" data-slide="3" data-order="3" data-theme="light" data-blackout-next>
           <div class="stat-keynote reveal">
-            <p class="kicker dark-kicker">Навыкоцентричный найм · IT</p>
             <div class="giant-number" data-value="63" data-decimals="0" data-percent="true">63%</div>
             <div class="stat-copy">
-              <h2>работодателей сначала смотрят на навыки.</h2>
+              <h2>работодателей сначала<br />смотрят на навыки.</h2>
               <p>Не на обещания. Не на список технологий. На способность показать результат.</p>
             </div>
           </div>
@@ -127,37 +137,51 @@
           <aside class="speaker-notes"><strong>00:26–00:35</strong><p>Навыки уже важнее перечня технологий. На интервью нужно показать не только знания, но и мышление под давлением.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-journey journey-proximity" data-slide="21" data-order="4" data-theme="dark">
+        <section class="slide theme-dark slide-journey journey-focus" data-slide="21" data-order="4" data-theme="dark" data-fade-next>
           <div class="journey-keynote reveal">
-            <div class="journey-stage" aria-label="Кандидат рядом с вакансией">
-              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
-              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
+            <div class="journey-stage" aria-label="Крупный план LeetCode перед раскрытием рынка подготовки">
+              <div class="journey-camera">
+                <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+                  <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
+                  <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
+                  <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
+                  <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
+                  <path class="journey-route-line" d="M150 220 C220 220 280 120 338 120 S500 120 579 120 C680 120 720 319 829 319 C920 319 970 120 1040 120 S1180 220 1250 220" />
+                </svg>
+                <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+                <div class="journey-materials" aria-hidden="true">
+                  <span>LeetCode</span><span>HackerRank</span><span>GeeksforGeeks</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+                </div>
+                <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
+              </div>
             </div>
           </div>
-          <aside class="speaker-notes"><strong>00:35–00:45</strong><p>У кандидата есть понятная цель — конкретная вакансия. На первый взгляд, между ними совсем небольшое расстояние.</p></aside>
+          <aside class="speaker-notes"><strong>00:35–00:45</strong><p>Обычно подготовка начинается с одной знакомой площадки — LeetCode. Но это лишь крупный план гораздо более сложного пространства.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-journey journey-intro" data-slide="4" data-order="5" data-theme="dark">
+        <section class="slide theme-dark slide-journey journey-reveal" data-slide="4" data-order="5" data-theme="dark">
           <div class="journey-keynote reveal">
             <div class="journey-stage" aria-label="Путь кандидата к вакансии">
-              <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+              <div class="journey-camera">
+                <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
                 <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
                 <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
                 <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
                 <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
                 <path class="journey-route-line" d="M150 220 C220 220 280 120 338 120 S500 120 579 120 C680 120 720 319 829 319 C920 319 970 120 1040 120 S1180 220 1250 220" />
-              </svg>
-              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
-              <div class="journey-materials" aria-hidden="true">
-                <span>LeetCode</span><span>HackerRank</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span>Anki</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+                </svg>
+                <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+                <div class="journey-materials" aria-hidden="true">
+                  <span>LeetCode</span><span>HackerRank</span><span>GeeksforGeeks</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+                </div>
+                <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
               </div>
-              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
             </div>
           </div>
           <aside class="speaker-notes"><strong>00:45–01:15</strong><p>Но затем между кандидатом и вакансией раскрывается огромный объём подготовки: тысячи задач, подборки компаний, roadmap, курсы, заметки и AI-чаты. Чем больше выбор, тем сложнее понять следующий шаг.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-team" data-slide="6" data-order="14" data-theme="dark" data-planet-exit>
+        <section class="slide theme-dark slide-team" data-slide="6" data-order="15" data-theme="dark" data-planet-exit>
           <div class="team-copy reveal">
             <p class="kicker">Команда FreeBurger</p>
             <h2>Шесть орбит.<br />Одна система.</h2>
@@ -254,59 +278,269 @@
         <section class="slide theme-dark slide-journey journey-route" data-slide="20" data-order="6" data-theme="dark">
           <div class="journey-keynote reveal">
             <div class="journey-stage" aria-label="Маршрут ReAlgo от кандидата к вакансии">
-              <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+              <div class="journey-camera">
+                <svg class="journey-lines" viewBox="0 0 1400 440" aria-hidden="true">
+                <defs>
+                  <linearGradient id="journeyRouteMaskFeather" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="white" />
+                    <stop offset="1" stop-color="black" />
+                  </linearGradient>
+                  <mask id="journeyRouteUncover" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                    <rect class="journey-route-mask-base" fill="white" />
+                    <g class="journey-route-mask-cover">
+                      <rect class="journey-route-mask-feather" fill="url(#journeyRouteMaskFeather)" />
+                      <rect class="journey-route-mask-body" fill="black" />
+                    </g>
+                  </mask>
+                </defs>
                 <path class="journey-direct" d="M150 220 C430 220 970 220 1250 220" />
                 <path class="tangle tangle-a" d="M150 220 C360 30 520 420 730 100 S1050 390 1250 220" />
                 <path class="tangle tangle-b" d="M150 220 C340 410 510 40 720 340 S1050 40 1250 220" />
                 <path class="tangle tangle-c" d="M150 220 C420 120 440 350 690 210 S970 130 1250 220" />
-                <path class="journey-route-line" d="M150 220 C220 220 280 120 338 120 S500 120 579 120 C680 120 720 319 829 319 C920 319 970 120 1040 120 S1180 220 1250 220" />
-              </svg>
-              <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
-              <div class="journey-materials" aria-hidden="true">
-                <span>LeetCode</span><span>HackerRank</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span>Anki</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+                <g class="journey-route-segments" mask="url(#journeyRouteUncover)"></g>
+                </svg>
+                <div class="journey-person journey-candidate"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="10"/><path d="M14 54c2-13 9-20 18-20s16 7 18 20"/></svg><strong>Кандидат</strong></div>
+                <div class="journey-materials" aria-hidden="true">
+                  <span>LeetCode</span><span>HackerRank</span><span>GeeksforGeeks</span><span>Codeforces</span><span>Roadmap</span><span>Курсы</span><span>AI-чаты</span><span>Заметки</span><span>YouTube</span><span>Таблицы</span><span>Mock-интервью</span><span>Разборы</span><span>Telegram</span><span>GitHub</span><span class="is-route">Компания</span><span class="is-route">111 паттернов</span><span class="is-route">Roadmap</span><span class="is-route">Практика</span>
+                </div>
+                <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
               </div>
-              <div class="journey-person journey-vacancy"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="20" width="44" height="32" rx="6"/><path d="M24 20v-6h16v6M10 34h44M28 34v4h8v-4"/></svg><strong>Вакансия</strong></div>
             </div>
           </div>
           <aside class="speaker-notes"><strong>01:15–01:30</strong><p>ReAlgo приглушает информационный шум и выделяет только те элементы, которые ведут кандидата к его цели.</p></aside>
         </section>
 
-        <section class="slide theme-dark" data-slide="8" data-order="13" data-theme="dark" data-blackout-next>
-          <div class="cycle-keynote reveal">
-            <p class="kicker">Повторение</p>
-            <h2>Маршрут адаптируется.</h2>
-            <div class="cycle">
-              <div><b>01</b><span>Решить</span></div><i>→</i>
-              <div><b>02</b><span>Проверить</span></div><i>→</i>
-              <div><b>03</b><span>Повторить</span></div><i>→</i>
-              <div><b>04</b><span>Закрепить</span></div><i>→</i>
-              <div class="cycle-last"><b>05</b><span>Обновить путь</span></div>
+        <section class="slide theme-light slide-roadmap-builder" data-slide="8" data-order="13" data-theme="light" data-blackout-next>
+          <div class="roadmap-story" aria-label="Последовательная настройка персонального roadmap">
+            <div class="roadmap-story__intro">
+              <h2>Roadmap.<br />Тот самый путь посреди хаоса.</h2>
             </div>
+
+            <section class="roadmap-story__step roadmap-story__step--platform">
+              <div class="roadmap-metric">
+                <small>В мире</small>
+                <strong>4</strong>
+                <p>наиболее популярные платформы с алгозадачами</p>
+              </div>
+              <div class="roadmap-choice-result"><small>Площадка выбрана</small><strong>LeetCode</strong><b aria-hidden="true">✓</b></div>
+              <div class="roadmap-word-wheel roadmap-word-wheel--platform" aria-label="Выбрана площадка LeetCode">
+                <div class="roadmap-word-wheel__track">
+                  <span>HackerRank</span><span class="is-target">LeetCode</span><span>GeeksforGeeks</span><span>Codeforces</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="roadmap-story__step roadmap-story__step--company">
+              <div class="roadmap-metric">
+                <small>База из</small>
+                <strong>428</strong>
+                <p>компаний</p>
+              </div>
+              <div class="roadmap-choice-result"><small>Компания выбрана</small><strong>Google</strong><b aria-hidden="true">✓</b></div>
+              <div class="roadmap-word-wheel roadmap-word-wheel--company" aria-label="Из 428 компаний выбрана Google">
+                <div class="roadmap-word-wheel__track">
+                  <span>6sense</span><span>Adobe</span><span>Airbnb</span><span>Amazon</span><span>Apple</span><span>Avito</span><span>Booking.com</span><span>Databricks</span><span>Meta</span><span>Microsoft</span><span>Netflix</span><span>NVIDIA</span><span>OpenAI</span><span>Oracle</span><span class="is-target">Google</span><span>Spotify</span><span>Stripe</span><span>Uber</span><span>VK</span><span>Yandex</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="roadmap-story__step roadmap-story__step--deadline">
+              <div class="roadmap-metric roadmap-metric--deadline">
+                <h3>срок для подготовки</h3>
+              </div>
+              <div class="roadmap-choice-result"><small>Срок зафиксирован</small><strong>45 дней</strong><b aria-hidden="true">✓</b></div>
+              <div class="roadmap-word-wheel roadmap-word-wheel--deadline" aria-label="До собеседования выбрано 45 дней">
+                <div class="roadmap-word-wheel__track">
+                  <span>1 день</span><span>2 дня</span><span>3 дня</span><span>4 дня</span><span>5 дней</span>
+                  <span>6 дней</span><span>7 дней</span><span>8 дней</span><span>9 дней</span><span>10 дней</span>
+                  <span>11 дней</span><span>12 дней</span><span>13 дней</span><span>14 дней</span><span>15 дней</span>
+                  <span>16 дней</span><span>17 дней</span><span>18 дней</span><span>19 дней</span><span>20 дней</span>
+                  <span>21 день</span><span>22 дня</span><span>23 дня</span><span>24 дня</span><span>25 дней</span>
+                  <span>26 дней</span><span>27 дней</span><span>28 дней</span><span>29 дней</span><span>30 дней</span>
+                  <span>31 день</span><span>32 дня</span><span>33 дня</span><span>34 дня</span><span>35 дней</span>
+                  <span>36 дней</span><span>37 дней</span><span>38 дней</span><span>39 дней</span><span>40 дней</span>
+                  <span>41 день</span><span>42 дня</span><span>43 дня</span><span>44 дня</span><span class="is-target">45 дней</span>
+                  <span>46 дней</span><span>47 дней</span><span>48 дней</span><span>49 дней</span><span>50 дней</span>
+                  <span>51 день</span><span>52 дня</span><span>53 дня</span><span>54 дня</span><span>55 дней</span>
+                  <span>56 дней</span><span>57 дней</span><span>58 дней</span><span>59 дней</span><span>60 дней</span>
+                  <span>61 день</span><span>62 дня</span><span>63 дня</span><span>64 дня</span><span>65 дней</span>
+                  <span>66 дней</span><span>67 дней</span><span>68 дней</span><span>69 дней</span><span>70 дней</span>
+                  <span>71 день</span><span>72 дня</span><span>73 дня</span><span>74 дня</span><span>75 дней</span>
+                  <span>76 дней</span><span>77 дней</span><span>78 дней</span><span>79 дней</span><span>80 дней</span>
+                  <span>81 день</span><span>82 дня</span><span>83 дня</span><span>84 дня</span><span>85 дней</span>
+                  <span>86 дней</span><span>87 дней</span><span>88 дней</span><span>89 дней</span><span>90 дней</span>
+                </div>
+              </div>
+            </section>
           </div>
-          <aside class="speaker-notes"><strong>03:20–03:35</strong><p>Знания возвращаются в работу перед забыванием. Закреплённый навык уходит дальше, а ошибка возвращает нужный подпаттерн в roadmap.</p></aside>
+          <aside class="speaker-notes"><strong>03:20–03:40</strong><p>Roadmap — тот самый путь среди хаоса. Сначала выбираем одну из четырёх поддерживаемых площадок. Затем — компанию: объединённая база ReAlgo содержит 428 уникальных компаний с привязанными задачами. Последний ввод — точный срок до собеседования с шагом в один день, под который будет рассчитан темп roadmap.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-macbook slide-macbook-extension" data-slide="9" data-order="9" data-theme="dark">
-          <div class="product-heading product-overlay reveal"><p class="kicker">Расширение поверх задачи</p><h2>Никакой смены<br />контекста.</h2><p>ReAlgo появляется там, где пользователь уже решает.</p></div>
-          <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension" aria-label="Трёхмерная модель MacBook с расширением ReAlgo на экране"></div>
-          <div class="platforms">LeetCode · HackerRank · GeeksforGeeks · Codeforces</div>
+        <section class="slide theme-dark slide-stack" data-slide="stack" data-order="14.5" data-theme="dark">
+          <div class="stack-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="stack-keynote">
+            <header class="stack-heading">
+              <p class="kicker">Архитектура ReAlgo</p>
+              <h2>Как данные проходят<br /><strong>через ReAlgo.</strong></h2>
+              <p>Клиенты, API, хранилища и AI связаны одним типизированным контрактом.</p>
+            </header>
+
+            <div class="architecture-map" aria-label="Схема архитектуры ReAlgo">
+              <svg class="architecture-links" viewBox="0 0 1660 570" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <marker id="architectureArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                  </marker>
+                </defs>
+                <path class="arch-link arch-link--client" d="M340 140 H404" />
+                <path class="arch-link arch-link--client" d="M340 350 H404" />
+                <path class="arch-link arch-link--main" d="M554 265 H620" />
+                <path class="arch-link arch-link--data" d="M1100 118 H1170" />
+                <path class="arch-link arch-link--data" d="M1100 202 H1170" />
+                <path class="arch-link arch-link--ai" d="M1100 360 H1170" />
+              </svg>
+              <svg class="architecture-return-links" viewBox="0 0 1660 570" preserveAspectRatio="none" aria-hidden="true">
+                <path class="arch-link arch-link--return" d="M636 425 H620 C580 425 600 536 540 536 H385 C350 536 365 397 340 397" />
+              </svg>
+
+              <section class="architecture-zone architecture-zone--clients" aria-label="Клиентские приложения">
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconBrowser" /></svg></span><strong>Browser / Client</strong><small>TypeScript</small></header>
+                <article class="architecture-node architecture-node--web">
+                  <span class="architecture-node__icon architecture-node__icon--next"><img src="assets/nextjs-logo.svg" alt="" aria-hidden="true" /></span>
+                  <div><small>Личный кабинет · PWA</small><h3>Next.js<span class="architecture-version">16</span><br />React<span class="architecture-version">19</span></h3><p>Roadmap, Pattern Atlas, повторения и аналитика.</p></div>
+                </article>
+                <article class="architecture-node architecture-node--extension">
+                  <span class="architecture-node__icon architecture-node__icon--plasmo"><img src="assets/plasmo-logo.svg?v=2" alt="" aria-hidden="true" /></span>
+                  <div><small>Прямо на странице задачи</small><h3>Plasmo · Manifest V3</h3><p>Считывает условие и код, ловит submit.</p></div>
+                  <footer><span>LeetCode</span><span>HackerRank</span><span>GFG</span><span>Codeforces</span></footer>
+                </article>
+              </section>
+
+              <section class="architecture-gateway" aria-label="Входной шлюз">
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconGlobe" /></svg></span><strong>Edge</strong></header>
+                <b><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCaddy" /></svg></b><strong>Caddy</strong><span>HTTPS</span>
+              </section>
+
+              <section class="architecture-zone architecture-zone--core" aria-label="Backend ReAlgo">
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCode" /></svg></span><strong>Go API</strong><small>Go 1.25 · chi</small></header>
+                <div class="architecture-core-main">
+                  <div class="architecture-domain-grid">
+                    <span>Auth</span><span>Problems</span><span>Cards</span>
+                    <span>Pattern Atlas</span><span>Roadmap</span><span>Practice</span>
+                  </div>
+                  <article class="architecture-service architecture-service--scheduler">
+                    <svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCalendar" /></svg>
+                    <small>Интервальные повторения</small><strong>FSRS Scheduler</strong><p>Оценка → новый интервал → очередь практики</p>
+                  </article>
+                  <article class="architecture-service architecture-service--ai">
+                    <svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconSpark" /></svg>
+                    <small>Встроенный модуль оркестрации</small><strong>AI Orchestrator</strong><p>Контекст, prompt versioning, streaming, validation</p>
+                  </article>
+                  <div class="architecture-orchestrator-results" aria-label="Результаты AI Orchestrator">
+                    <span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconChat" /></svg><strong>3 уровня подсказок<br />кулдаун 30 секунд</strong></span>
+                    <span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconCard" /></svg><strong>3 AI-карточки<br />→ PostgreSQL</strong></span>
+                  </div>
+                </div>
+                <footer><span>pgx</span><span>sqlc</span><span>REST + SSE</span><span>typed contracts</span></footer>
+              </section>
+
+              <section class="architecture-zone architecture-zone--services" aria-label="Хранилища и AI-провайдер">
+                <header><span><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconDatabase" /></svg></span><strong>Data</strong></header>
+                <div class="architecture-stores">
+                  <article class="architecture-store architecture-store--postgres">
+                    <span class="architecture-store__icon architecture-store__icon--postgres"><img src="assets/postgresql-logo.svg" alt="" aria-hidden="true" /></span><div><small>Источник истины</small><h3>PostgreSQL<span class="architecture-version">16</span></h3><p>Пользователи, задачи, roadmap, карточки</p></div>
+                  </article>
+                  <article class="architecture-store architecture-store--redis">
+                    <span class="architecture-store__icon architecture-store__icon--redis"><img src="assets/redis-logo.svg" alt="" aria-hidden="true" /></span><div><small>Быстрый контур</small><h3>Redis 7</h3><p>Кэш, locks, rate limits, дедупликация</p></div>
+                  </article>
+                </div>
+
+                <article class="architecture-ai-module">
+                  <header>
+                    <span class="architecture-ai-orb"><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#stackIconSpark" /></svg></span>
+                    <div><small>Внешний AI Provider</small><h3>Gemini<span class="architecture-version">2.5 Flash</span></h3></div>
+                  </header>
+                  <p>Получает контекст задачи и кода.<br />Возвращает структурированный JSON.</p>
+                </article>
+              </section>
+
+              <span class="architecture-label architecture-label--rest">REST</span>
+              <span class="architecture-label architecture-label--sql">SQL</span>
+              <span class="architecture-label architecture-label--cache">cache</span>
+              <span class="architecture-label architecture-label--provider">AI API</span>
+              <span class="architecture-label architecture-label--sse">SSE → Extension</span>
+
+              <footer class="architecture-infra">
+                <strong>Delivery</strong><span>Docker Compose</span><span>Caddy</span><span>golang-migrate</span><span>GitHub Actions</span>
+              </footer>
+            </div>
+          </div>
+          <aside class="speaker-notes"><strong>03:40–04:05</strong><p>Слева два клиента: кабинет на Next.js и расширение на Plasmo. Оба приходят по HTTPS через Caddy в модульный Go API. API хранит постоянное состояние в PostgreSQL, а Redis использует для кэша, блокировок и лимитов. FSRS внутри API рассчитывает повторения. Отдельный AI Orchestrator собирает условие, текущий код и паттерны, вызывает Gemini 2.5 Flash через provider adapter и строго валидирует JSON. Подсказки возвращаются в расширение потоком SSE, а три сгенерированные карточки дедуплицируются и сохраняются в PostgreSQL.</p></aside>
+        </section>
+
+        <section class="slide theme-dark slide-macbook slide-macbook-extension-intro" data-slide="9-intro" data-order="9" data-theme="dark">
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--context" data-product-copy="extension-intro extension">
+              <h2>Помощь появляется<br /><strong>там, где возник вопрос.</strong></h2>
+              <p class="product-story__lead">ReAlgo распознаёт открытую задачу и разворачивает подсказку поверх страницы — без вкладок, копипаста и потери контекста.</p>
+            </article>
+            <article class="product-story product-story--ai" data-product-copy="agent">
+              <h2>ИИ ведёт к ответу.<br /><strong>Не подменяет мышление.</strong></h2>
+              <p class="product-story__lead">Модель читает условие, ограничения и текущий код. Между уровнями действует кулдаун 30 секунд: сначала пользователь пробует применить подсказку сам, а не прокликивает путь к готовому решению.</p>
+              <div class="product-story__levels" aria-label="Три уровня AI-подсказок">
+                <div><b>01</b><span><strong>Направление</strong><small>идея и подходящий паттерн</small></span></div>
+                <div><b>02</b><span><strong>Инвариант</strong><small>ключевой вопрос к решению</small></span></div>
+                <div><b>03</b><span><strong>Конкретика</strong><small>формула следующего шага</small></span></div>
+              </div>
+            </article>
+            <article class="product-story product-story--memory" data-product-copy="rating">
+              <h2>Решение превращается<br /><strong>в долгую память.</strong></h2>
+              <p class="product-story__lead">Оценка сложности задаёт интервал повторения. Если карточек к задаче ещё нет в базе, ИИ разбирает решение и генерирует их автоматически.</p>
+            </article>
+          </div>
+          <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension-intro" aria-label="MacBook с нерешённой задачей; интерфейс затемняется и появляется предложение запросить подсказку"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:05–02:25</strong><p>Пользователь продолжает решать задачи на привычной платформе. Расширение распознаёт задачу и сопровождает практику без смены контекста.</p></aside>
+          <aside class="speaker-notes" data-product-note="extension-intro"><strong>02:05–02:15</strong><p>Когда решение заходит в тупик, ReAlgo распознаёт открытую задачу. Сначала мы фиксируем внимание на проблеме: интерфейс приглушается, появляется простой следующий шаг — запросить подсказку.</p></aside>
+          <aside class="speaker-notes" data-product-note="extension" hidden><strong>02:15–02:25</strong><p>Расширение распознаёт открытую задачу и появляется поверх платформы. Пользователю не нужно переносить условие в другой чат: весь контекст уже здесь.</p></aside>
+          <aside class="speaker-notes" data-product-note="agent" hidden><strong>02:25–02:45</strong><p>ИИ анализирует условие, ограничения и текущий код. Три уровня помощи раскрываются постепенно: направление и паттерн, вопрос об инварианте, затем конкретная формула следующего шага. Между уровнями действует кулдаун 30 секунд — пользователь должен сначала попробовать применить идею, а не прокликать подсказки в поиске готового решения.</p></aside>
+          <aside class="speaker-notes" data-product-note="rating" hidden><strong>02:45–03:05</strong><p>После Accepted оценка сложности влияет на интервал повторения. Если готовых карточек для задачи нет в базе, ИИ разбирает решение и автоматически генерирует три карточки для закрепления паттерна.</p></aside>
+        </section>
+
+        <section class="slide theme-dark slide-macbook slide-macbook-extension" data-slide="9" data-order="9.5" data-theme="dark">
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--context">
+              <h2>Помощь появляется<br /><strong>там, где возник вопрос.</strong></h2>
+              <p class="product-story__lead">ReAlgo распознаёт открытую задачу и разворачивает подсказку поверх страницы — без вкладок, копипаста и потери контекста.</p>
+            </article>
+          </div>
+          <div class="macbook-3d-slot macbook-3d-extension" data-macbook-mode="extension" aria-label="MacBook с нерешённой задачей; затем открывается расширение ReAlgo с предложением получить первую подсказку"></div>
+          <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
+          <aside class="speaker-notes"><strong>02:15–02:25</strong><p>Расширение распознаёт открытую задачу и появляется поверх платформы. Пользователю не нужно переносить условие в другой чат: весь контекст уже здесь.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-agent" data-slide="10" data-order="10" data-theme="dark">
-          <div class="ai-copy product-overlay reveal"><p class="kicker">AI-агент</p><h2>Не ответ.<br /><span class="accent-blue">Следующий шаг.</span></h2><p>AI видит задачу и дозирует помощь, не раскрывая решение раньше времени.</p></div>
-          <div class="macbook-3d-slot macbook-3d-agent" data-macbook-mode="agent" aria-label="Трёхмерная модель MacBook с AI-агентом ReAlgo на экране"></div>
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--ai">
+              <h2>ИИ ведёт к ответу.<br /><strong>Не подменяет мышление.</strong></h2>
+              <p class="product-story__lead">Модель читает условие, ограничения и текущий код. Между уровнями действует кулдаун 30 секунд: сначала пользователь пробует применить подсказку сам, а не прокликивает путь к готовому решению.</p>
+              <div class="product-story__levels" aria-label="Три уровня AI-подсказок">
+                <div><b>01</b><span><strong>Направление</strong><small>идея и подходящий паттерн</small></span></div>
+                <div><b>02</b><span><strong>Инвариант</strong><small>ключевой вопрос к решению</small></span></div>
+                <div><b>03</b><span><strong>Конкретика</strong><small>формула следующего шага</small></span></div>
+              </div>
+            </article>
+          </div>
+          <div class="macbook-3d-slot macbook-3d-agent" data-macbook-mode="agent" aria-label="MacBook: AI-агент даёт подсказку, пользователь заполняет код и получает Accepted"></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:25–02:45</strong><p>Если пользователь застрял, AI не пишет код за него. Он указывает на ограничение, напоминает о паттерне и задаёт наводящий вопрос — возвращает мышление в нужное русло.</p></aside>
+          <aside class="speaker-notes"><strong>02:25–02:45</strong><p>ИИ анализирует условие, ограничения и текущий код. Три уровня помощи раскрываются постепенно: направление и паттерн, вопрос об инварианте, затем конкретная формула следующего шага. Между уровнями действует кулдаун 30 секунд — пользователь должен сначала попробовать применить идею, а не прокликать подсказки в поиске готового решения.</p></aside>
         </section>
 
-        <section class="slide theme-dark slide-taxonomy-graph" data-slide="11" data-order="7" data-theme="dark">
+        <section class="slide theme-dark slide-taxonomy-graph" data-slide="11" data-order="14" data-theme="dark">
           <div class="taxonomy-keynote reveal">
             <div class="taxonomy-flow" aria-label="Граф задач, паттернов и подпаттернов">
               <svg class="taxonomy-links" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
-                  <linearGradient id="taxonomyInputFlow" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#143b67"/><stop offset="1" stop-color="#2997ff"/></linearGradient>
+                  <linearGradient id="taxonomyInputFlow" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#215b91"/><stop offset="1" stop-color="#64d2ff"/></linearGradient>
                   <linearGradient id="taxonomyMainFlow" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#64d2ff"/><stop offset=".52" stop-color="#2997ff"/><stop offset="1" stop-color="#5e5ce6"/></linearGradient>
                 </defs>
                 <g class="taxonomy-links-platforms"></g>
@@ -342,50 +576,15 @@
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-rating" data-slide="12" data-order="11" data-theme="dark" data-fade-next>
-          <div class="product-demo-copy product-overlay reveal"><p class="kicker">После Accepted — один вопрос</p><h2>Как далась<br /><span class="accent-blue">эта задача?</span></h2><p>Личный сигнал для следующего повторения</p></div>
+          <div class="product-heading product-overlay reveal">
+            <article class="product-story product-story--memory">
+              <h2>Решение превращается<br /><strong>в долгую память.</strong></h2>
+              <p class="product-story__lead">Оценка сложности задаёт интервал повторения. Если карточек к задаче ещё нет в базе, ИИ разбирает решение и генерирует их автоматически.</p>
+            </article>
+          </div>
           <div class="macbook-3d-slot macbook-3d-rating" data-macbook-mode="rating" aria-label="MacBook с демонстрацией оценки сложности и постановки задачи в повторение"></div>
-          <div class="product-demo-rail product-demo-rail--rating" aria-hidden="true"><span>Accepted</span><span>оценка</span><span>FSRS</span><span>карточки</span></div>
           <a class="model-credit" href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2025-2026-41f60625facf4ef381680fc916f77516" target="_blank" rel="noreferrer">3D model: Maroi Mister Let Me Think · CC BY 4.0</a>
-          <aside class="speaker-notes"><strong>02:45–03:05</strong><p>После Accepted пользователь отмечает, насколько легко далась задача. Одинаковый статус может скрывать десять минут самостоятельной работы или час с подсказками — для готовности это разные результаты.</p></aside>
-        </section>
-
-        <section class="slide theme-dark" data-slide="13" data-order="12" data-theme="dark">
-          <div class="cards-keynote reveal">
-            <div class="cards-copy"><p class="kicker">После решения</p><div class="giant-dark">3</div><h2>проверяемых<br />навыка.</h2><p>Пользователь повторяет не код, а способ мышления.</p></div>
-            <div class="memory-cards memory-cards-three"><article><small>PATTERN RECOGNITION</small><h3>Как распознать<br />подход?</h3><p>Сигналы в условии и ключевое ограничение.</p></article><article><small>ALGORITHM MECHANICS</small><h3>Почему решение<br />работает?</h3><p>Инвариант, переход и оценка сложности.</p></article><article class="personal"><small>EDGE CASES</small><h3>Где решение<br />сломается?</h3><p>Границы, исключения и типичная ошибка.</p></article></div>
-          </div>
-          <aside class="speaker-notes"><strong>03:05–03:20</strong><p>Решённая задача превращается в три проверки: распознать паттерн, объяснить механику и вспомнить крайние случаи. Мы повторяем способ мышления, а не готовый код.</p></aside>
-        </section>
-
-        <section class="slide theme-dark slide-company-targets" data-slide="15" data-order="8" data-theme="dark" data-count-after-transition data-count-delay="300">
-          <div class="company-target-keynote reveal">
-            <div class="company-target-copy">
-              <p class="kicker">Company overlay</p>
-              <h2>Практика под<br /><span class="accent-blue">конкретную компанию.</span></h2>
-              <p>Задачи интервью связываются с паттернами и превращаются в персональный маршрут.</p>
-            </div>
-            <div class="company-target-list" aria-label="Компании и количество связанных задач">
-              <article><span class="company-target-logo company-logo-amazon" aria-hidden="true">a<i></i></span><strong>Amazon</strong><span class="company-target-count"><b data-taxonomy-count="2676">2 676</b><small>задач</small></span></article>
-              <article><span class="company-target-logo company-logo-google" aria-hidden="true">G</span><strong>Google</strong><span class="company-target-count"><b data-taxonomy-count="2529">2 529</b><small>задач</small></span></article>
-              <article><span class="company-target-logo company-logo-microsoft" aria-hidden="true"><i></i><i></i><i></i><i></i></span><strong>Microsoft</strong><span class="company-target-count"><b data-taxonomy-count="1863">1 863</b><small>задачи</small></span></article>
-              <article><svg class="company-target-logo company-logo-meta" viewBox="0 0 52 34" aria-hidden="true"><path d="M4 27C8 9 14 5 19 5c8 0 12 22 18 22 5 0 8-8 11-20M4 27c3 0 8-14 15-14 8 0 11 14 18 14"/></svg><strong>Meta</strong><span class="company-target-count"><b data-taxonomy-count="1450">1 450</b><small>задач</small></span></article>
-            </div>
-          </div>
-          <aside class="speaker-notes"><strong>01:54–02:05</strong><p>ReAlgo накладывает данные интервью конкретной компании на карту паттернов. Пользователь получает не общий список, а практику под выбранную карьерную цель.</p></aside>
-        </section>
-
-        <section class="slide theme-light slide-monetization" data-slide="16" data-order="15" data-theme="light">
-          <div class="monetization-keynote reveal">
-            <p class="kicker dark-kicker">Коммерциализация · freemium</p>
-            <h2>Бесплатно начать.<br /><span class="accent-blue">Платно — ускорить цель.</span></h2>
-            <div class="plan-flow">
-              <article><small>FREE</small><strong>Построить систему</strong><p>Roadmap · сохранение задач · прогресс</p></article>
-              <i>→</i>
-              <article class="plan-pro"><small>PRO</small><strong>Подготовиться точнее</strong><p>AI · аналитика · повторения · компании</p></article>
-            </div>
-            <p>Пользователь платит не за список задач, а за понимание следующего шага.</p>
-          </div>
-          <aside class="speaker-notes"><strong>04:15–04:40</strong><p>Базовая версия строит roadmap, сохраняет задачи и показывает прогресс. Pro открывает AI, расширенную аналитику, персональные повторения, карточки и подготовку под компании. Пользователь платит за систему, которая знает его следующий шаг.</p></aside>
+          <aside class="speaker-notes"><strong>02:45–03:05</strong><p>После Accepted оценка сложности влияет на интервал повторения. Если готовых карточек для задачи нет в базе, ИИ разбирает решение и автоматически генерирует три карточки для закрепления паттерна.</p></aside>
         </section>
 
         <section class="slide theme-light slide-price slide-price-free" data-slide="16-free" data-order="16" data-theme="light">
@@ -421,6 +620,30 @@
           <div class="final-line">ReAlgo. <strong>Превращаем хаос подготовки в понятный путь к работе.</strong></div>
           <aside class="speaker-notes"><strong>04:40–05:00</strong><p>Сегодня подготовку измеряют количеством задач. Мы предлагаем другую единицу: не «я когда-то это решал», а «я умею решить это сейчас». ReAlgo превращает хаос подготовки в понятный путь к работе. Спасибо.</p></aside>
         </section>
+
+        <section class="slide theme-dark slide-gradient-poster" data-slide="19" data-order="19" data-theme="dark" aria-label="Типографический постер с градиентными фразами">
+          <div class="gradient-poster-half gradient-poster-half--light" aria-hidden="true">
+            <div class="gradient-poster-row gradient-poster-row--1">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--2">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--3">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--4">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--5">КОНТОРА ПИДОРАСОВ</div>
+          </div>
+          <div class="gradient-poster-half gradient-poster-half--dark" aria-hidden="true">
+            <div class="gradient-poster-row gradient-poster-row--1">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--2">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--3">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--4">КОНТОРА ПИДОРАСОВ</div>
+            <div class="gradient-poster-row gradient-poster-row--5">КОНТОРА ПИДОРАСОВ</div>
+          </div>
+          <aside class="speaker-notes"><strong>Финальный постер</strong><p>Контрастная типографическая отбивка: одна фраза, пять цветовых характеров, две противоположные среды.</p></aside>
+        </section>
+      </div>
+
+      <div id="coverTransition" class="cover-transition" aria-hidden="true">
+        <video id="coverTransitionVideo" preload="auto" playsinline muted src="assets/cover-to-market.mp4"></video>
+        <div id="coverTransitionForeground" class="cover-transition-foreground"></div>
+        <div id="coverTransitionWhite" class="cover-transition-white"></div>
       </div>
 
       <div id="blackout" class="blackout" aria-hidden="true"></div>
@@ -439,8 +662,8 @@
       <nav id="dots" class="slide-dots" aria-label="Навигация по слайдам"></nav>
       <div id="help" class="help-panel" aria-hidden="true"><strong>Управление</strong><span><kbd>←</kbd><kbd>→</kbd> слайды</span><span><kbd>Space</kbd> дальше</span><span><kbd>N</kbd> заметки</span><span><kbd>F</kbd> полный экран</span><span><kbd>?</kbd> закрыть</span></div>
     </main>
-    <script type="module" src="assets/product-ui.js?v=35"></script>
-    <script type="module" src="macbook-3d.js?v=43"></script>
-    <script src="deck.js?v=31"></script>
+    <script type="module" src="assets/product-ui.js?v=54"></script>
+    <script type="module" src="macbook-3d.js?v=68"></script>
+    <script src="deck.js?v=62"></script>
   </body>
 </html>
