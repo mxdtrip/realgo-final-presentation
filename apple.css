@@ -3943,6 +3943,222 @@ h2 {
   }
 }
 
+/* Card memory — solved ideas become durable recall through FSRS. */
+
+.slide-card-memory {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 24% 48%, rgba(46, 111, 210, 0.24), transparent 32%),
+    radial-gradient(circle at 58% 84%, rgba(31, 145, 116, 0.12), transparent 27%),
+    linear-gradient(118deg, #05080d 0%, #080d15 48%, #05070b 100%);
+}
+
+.slide-card-memory::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(120, 170, 225, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 170, 225, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  content: "";
+  mask-image: linear-gradient(90deg, #000, transparent 70%);
+}
+
+.card-memory__glow {
+  position: absolute;
+  top: 165px;
+  left: 120px;
+  width: 920px;
+  height: 650px;
+  border-radius: 50%;
+  background: rgba(45, 114, 220, 0.13);
+  filter: blur(90px);
+}
+
+.card-memory__visual {
+  position: absolute;
+  top: 150px;
+  left: 38px;
+  z-index: 1;
+  width: 1080px;
+  opacity: 0;
+  transform: translateX(-44px) scale(0.97);
+}
+
+.card-memory__visual::after {
+  position: absolute;
+  right: 135px;
+  bottom: 78px;
+  left: 125px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.68);
+  content: "";
+  filter: blur(28px);
+}
+
+.card-memory__visual img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 34px 65px rgba(0, 0, 0, 0.38));
+}
+
+.card-memory__copy {
+  position: absolute;
+  top: 142px;
+  right: 128px;
+  z-index: 2;
+  width: 650px;
+}
+
+.card-memory__eyebrow {
+  display: block;
+  margin-bottom: 22px;
+  color: #72a9ff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.slide-card-memory h2 {
+  margin: 0;
+  color: #f4f7fb;
+  font-size: 66px;
+  font-weight: 720;
+  line-height: 1.01;
+  letter-spacing: -0.055em;
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.slide-card-memory h2::first-line {
+  color: #f4f7fb;
+}
+
+.card-memory__lead {
+  max-width: 610px;
+  margin: 28px 0 34px;
+  color: #aeb7c5;
+  font-size: 18px;
+  line-height: 1.55;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.card-memory__steps {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card-memory__steps li {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 15px 18px 15px 14px;
+  border: 1px solid rgba(116, 165, 230, 0.14);
+  border-radius: 15px;
+  background: rgba(13, 20, 30, 0.7);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+  opacity: 0;
+  transform: translateY(15px);
+  backdrop-filter: blur(12px);
+}
+
+.card-memory__steps li > b {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(77, 148, 255, 0.28);
+  border-radius: 12px;
+  background: rgba(44, 112, 217, 0.12);
+  color: #6da5ff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  place-items: center;
+}
+
+.card-memory__steps span,
+.card-memory__steps strong,
+.card-memory__steps small {
+  display: block;
+}
+
+.card-memory__steps strong {
+  margin-bottom: 5px;
+  color: #eef3fa;
+  font-size: 15px;
+  font-weight: 660;
+}
+
+.card-memory__steps small {
+  color: #818c9c;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.card-memory__loop {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 24px;
+  color: #778292;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.card-memory__loop i {
+  color: #3f6fae;
+  font-style: normal;
+}
+
+.card-memory__loop strong {
+  color: #70d7b8;
+  font-weight: 650;
+}
+
+.slide-card-memory.is-active .card-memory__visual {
+  animation: card-memory-visual-in 900ms 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.slide-card-memory.is-active .card-memory__eyebrow,
+.slide-card-memory.is-active h2,
+.slide-card-memory.is-active .card-memory__lead,
+.slide-card-memory.is-active .card-memory__steps li,
+.slide-card-memory.is-active .card-memory__loop {
+  animation: card-memory-copy-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.slide-card-memory.is-active .card-memory__eyebrow { animation-delay: 260ms; }
+.slide-card-memory.is-active h2 { animation-delay: 360ms; }
+.slide-card-memory.is-active .card-memory__lead { animation-delay: 500ms; }
+.slide-card-memory.is-active .card-memory__steps li:nth-child(1) { animation-delay: 660ms; }
+.slide-card-memory.is-active .card-memory__steps li:nth-child(2) { animation-delay: 790ms; }
+.slide-card-memory.is-active .card-memory__steps li:nth-child(3) { animation-delay: 920ms; }
+.slide-card-memory.is-active .card-memory__loop { animation-delay: 1080ms; }
+
+@keyframes card-memory-visual-in {
+  from { opacity: 0; transform: translateX(-44px) scale(0.97); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes card-memory-copy-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Product architecture and dedicated AI module */
 
 .slide-stack {

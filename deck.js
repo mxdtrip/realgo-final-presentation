@@ -407,7 +407,8 @@
       [".macbook-3d-slot", ".macbook-3d-slot", "morph-surface"],
     ],
     [], // Rating → roadmap: cross-fade
-    [], // Roadmap → taxonomy: blackout
+    [], // Roadmap → cards: blackout
+    [], // Cards → taxonomy
     [], // Taxonomy → team
     [], // Team → Free: planet transition
     [], // Free → Pro: price transition
