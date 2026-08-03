@@ -2658,18 +2658,16 @@ h2 {
   letter-spacing: -0.02em;
 }
 
-.slide-roadmap-builder .roadmap-metric--deadline > h3 {
+.slide-roadmap-builder .roadmap-metric--deadline > p {
   max-width: 350px;
-  margin: 0;
-  color: transparent;
-  background: var(--roadmap-accent-gradient);
-  background-clip: text;
-  font-size: 58px;
-  font-weight: 720;
-  line-height: 0.98;
-  letter-spacing: -0.055em;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin: 0 0 0 7px;
+  color: #29292d;
+  background: none;
+  font-size: 31px;
+  font-weight: 630;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  -webkit-text-fill-color: currentColor;
 }
 
 .roadmap-word-wheel {
@@ -2991,7 +2989,7 @@ h2 {
   height: 30px;
   place-items: center;
   border-radius: 50%;
-  background: var(--roadmap-accent-gradient);
+  background: #4286f4;
   box-shadow: 0 8px 20px rgba(var(--roadmap-accent-rgb), 0.22);
   color: #fff;
   font-size: 15px;
