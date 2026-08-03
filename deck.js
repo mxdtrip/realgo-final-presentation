@@ -40,6 +40,8 @@
   const roadmapList = document.querySelector(".roadmap-list");
   const roadmapItems = roadmapList ? Array.from(roadmapList.children) : [];
   const roadmapSlide = roadmapList?.closest(".slide") || null;
+  const roadmapBuilderSlide = document.querySelector(".slide-roadmap-builder");
+  if (roadmapBuilderSlide) roadmapBuilderSlide.dataset.roadmapStage = "0";
   const teamSlide = document.querySelector(".slide-team");
   const teamHandles = Array.from(document.querySelectorAll("[data-team-index]"));
   const teamOrbits = Array.from(document.querySelectorAll(".team-orbit"));
@@ -423,6 +425,8 @@
   let activeRoadmapItem = 0;
   let roadmapTimer = null;
   let roadmapStartTimer = null;
+  let roadmapBuilderStage = 0;
+  const ROADMAP_BUILDER_STAGES = 5;
   const ROADMAP_STEP = 2200;
   const JOURNEY_ROUTE_DELAY = 180;
   const JOURNEY_ROUTE_DURATION = 5400;
@@ -1804,6 +1808,14 @@
       slide.setAttribute("aria-hidden", isVisualSlide ? "false" : "true");
     });
 
+    if (currentSlideElement === roadmapBuilderSlide && previousSlideElement !== roadmapBuilderSlide) {
+      roadmapBuilderStage = nextSlide < previousSlide ? ROADMAP_BUILDER_STAGES : 0;
+      roadmapBuilderSlide.dataset.roadmapStage = String(roadmapBuilderStage);
+    } else if (currentSlideElement !== roadmapBuilderSlide && roadmapBuilderSlide) {
+      roadmapBuilderStage = 0;
+      roadmapBuilderSlide.dataset.roadmapStage = "0";
+    }
+
     currentSlideElement.querySelectorAll("[data-product-note]").forEach((note) => {
       note.hidden = note.dataset.productNote !== logicalProductMode;
     });
@@ -1993,10 +2005,20 @@
   }
 
   function nextSlide() {
+    if (visualSlideAt(currentSlide) === roadmapBuilderSlide && roadmapBuilderStage < ROADMAP_BUILDER_STAGES) {
+      roadmapBuilderStage += 1;
+      roadmapBuilderSlide.dataset.roadmapStage = String(roadmapBuilderStage);
+      return;
+    }
     showSlide(currentSlide + 1);
   }
 
   function previousSlide() {
+    if (visualSlideAt(currentSlide) === roadmapBuilderSlide && roadmapBuilderStage > 0) {
+      roadmapBuilderStage -= 1;
+      roadmapBuilderSlide.dataset.roadmapStage = String(roadmapBuilderStage);
+      return;
+    }
     showSlide(currentSlide - 1);
   }
 
