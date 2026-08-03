@@ -3276,13 +3276,13 @@ h2 {
   left: 130px;
   z-index: 6;
   padding: 28px 30px 30px;
-  border: 1px solid rgba(31, 42, 58, 0.12);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.66);
-  box-shadow: 0 30px 80px rgba(44, 61, 84, 0.09), inset 0 1px #fff;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   opacity: 0;
   transform: translateY(24px);
-  backdrop-filter: blur(18px);
+  backdrop-filter: none;
 }
 
 .roadmap-final-plan > header {
@@ -3557,7 +3557,7 @@ h2 {
 
 .roadmap-final-plan__summary {
   position: absolute;
-  right: 30px;
+  right: auto;
   bottom: 28px;
   left: 30px;
   display: flex;
@@ -3584,6 +3584,10 @@ h2 {
   min-width: 138px;
   padding: 0 24px;
   border-right: 1px solid rgba(31, 42, 58, 0.09);
+}
+
+.roadmap-final-plan__metrics > span:last-child {
+  border-right: 0;
 }
 
 .roadmap-final-plan__metrics b {
