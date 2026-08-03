@@ -3246,42 +3246,17 @@ h2 {
 
 .stack-heading {
   position: relative;
-  display: grid;
-  grid-template-columns: 690px 430px;
-  grid-template-rows: auto auto;
-  align-items: end;
-  column-gap: 80px;
-  height: 210px;
-}
-
-.stack-heading .kicker {
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: #6bdcff;
+  display: flex;
+  align-items: flex-end;
+  height: 120px;
 }
 
 .stack-heading h2 {
-  grid-row: 1 / 3;
-  align-self: end;
   margin: 0;
-  font-size: 66px;
+  font-size: 64px;
   line-height: 0.96;
   letter-spacing: -0.058em;
-}
-
-.stack-heading h2 strong {
-  font-weight: 800;
-}
-
-.stack-heading > p:last-child {
-  grid-column: 2;
-  grid-row: 2;
-  width: 430px;
-  margin: 0 0 4px;
-  color: rgba(226, 232, 240, 0.58);
-  font-size: 19px;
-  line-height: 1.48;
+  white-space: nowrap;
 }
 
 .stack-system {
@@ -5577,15 +5552,13 @@ h2 {
 
 .slide-macbook .product-heading h2 {
   margin: 0;
-  color: transparent;
-  background: linear-gradient(102deg, #eef2f7 0%, #aebdce 50%, #4286f4 100%);
-  background-clip: text;
+  color: #eef2f7;
+  background: none;
   font-size: 48px;
   font-weight: 610;
   line-height: 1.01;
   letter-spacing: -0.052em;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: currentColor;
 }
 
 .product-story {
@@ -5634,10 +5607,12 @@ h2 {
 }
 
 .product-story h2 strong {
-  color: inherit;
-  background: none;
+  color: transparent;
+  background: linear-gradient(102deg, #dce8ff 0%, #8eb8ff 46%, #4286f4 100%);
+  background-clip: text;
   font-weight: 650;
-  -webkit-text-fill-color: inherit;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .product-story__lead {
