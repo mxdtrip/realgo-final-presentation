@@ -2482,7 +2482,7 @@ h2 {
 /* Roadmap story v2 — Apple-style typography and fully transparent wheels. */
 
 .slide-roadmap-builder {
-  --roadmap-accent-gradient: linear-gradient(102deg, #bdc3c7 0%, #2c3e50 100%);
+  --roadmap-accent-gradient: linear-gradient(102deg, #373b44 0%, #4286f4 100%);
   --roadmap-accent-rgb: 52, 136, 255;
   padding: 0;
   background:
