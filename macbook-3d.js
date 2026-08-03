@@ -188,7 +188,6 @@ if (stage && slots.length) {
   let contactShadow = null;
   let contactBaseY = 0;
   let revealStartedAt = performance.now();
-  let uiFocusStartedAt = Number.POSITIVE_INFINITY;
   let screenPlaneWidth = 0;
   let screenPlaneHeight = 0;
   let screenCenter = null;
@@ -201,7 +200,6 @@ if (stage && slots.length) {
   let trackedPanelWidth = 400;
   let trackedPanelHeight = 372;
   const planeCenter = new THREE.Vector3();
-  const shadowCenter = new THREE.Vector3();
   const screenBasisMatrix = new THREE.Matrix4();
   const panelResizeObserver = typeof ResizeObserver === "undefined"
     ? null
@@ -580,7 +578,7 @@ if (stage && slots.length) {
     return productUiObject;
   }
 
-  function updateProductObject(now) {
+  function updateProductObject() {
     if (!activeSlot || !screenCenter || !screenRight || !screenUp || !screenNormal || !screenPlaneWidth || !screenPlaneHeight) return;
     const object = ensureProductObject();
     if (!object) return;
@@ -594,51 +592,39 @@ if (stage && slots.length) {
     const panelHeight = object.element.classList.contains("is-height-transitioning")
       ? object.element.offsetHeight || trackedPanelHeight
       : trackedPanelHeight;
-    const rawProgress = Number.isFinite(uiFocusStartedAt)
-      ? THREE.MathUtils.clamp((now - uiFocusStartedAt) / 1450, 0, 1)
-      : 0;
-    const progress = 1 - Math.pow(1 - rawProgress, 4);
     const tallPanel = panelHeight > 450;
     const storyPanel = activeMode === "extension" || activeMode === "agent" || activeMode === "rating";
     const widthFraction = storyPanel ? 0.28 : tallPanel ? 0.27 : 0.35;
     const worldWidth = screenPlaneWidth * widthFraction;
     const worldHeight = worldWidth * panelHeight / panelWidth;
     const margin = screenPlaneWidth * 0.025;
-    const lateralLift = storyPanel ? 0.095 : 0.105;
-    // Keep every product window slightly below and to the right throughout
-    // its full entrance/lift path. Slides 9+ reuse this same CSS3D object, so
-    // one screen-relative offset keeps the whole sequence spatially stable.
-    const spawnOffsetX = screenPlaneWidth * 0.025;
-    const spawnOffsetY = screenPlaneHeight * 0.02;
+    const panelInsetX = storyPanel ? 0.095 : 0.105;
+    // Product windows stay attached to one fixed screen-relative point across
+    // slides 8–11. Only their contents change; there is no depth or lateral
+    // lift away from the physical display.
+    const screenOffsetX = screenPlaneWidth * 0.025;
+    const screenOffsetY = screenPlaneHeight * 0.02;
     const centerX = screenPlaneWidth * 0.5 - margin - worldWidth * 0.5
-      + spawnOffsetX
-      + screenPlaneWidth * lateralLift * progress
-      - screenPlaneWidth * EXTENSION_SETTLED_SHIFT_LEFT * progress;
+      + screenOffsetX
+      + screenPlaneWidth * panelInsetX
+      - screenPlaneWidth * EXTENSION_SETTLED_SHIFT_LEFT;
     const storyTopY = -screenPlaneHeight * 0.195 + worldWidth * (520 / 400) * 0.5;
     const settledCenterY = storyPanel ? storyTopY - worldHeight * 0.5 : -screenPlaneHeight * 0.065;
-    const centerY = settledCenterY - spawnOffsetY;
+    const centerY = settledCenterY - screenOffsetY;
     planeCenter.copy(screenCenter)
       .addScaledVector(screenRight, centerX)
       .addScaledVector(screenUp, centerY)
-      .addScaledVector(screenNormal, screenPlaneWidth * 0.025 * progress);
+      .addScaledVector(screenNormal, screenPlaneWidth * 0.0012);
     object.position.copy(planeCenter);
     // CSS3DObject uses one uniform world-units-per-CSS-pixel scale. The DOM
     // panel therefore keeps its native aspect ratio; camera perspective is
     // supplied by the same Three.js camera that renders the MacBook.
     object.scale.setScalar(worldWidth / panelWidth);
 
-    // CSS3D elements cannot cast WebGL shadows. Render a separate soft plane
-    // directly on the display so the lifted window leaves a real projected
-    // shadow on the monitor instead of carrying a fake duplicate outline.
+    // A screen-attached window does not cast a detached projected shadow.
     const screenShadow = ensureProductScreenShadow();
-    shadowCenter.copy(screenCenter)
-      .addScaledVector(screenRight, centerX - screenPlaneWidth * 0.045 * progress)
-      .addScaledVector(screenUp, centerY - screenPlaneHeight * 0.018 * progress)
-      .addScaledVector(screenNormal, screenPlaneWidth * 0.0012);
-    screenShadow.position.copy(shadowCenter);
-    screenShadow.scale.set(worldWidth * 1.12, worldHeight * 1.12, 1);
-    screenShadow.material.opacity = 0.62 * progress;
-    screenShadow.visible = progress > 0.001;
+    screenShadow.material.opacity = 0;
+    screenShadow.visible = false;
   }
 
   function renderNow() {
@@ -648,7 +634,7 @@ if (stage && slots.length) {
     updateCameraMove(now);
     updateScreenStory(now);
     modelPivot.updateMatrixWorld(true);
-    updateProductObject(now);
+    updateProductObject();
     renderer.render(scene, camera);
     cssRenderer.render(scene, camera);
   }
@@ -677,9 +663,6 @@ if (stage && slots.length) {
     // 10 → 11 → 12 → 13 все четыре источника гасли в ноль и заново
     // разгорались 1650мс, из-за чего сцена вспыхивала повторно.
     if (enterFromWide) revealStartedAt = performance.now();
-    uiFocusStartedAt = slot.closest(".slide")?.classList.contains("is-product-focus")
-      ? performance.now() - 1450
-      : Number.POSITIVE_INFINITY;
     const requestedMode = activeSlot.dataset.macbookMode;
     drawScreen(requestedMode, true);
     const cameraMode = requestedMode === "extension-intro" ? "extensionIntro" : activeMode;
@@ -711,9 +694,6 @@ if (stage && slots.length) {
   window.addEventListener("realgo:codetypingstart", () => {
     if (activeMode !== "agent") return;
     startCameraMove("agentScreen");
-  });
-  window.addEventListener("realgo:productfocus", (event) => {
-    uiFocusStartedAt = performance.now() - (event.detail?.immediate ? 1450 : 0);
   });
   window.addEventListener("resize", resizeRenderer);
 
@@ -912,24 +892,23 @@ if (stage && slots.length) {
       pose.fov = config.fov;
     }
 
-    // The window keeps its original spawn point and only shifts left as it
-    // lifts off the display. Follow that final screen-relative position with
-    // the camera while preserving the established viewing angle.
+    // Compose the camera around the window's fixed screen-relative position
+    // while preserving the established viewing angle.
     const extensionCameraShiftX = screenPlaneWidth * EXTENSION_SETTLED_SHIFT_LEFT;
 
-    // Slide 8 keeps the established three-quarter angle, but pulls back far
-    // enough to retain the complete display inside the frame.
+    // Slide 8 keeps the established three-quarter angle, with a slightly
+    // lower lens and tighter final framing around the display.
     configureScreenShot("extensionIntro", {
-      distance: 6.05,
+      distance: 5.72,
       cameraX: -1.72,
-      cameraY: 0.34,
+      cameraY: 0.1,
       targetX: 0,
-      targetY: 0,
+      targetY: -0.08,
       frameYFraction: -0.25,
       fov: 25,
     });
-    // On slide 9 the camera crosses to the right of the floating extension
-    // and aims at the extension's screen-relative centre.
+    // On slide 9 the camera crosses to the right and aims at the extension's
+    // fixed screen-relative centre.
     configureScreenShot("extension", {
       distance: 3.15,
       cameraX: 1.38 - extensionCameraShiftX,
@@ -1032,7 +1011,7 @@ if (stage && slots.length) {
       updateCameraMove(now);
       updateScreenStory(now);
       modelPivot.updateMatrixWorld(true);
-      updateProductObject(now);
+      updateProductObject();
       renderer.render(scene, camera);
       cssRenderer.render(scene, camera);
     }

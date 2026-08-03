@@ -274,9 +274,8 @@ function activateDemo(event?: Event) {
     }, hintDelay));
   }
 
-  // Once the window has detached from the display, keep that exact DOM node
-  // and CSS3D object alive for every adjacent product slide. Only React state
-  // and intrinsic height change; opacity and the lift animation never reset.
+  // Keep the exact DOM node and CSS3D object attached to the display for every
+  // adjacent product slide. Only React state and intrinsic height change.
   if (continuesProductSequence) {
     slide.classList.add("is-camera-settled");
     if (mode !== "extension-intro" && !(mode === "extension" && previousMode === "extension-intro")) {
