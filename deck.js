@@ -1539,15 +1539,17 @@
       && readPrice(slides[nextIndex]) !== null;
   }
 
-  // Якорь — левый верхний угол знака валюты, а НЕ центр связки «$ + цифры».
-  // При центрировании на разряде 9 → 10 бокс цифр разом становится шире на
-  // слот, и всё содержимое рывком съезжает влево на пол-слота. С привязкой
-  // по левому краю «$» стоит на месте, а число растёт вправо — как в одометре.
+  // Якорь — левый верхний угол блока цифр, а НЕ центр связки «цифры + валюта».
+  // При центрировании смена разряда (0 → 699 проходит 9 → 10 и 99 → 100)
+  // разом расширяет бокс на слот, и всё содержимое рывком съезжает влево на
+  // пол-слота. С привязкой по левому краю число растёт вправо, как в одометре,
+  // а «руб.» едет за ним. Раньше якорем была валюта — она стояла перед числом;
+  // теперь она справа, и держать надо именно левый край цифр.
   function priceAnchor(root) {
-    const currency = root?.querySelector(".price-currency");
-    if (!currency) return null;
+    const value = root?.querySelector(".price-value");
+    if (!value) return null;
 
-    const rect = currency.getBoundingClientRect();
+    const rect = value.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     const scale = getStageScale();
     return {
