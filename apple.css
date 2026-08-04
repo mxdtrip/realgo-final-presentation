@@ -8406,6 +8406,29 @@ h2 {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Keep the architecture column labels quiet and geometrically centered. */
+
+.slide-stack .architecture-zone > header,
+.slide-stack .architecture-gateway > header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.slide-stack .architecture-zone > header > span,
+.slide-stack .architecture-zone > header > small,
+.slide-stack .architecture-gateway > header > span {
+  display: none;
+}
+
+.slide-stack .architecture-zone > header > strong,
+.slide-stack .architecture-gateway > header > strong {
+  width: 100%;
+  text-align: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .slide-roadmap-builder .roadmap-picker,
   .slide-roadmap-builder .roadmap-picker > header b,
