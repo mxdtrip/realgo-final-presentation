@@ -5852,11 +5852,11 @@ h2 {
 /* AI development stack above the runtime architecture. */
 
 .slide-stack .stack-keynote {
-  inset: 84px 130px 28px;
+  inset: 94px 130px 28px;
 }
 
 .slide-stack .stack-heading {
-  height: 56px;
+  height: 64px;
 }
 
 .slide-stack .stack-heading h2 {
@@ -5867,9 +5867,9 @@ h2 {
 
 .ai-development-stack {
   display: grid;
-  height: 96px;
+  height: 104px;
   grid-template-columns: 270px 1fr 1.08fr 0.92fr;
-  margin-top: 12px;
+  margin-top: 18px;
   border: 1px solid rgba(117, 159, 205, 0.2);
   border-radius: 20px;
   background:
@@ -5975,7 +5975,7 @@ h2 {
 }
 
 .slide-stack .architecture-map {
-  margin-top: 14px;
+  margin-top: 28px;
 }
 
 .slide-stack.is-active .ai-development-stack {
