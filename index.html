@@ -461,25 +461,6 @@
               <h2>Как данные проходят через ReAlgo.</h2>
             </header>
 
-            <section class="ai-development-stack" aria-label="AI-стек, использованный при разработке ReAlgo">
-              <header class="ai-development-stack__intro">
-                <span>AI-стек разработки</span>
-                <strong>Как создавался продукт</strong>
-              </header>
-              <article class="ai-development-stack__item ai-development-stack__item--openai">
-                <span class="ai-development-stack__logo"><img src="assets/ai-stack-openai.svg" alt="OpenAI" /></span>
-                <div><small>Архитектура</small><strong>ChatGPT 5.6 Sol</strong></div>
-              </article>
-              <article class="ai-development-stack__item ai-development-stack__item--claude">
-                <span class="ai-development-stack__logo"><img src="assets/ai-stack-claude.svg" alt="Claude" /></span>
-                <div><small>Генерация кода</small><strong>Claude Code · Fable 5</strong></div>
-              </article>
-              <article class="ai-development-stack__item ai-development-stack__item--kodik">
-                <span class="ai-development-stack__logo"><img src="assets/ai-stack-kodik.svg" alt="Kodik AI" /></span>
-                <div><small>Чтение и создание документации</small><strong>Kodik AI</strong></div>
-              </article>
-            </section>
-
             <div class="architecture-map" aria-label="Схема архитектуры ReAlgo">
               <svg class="architecture-links" viewBox="0 0 1660 570" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
@@ -570,7 +551,7 @@
               </footer>
             </div>
           </div>
-          <aside class="speaker-notes"><strong>03:40–04:05</strong><p>Сначала коротко про AI-стек разработки: архитектуру проектировали с ChatGPT 5.6 Sol, код генерировали через Claude Code Fable 5, документацию читали и создавали с Kodik AI. Ниже — уже runtime-архитектура продукта. Слева два клиента: кабинет на Next.js и расширение на Plasmo. Оба приходят по HTTPS через Caddy в модульный Go API. API хранит постоянное состояние в PostgreSQL, а Redis использует для кэша, блокировок и лимитов. FSRS внутри API рассчитывает повторения. Отдельный AI Orchestrator собирает условие, текущий код и паттерны, вызывает Gemini 2.5 Flash через provider adapter и строго валидирует JSON. Подсказки возвращаются в расширение потоком SSE, а три сгенерированные карточки дедуплицируются и сохраняются в PostgreSQL.</p></aside>
+          <aside class="speaker-notes"><strong>03:40–04:05</strong><p>Слева два клиента: кабинет на Next.js и расширение на Plasmo. Оба приходят по HTTPS через Caddy в модульный Go API. API хранит постоянное состояние в PostgreSQL, а Redis использует для кэша, блокировок и лимитов. FSRS внутри API рассчитывает повторения. Отдельный AI Orchestrator собирает условие, текущий код и паттерны, вызывает Gemini 2.5 Flash через provider adapter и строго валидирует JSON. Подсказки возвращаются в расширение потоком SSE, а три сгенерированные карточки дедуплицируются и сохраняются в PostgreSQL.</p></aside>
         </section>
 
         <section class="slide theme-dark slide-macbook slide-macbook-extension-intro" data-slide="9-intro" data-order="9" data-theme="dark">
